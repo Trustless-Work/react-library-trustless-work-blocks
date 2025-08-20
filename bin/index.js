@@ -245,7 +245,7 @@ function parseFlags(argv) {
 function copyTemplate(name, { uiBase, shouldInstall = false } = {}) {
   const srcFile = path.join(TEMPLATES_DIR, `${name}.tsx`);
   const srcDir = path.join(TEMPLATES_DIR, name);
-  const outRoot = path.join(PROJECT_ROOT, "components", "tw-blocks");
+  const outRoot = path.join(PROJECT_ROOT, "src", "components", "tw-blocks");
 
   const config = loadConfig();
   const effectiveUiBase = uiBase || config.uiBase || "@/components/ui";
@@ -261,6 +261,7 @@ function copyTemplate(name, { uiBase, shouldInstall = false } = {}) {
   if (fs.existsSync(srcDir) && fs.lstatSync(srcDir).isDirectory()) {
     // Copy directory recursively
     const destDir = path.join(outRoot, name);
+    fs.mkdirSync(destDir, { recursive: true });
     const stack = [""];
     while (stack.length) {
       const rel = stack.pop();
@@ -285,6 +286,7 @@ function copyTemplate(name, { uiBase, shouldInstall = false } = {}) {
       }
     }
   } else if (fs.existsSync(srcFile)) {
+    fs.mkdirSync(outRoot, { recursive: true });
     const destFile = path.join(outRoot, name + ".tsx");
     writeTransformed(srcFile, destFile);
   } else {
@@ -308,7 +310,7 @@ if (args[0] === "init") {
   }
 
   const addShadcn = await promptYesNo(
-    "Add shadcn components (button, input, form, card, sonner, checkbox, dialog, textarea)?",
+    "Add shadcn components (button, input, form, card, sonner, checkbox, dialog, textarea, sonner, select)?",
     true
   );
   if (addShadcn) {
@@ -324,6 +326,8 @@ if (args[0] === "init") {
         "checkbox",
         "dialog",
         "textarea",
+        "sonner",
+        "select",
       ]);
     });
   } else {
@@ -336,7 +340,7 @@ if (args[0] === "init") {
   }
   const meta = JSON.parse(fs.readFileSync(GLOBAL_DEPS_FILE, "utf8"));
   const installLibs = await promptYesNo(
-    "Install (react-hook-form, zod, @tanstack/react-query, @tanstack/react-query-devtools, @trustless-work/escrow, @hookform/resolvers, @creit.tech/stellar-wallets-kit & zod) dependencies now?",
+    "Install (react-hook-form, zod, @tanstack/react-query, @tanstack/react-query-devtools, @trustless-work/escrow, @hookform/resolvers, axios, @creit.tech/stellar-wallets-kit & zod) dependencies now?",
     true
   );
   if (installLibs) {
