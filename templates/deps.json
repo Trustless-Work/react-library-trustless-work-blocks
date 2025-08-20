@@ -12,7 +12,9 @@
     "typescript": "^5.6.3",
     "@hookform/resolvers": "^3.10.0",
     "@creit.tech/stellar-wallets-kit": "^1.8.0",
-    "axios": "^1.7.9"
+    "axios": "^1.7.9",
+    "@tanstack/react-table": "^8.21.3",
+    "react-day-picker": "^9.5.0"
   },
   "devDependencies": {
     "postcss": "^8",
