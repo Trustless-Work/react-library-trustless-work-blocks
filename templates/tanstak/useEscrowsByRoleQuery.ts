@@ -5,10 +5,13 @@ import {
 } from "@trustless-work/escrow";
 import { GetEscrowsFromIndexerResponse as Escrow } from "@trustless-work/escrow/types";
 
-interface UseEscrowsByRoleQueryParams
-  extends GetEscrowsFromIndexerByRoleParams {
+type UseEscrowsByRoleQueryParams = Omit<
+  GetEscrowsFromIndexerByRoleParams,
+  "role"
+> & {
+  role?: GetEscrowsFromIndexerByRoleParams["role"];
   enabled?: boolean;
-}
+};
 
 export const useEscrowsByRoleQuery = ({
   role,
@@ -48,6 +51,9 @@ export const useEscrowsByRoleQuery = ({
       type,
     ],
     queryFn: async (): Promise<Escrow[]> => {
+      if (!role) {
+        throw new Error("Role is required to fetch escrows by role");
+      }
       const escrows = await getEscrowsByRole({
         role,
         roleAddress,
