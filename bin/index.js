@@ -310,7 +310,7 @@ if (args[0] === "init") {
   }
 
   const addShadcn = await promptYesNo(
-    "Add shadcn components (button, input, form, card, sonner, checkbox, dialog, textarea, sonner, select)?",
+    "Add shadcn components (button, input, form, card, sonner, checkbox, dialog, textarea, sonner, select, table, calendar, popover, separator)?",
     true
   );
   if (addShadcn) {
@@ -328,6 +328,10 @@ if (args[0] === "init") {
         "textarea",
         "sonner",
         "select",
+        "table",
+        "calendar",
+        "popover",
+        "separator",
       ]);
     });
   } else {
@@ -340,7 +344,7 @@ if (args[0] === "init") {
   }
   const meta = JSON.parse(fs.readFileSync(GLOBAL_DEPS_FILE, "utf8"));
   const installLibs = await promptYesNo(
-    "Install (react-hook-form, zod, @tanstack/react-query, @tanstack/react-query-devtools, @trustless-work/escrow, @hookform/resolvers, axios, @creit.tech/stellar-wallets-kit & zod) dependencies now?",
+    "Install (react-hook-form, zod, @tanstack/react-query, @tanstack/react-query-devtools, @trustless-work/escrow, @hookform/resolvers, axios, @creit.tech/stellar-wallets-kit, react-day-picker & zod) dependencies now?",
     true
   );
   if (installLibs) {
