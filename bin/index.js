@@ -1,8 +1,17 @@
 #!/usr/bin/env node
+
+/* 
+ AUTHOR: @trustless-work / Joel Vargas
+ COPYRIGHT: 2025 Trustless Work
+ LICENSE: MIT
+ VERSION: 1.0.0
+*/
+
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { spawnSync } from "node:child_process";
+import { spawnSync, spawn } from "node:child_process";
+import readline from "node:readline";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -29,10 +38,166 @@ function run(cmd, args) {
   if (r.status !== 0) process.exit(r.status ?? 1);
 }
 
+function tryRun(cmd, args, errorMessage) {
+  const r = spawnSync(cmd, args.filter(Boolean), {
+    stdio: "inherit",
+    cwd: PROJECT_ROOT,
+    shell: true,
+  });
+  if (r.status !== 0) {
+    console.error(errorMessage);
+    process.exit(r.status ?? 1);
+  }
+}
+
+async function runAsync(cmd, args) {
+  return new Promise((resolve, reject) => {
+    const child = spawn(cmd, args.filter(Boolean), {
+      stdio: "inherit",
+      cwd: PROJECT_ROOT,
+      shell: true,
+    });
+    child.on("close", (code) => {
+      if (code === 0) resolve();
+      else reject(new Error(`${cmd} exited with code ${code}`));
+    });
+  });
+}
+
+const COLORS = {
+  reset: "\x1b[0m",
+  green: "\x1b[32m",
+  gray: "\x1b[90m",
+  blueTW: "\x1b[38;2;0;107;228m",
+};
+
+function logCheck(message) {
+  console.log(`${COLORS.green}✔${COLORS.reset} ${message}`);
+}
+
+function startSpinner(message) {
+  const frames = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
+  let i = 0;
+  process.stdout.write(`${frames[0]} ${message}`);
+  const timer = setInterval(() => {
+    i = (i + 1) % frames.length;
+    process.stdout.write(`\r${frames[i]} ${message}`);
+  }, 80);
+  return () => {
+    clearInterval(timer);
+    process.stdout.write("\r");
+  };
+}
+
+async function withSpinner(message, fn) {
+  const stop = startSpinner(message);
+  try {
+    await fn();
+    stop();
+    logCheck(message);
+  } catch (err) {
+    stop();
+    throw err;
+  }
+}
+
+async function promptYesNo(question, def = true) {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+  const suffix = def ? "(Y/n)" : "(y/N)";
+  const answer = await new Promise((res) =>
+    rl.question(`${question} ${suffix} `, (ans) => res(ans))
+  );
+  rl.close();
+  const a = String(answer).trim().toLowerCase();
+  if (!a) return def;
+  return a.startsWith("y");
+}
+
+function oscHyperlink(text, url) {
+  return `\x1b]8;;${url}\x1b\\${text}\x1b]8;;\x1b\\`;
+}
+
+function printBannerTRUSTLESSWORK() {
+  const map = {
+    T: ["******", "  **  ", "  **  ", "  **  ", "  **  "],
+    R: ["***** ", "**  **", "***** ", "** ** ", "**  **"],
+    U: ["**  **", "**  **", "**  **", "**  **", " **** "],
+    S: [" **** ", "**    ", " **** ", "    **", " **** "],
+    L: ["**    ", "**    ", "**    ", "**    ", "******"],
+    E: ["******", "**    ", "***** ", "**    ", "******"],
+    W: ["**   **", "**   **", "** * **", "*** ***", "**   **"],
+    O: [" **** ", "**  **", "**  **", "**  **", " **** "],
+    K: ["**  **", "** ** ", "****  ", "** ** ", "**  **"],
+    " ": ["   ", "   ", "   ", "   ", "   "],
+  };
+  const text = "TRUSTLESS WORK";
+  const rows = ["", "", "", "", ""];
+  for (const ch of text) {
+    const glyph = map[ch] || map[" "];
+    for (let i = 0; i < 5; i++) {
+      rows[i] += glyph[i] + " ";
+    }
+  }
+  console.log("\n\n");
+  for (const line of rows) {
+    console.log(`${COLORS.blueTW}${line}${COLORS.reset}`);
+  }
+}
+
+function readProjectPackageJson() {
+  const pkgPath = path.join(PROJECT_ROOT, "package.json");
+  if (!fs.existsSync(pkgPath)) return null;
+  try {
+    return JSON.parse(fs.readFileSync(pkgPath, "utf8"));
+  } catch {
+    return null;
+  }
+}
+
+function getInstalledVersion(pkgName) {
+  const pkg = readProjectPackageJson();
+  if (!pkg) return null;
+  const all = { ...(pkg.dependencies || {}), ...(pkg.devDependencies || {}) };
+  return all[pkgName] || null;
+}
+
+function getMajorVersion(range) {
+  if (!range) return null;
+  // crude parse for ranges like ^4.1.0, ~4.0.0, 4.0.0, >=4
+  const m = range.match(/(\d+)\./) || range.match(/^(\d+)$/);
+  return m ? parseInt(m[1], 10) : null;
+}
+
+function hasTailwindConfig() {
+  const candidates = [
+    "tailwind.config.ts",
+    "tailwind.config.js",
+    "tailwind.config.mjs",
+    "tailwind.config.cjs",
+  ];
+  return candidates.some((f) => fs.existsSync(path.join(PROJECT_ROOT, f)));
+}
+
 function installDeps({ dependencies = {}, devDependencies = {} }) {
   const pm = detectPM();
-  const depList = Object.entries(dependencies).map(([k, v]) => `${k}@${v}`);
-  const devList = Object.entries(devDependencies).map(([k, v]) => `${k}@${v}`);
+  const BLOCKED = new Set([
+    "tailwindcss",
+    "@tailwindcss/cli",
+    "@tailwindcss/postcss",
+    "@tailwindcss/vite",
+    "postcss",
+    "autoprefixer",
+    "postcss-import",
+  ]);
+  const depList = Object.entries(dependencies)
+    .filter(([k]) => !BLOCKED.has(k))
+    .map(([k, v]) => `${k}@${v}`);
+  const devList = Object.entries(devDependencies)
+    .filter(([k]) => !BLOCKED.has(k))
+    .map(([k, v]) => `${k}@${v}`);
 
   if (depList.length) {
     if (pm === "pnpm") run("pnpm", ["add", ...depList]);
@@ -70,12 +235,14 @@ function parseFlags(argv) {
     } else if (a === "--ui-base") {
       flags.uiBase = argv[i + 1];
       i++;
+    } else if (a === "--install" || a === "-i") {
+      flags.install = true;
     }
   }
   return flags;
 }
 
-function copyTemplate(name, { uiBase } = {}) {
+function copyTemplate(name, { uiBase, shouldInstall = false } = {}) {
   const srcFile = path.join(TEMPLATES_DIR, `${name}.tsx`);
   const srcDir = path.join(TEMPLATES_DIR, name);
   const outRoot = path.join(PROJECT_ROOT, "components", "tw-blocks");
@@ -125,27 +292,136 @@ function copyTemplate(name, { uiBase } = {}) {
     process.exit(1);
   }
 
-  if (fs.existsSync(GLOBAL_DEPS_FILE)) {
+  if (shouldInstall && fs.existsSync(GLOBAL_DEPS_FILE)) {
     const meta = JSON.parse(fs.readFileSync(GLOBAL_DEPS_FILE, "utf8"));
     installDeps(meta);
   }
 }
 
-if (args[0] === "add" && args[1]) {
+if (args[0] === "init") {
+  console.log("\n▶ Setting up shadcn/ui components...");
+  const doInit = await promptYesNo("Run shadcn init now?", true);
+  if (doInit) {
+    run("npx", ["shadcn@latest", "init"]);
+  } else {
+    console.log("\x1b[90m– Skipped shadcn init\x1b[0m");
+  }
+
+  const addShadcn = await promptYesNo(
+    "Add shadcn components (button, input, form, card, sonner, checkbox, dialog, textarea)?",
+    true
+  );
+  if (addShadcn) {
+    await withSpinner("Installing shadcn/ui components", async () => {
+      await runAsync("npx", [
+        "shadcn@latest",
+        "add",
+        "button",
+        "input",
+        "form",
+        "card",
+        "sonner",
+        "checkbox",
+        "dialog",
+        "textarea",
+      ]);
+    });
+  } else {
+    console.log("\x1b[90m– Skipped adding shadcn components\x1b[0m");
+  }
+
+  if (!fs.existsSync(GLOBAL_DEPS_FILE)) {
+    console.error("❌ deps.json not found in templates/");
+    process.exit(1);
+  }
+  const meta = JSON.parse(fs.readFileSync(GLOBAL_DEPS_FILE, "utf8"));
+  const installLibs = await promptYesNo(
+    "Install (react-hook-form, zod, @tanstack/react-query, @tanstack/react-query-devtools, @trustless-work/escrow, @hookform/resolvers, @creit.tech/stellar-wallets-kit & zod) dependencies now?",
+    true
+  );
+  if (installLibs) {
+    await withSpinner("Installing required dependencies", async () => {
+      installDeps(meta);
+    });
+  } else {
+    console.log("\x1b[90m– Skipped installing required dependencies\x1b[0m");
+  }
+  const cfgPath = path.join(PROJECT_ROOT, ".twblocks.json");
+  if (!fs.existsSync(cfgPath)) {
+    fs.writeFileSync(
+      cfgPath,
+      JSON.stringify({ uiBase: "@/components/ui" }, null, 2)
+    );
+    console.log(
+      `\x1b[32m✔\x1b[0m Created ${path.relative(
+        PROJECT_ROOT,
+        cfgPath
+      )} with default uiBase`
+    );
+  }
+  console.log("\x1b[32m✔\x1b[0m shadcn/ui components step completed");
+
+  printBannerTRUSTLESSWORK();
+  console.log("\n\nResources");
+  console.log("- " + oscHyperlink("Website", "https://trustlesswork.com"));
+  console.log(
+    "- " + oscHyperlink("Documentation", "https://docs.trustlesswork.com")
+  );
+  console.log("- " + oscHyperlink("Demo", "https://demo.trustlesswork.com"));
+  console.log(
+    "- " + oscHyperlink("Backoffice", "https://dapp.trustlesswork.com")
+  );
+  console.log(
+    "- " + oscHyperlink("GitHub", "https://github.com/trustless-work")
+  );
+  console.log(
+    "- " + oscHyperlink("Escrow Viewer", "https://viewer.trustlesswork.com")
+  );
+  console.log(
+    "- " + oscHyperlink("Telegram", "https://t.me/+kmr8tGegxLU0NTA5")
+  );
+  console.log(
+    "- " +
+      oscHyperlink(
+        "LinkedIn",
+        "https://www.linkedin.com/company/trustlesswork/posts/?feedView=all"
+      )
+  );
+  console.log("- " + oscHyperlink("X", "https://x.com/TrustlessWork"));
+} else if (args[0] === "add" && args[1]) {
   const flags = parseFlags(args.slice(2));
-  copyTemplate(args[1], { uiBase: flags.uiBase });
+  const cfgPath = path.join(PROJECT_ROOT, ".twblocks.json");
+  if (!fs.existsSync(cfgPath)) {
+    console.error(
+      "❌ Missing initial setup. Run 'trustless-work init' first to install dependencies and create .twblocks.json (uiBase)."
+    );
+    console.error(
+      "   After init, re-run: trustless-work add " +
+        args[1] +
+        (flags.uiBase ? ' --ui-base "' + flags.uiBase + '"' : "")
+    );
+    process.exit(1);
+  }
+  copyTemplate(args[1], {
+    uiBase: flags.uiBase,
+    shouldInstall: !!flags.install,
+  });
 } else {
   console.log(`
 Usage:
-  trustless-work add <template>
+  trustless-work init
+  trustless-work add <template> [--install]
 Options:
   --ui-base <path>      Base import path to your shadcn/ui components (default: "@/components/ui")
+  --install, -i         Also install dependencies (normally use 'init' once instead)
 
 Examples:
+  trustless-work init
   trustless-work add ui/Button
   trustless-work add forms/Form1
   trustless-work add ui/Button --ui-base "@/components/ui"
   trustless-work add forms/InitializeEscrow --ui-base "@/components/ui"
   trustless-work add single-release/fund-escrow --ui-base "@/components/ui"
+  trustless-work add wallet-kit --ui-base "@/components/ui"
 `);
 }
