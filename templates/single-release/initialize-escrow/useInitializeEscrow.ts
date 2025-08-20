@@ -1,34 +1,117 @@
 import * as React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { initializeEscrowSchema, type InitializeEscrowValues } from "./schema";
+import { useInitializeEscrowSchema } from "./schema";
+import { z } from "zod";
+import { useWalletContext } from "../../wallet-kit/WalletProvider";
+import {
+  InitializeSingleReleaseEscrowPayload,
+  InitializeSingleReleaseEscrowResponse,
+  GetEscrowsFromIndexerResponse,
+} from "@trustless-work/escrow/types";
+import { useEscrowsMutations } from "../../tanstak/useEscrowsMutations";
+import { toast } from "sonner";
+import { ErrorResponse, handleError } from "../../handle-errors/handle";
 
-export type UseInitializeEscrowOptions = {
-  defaultValues?: Partial<InitializeEscrowValues>;
-  onSubmit?: (values: InitializeEscrowValues) => Promise<void> | void;
-};
-
-export function useInitializeEscrow(options?: UseInitializeEscrowOptions) {
-  const form = useForm<InitializeEscrowValues>({
-    resolver: zodResolver(initializeEscrowSchema),
-    defaultValues: {
-      name: "",
-      ...(options?.defaultValues || {}),
-    },
-    mode: "onSubmit",
-  });
-
+export function useInitializeEscrow() {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
-  const handleSubmit = form.handleSubmit(async (values) => {
+  const { getSingleReleaseFormSchema } = useInitializeEscrowSchema();
+  const formSchema = getSingleReleaseFormSchema();
+
+  const { walletAddress } = useWalletContext();
+  const { deployEscrow } = useEscrowsMutations();
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      engagementId: "",
+      title: "",
+      description: "",
+      platformFee: undefined,
+      amount: undefined,
+      receiverMemo: "",
+      trustline: {
+        address: "",
+        decimals: 10000000,
+      },
+      roles: {
+        approver: "",
+        serviceProvider: "",
+        platformAddress: "",
+        receiver: "",
+        releaseSigner: "",
+        disputeResolver: "",
+      },
+      milestones: [{ description: "" }],
+    },
+    mode: "onChange",
+  });
+
+  const milestones = form.watch("milestones");
+  const isAnyMilestoneEmpty = milestones.some(
+    (milestone) => milestone.description === ""
+  );
+
+  const handleAddMilestone = () => {
+    const currentMilestones = form.getValues("milestones");
+    const updatedMilestones = [...currentMilestones, { description: "" }];
+    form.setValue("milestones", updatedMilestones);
+  };
+
+  const handleRemoveMilestone = (index: number) => {
+    const currentMilestones = form.getValues("milestones");
+    const updatedMilestones = currentMilestones.filter((_, i) => i !== index);
+    form.setValue("milestones", updatedMilestones);
+  };
+
+  const handleSubmit = form.handleSubmit(async (payload) => {
     try {
       setIsSubmitting(true);
-      console.log("values1", values);
-      await options?.onSubmit?.(values);
+
+      const finalPayload: InitializeSingleReleaseEscrowPayload = {
+        ...payload,
+        amount:
+          typeof payload.amount === "string"
+            ? Number(payload.amount)
+            : payload.amount,
+        platformFee:
+          typeof payload.platformFee === "string"
+            ? Number(payload.platformFee)
+            : payload.platformFee,
+        receiverMemo: Number(payload.receiverMemo) ?? 0,
+        signer: walletAddress || "",
+        milestones: payload.milestones,
+      };
+
+      const response = (await deployEscrow.mutateAsync({
+        payload: finalPayload,
+        type: "single-release",
+        address: walletAddress || "",
+      })) as InitializeSingleReleaseEscrowResponse & {
+        escrow: GetEscrowsFromIndexerResponse;
+      };
+
+      console.log("response", response);
+      toast.success("Escrow initialized successfully");
+
+      // do something with the response ...
+    } catch (error) {
+      toast.error(handleError(error as ErrorResponse).message);
     } finally {
       setIsSubmitting(false);
+      form.reset();
     }
   });
 
-  return { form, handleSubmit, isSubmitting };
+  return {
+    form,
+    isSubmitting,
+    milestones,
+    isAnyMilestoneEmpty,
+
+    handleSubmit,
+    handleAddMilestone,
+    handleRemoveMilestone,
+  };
 }
