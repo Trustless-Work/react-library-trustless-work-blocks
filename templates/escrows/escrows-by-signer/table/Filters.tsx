@@ -36,6 +36,7 @@ type FiltersProps = {
   title: string;
   engagementId: string;
   isActive: boolean;
+  validateOnChain: boolean;
   type: "single-release" | "multi-release" | "all";
   status:
     | "working"
@@ -53,6 +54,7 @@ type FiltersProps = {
   setTitle: (v: string) => void;
   setEngagementId: (v: string) => void;
   setIsActive: (v: boolean) => void;
+  setValidateOnChain: (v: boolean) => void;
   setType: (v: "single-release" | "multi-release" | "all") => void;
   setStatus: (
     v:
@@ -83,6 +85,7 @@ function Filters({
   title,
   engagementId,
   isActive,
+  validateOnChain,
   type,
   status,
   minAmount,
@@ -95,6 +98,7 @@ function Filters({
   setTitle,
   setEngagementId,
   setIsActive,
+  setValidateOnChain,
   setType,
   setStatus,
   setMinAmount,
@@ -304,17 +308,30 @@ function Filters({
 
           <div className="space-y-1.5">
             <label className="text-xs font-medium text-muted-foreground">
-              Active
+              Active / OnChain
             </label>
             <div className="w-full lg:w-auto lg:min-w-fit">
-              <div className="flex items-center justify-center lg:justify-start gap-2 h-9 px-3 rounded-md border border-border/60 bg-background/80 w-full lg:w-auto">
-                <Checkbox
-                  checked={Boolean(isActive)}
-                  onCheckedChange={(checked) => setIsActive(Boolean(checked))}
-                />
-                <span className="text-sm text-foreground font-medium whitespace-nowrap">
-                  Active
-                </span>
+              <div className="grid grid-cols-2 gap-2 w-full lg:w-auto">
+                <div className="flex items-center justify-center lg:justify-start gap-2 h-9 px-3 rounded-md border border-border/60 bg-background/80 w-full lg:w-auto">
+                  <Checkbox
+                    checked={Boolean(isActive)}
+                    onCheckedChange={(checked) => setIsActive(Boolean(checked))}
+                  />
+                  <span className="text-sm text-foreground font-medium whitespace-nowrap">
+                    Active
+                  </span>
+                </div>
+                <div className="flex items-center justify-center lg:justify-start gap-2 h-9 px-3 rounded-md border border-border/60 bg-background/80 w-full lg:w-auto">
+                  <Checkbox
+                    checked={Boolean(validateOnChain)}
+                    onCheckedChange={(checked) =>
+                      setValidateOnChain(Boolean(checked))
+                    }
+                  />
+                  <span className="text-sm text-foreground font-medium whitespace-nowrap">
+                    OnChain
+                  </span>
+                </div>
               </div>
             </div>
           </div>

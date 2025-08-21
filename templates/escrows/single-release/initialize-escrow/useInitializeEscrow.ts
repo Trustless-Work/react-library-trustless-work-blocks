@@ -3,15 +3,18 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useInitializeEscrowSchema } from "./schema";
 import { z } from "zod";
-import { useWalletContext } from "../../wallet-kit/WalletProvider";
 import {
   InitializeSingleReleaseEscrowPayload,
   InitializeSingleReleaseEscrowResponse,
-  GetEscrowsFromIndexerResponse,
 } from "@trustless-work/escrow/types";
-import { useEscrowsMutations } from "../../tanstak/useEscrowsMutations";
 import { toast } from "sonner";
-import { ErrorResponse, handleError } from "../../handle-errors/handle";
+import { useEscrowContext } from "../../escrow-context/EscrowProvider";
+import { useWalletContext } from "@/components/tw-blocks/wallet-kit/WalletProvider";
+import { useEscrowsMutations } from "@/components/tw-blocks/tanstak/useEscrowsMutations";
+import {
+  ErrorResponse,
+  handleError,
+} from "@/components/tw-blocks/handle-errors/handle";
 
 export function useInitializeEscrow() {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
@@ -20,6 +23,7 @@ export function useInitializeEscrow() {
   const formSchema = getSingleReleaseFormSchema();
 
   const { walletAddress } = useWalletContext();
+  const { setEscrow } = useEscrowContext();
   const { deployEscrow } = useEscrowsMutations();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -84,13 +88,14 @@ export function useInitializeEscrow() {
         milestones: payload.milestones,
       };
 
-      const response = (await deployEscrow.mutateAsync({
-        payload: finalPayload,
-        type: "single-release",
-        address: walletAddress || "",
-      })) as InitializeSingleReleaseEscrowResponse & {
-        escrow: GetEscrowsFromIndexerResponse;
-      };
+      const response: InitializeSingleReleaseEscrowResponse =
+        (await deployEscrow.mutateAsync({
+          payload: finalPayload,
+          type: "single-release",
+          address: walletAddress || "",
+        })) as InitializeSingleReleaseEscrowResponse;
+
+      setEscrow({ ...response.escrow, contractId: response.contractId });
 
       console.log("response", response);
       toast.success("Escrow initialized successfully");

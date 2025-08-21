@@ -3,7 +3,10 @@
 import React from "react";
 import { Card } from "__UI_BASE__/card";
 import { Button } from "__UI_BASE__/button";
-import type { GetEscrowsFromIndexerResponse as Escrow } from "@trustless-work/escrow/types";
+import type {
+  GetEscrowsFromIndexerResponse as Escrow,
+  Role,
+} from "@trustless-work/escrow/types";
 import {
   ColumnDef,
   flexRender,
@@ -20,7 +23,7 @@ import {
 } from "__UI_BASE__/table";
 import { FileX, Loader2, Wallet, RefreshCw, AlertTriangle } from "lucide-react";
 import Filters from "./Filters";
-import { useEscrowsBySigner } from "./useEsrowsBySigner";
+import { useEscrowsByRole } from "./useEsrowsByRole";
 
 function formatTimestamp(ts?: { _seconds: number; _nanoseconds: number }) {
   if (!ts) return "-";
@@ -28,7 +31,7 @@ function formatTimestamp(ts?: { _seconds: number; _nanoseconds: number }) {
   return d.toLocaleString();
 }
 
-export function EscrowsBySignerTable() {
+export function EscrowsByRoleTable() {
   const {
     walletAddress,
     data,
@@ -51,6 +54,8 @@ export function EscrowsBySignerTable() {
     setEngagementId,
     isActive,
     setIsActive,
+    validateOnChain,
+    setValidateOnChain,
     type,
     setType,
     status,
@@ -62,9 +67,11 @@ export function EscrowsBySignerTable() {
     dateRange,
     setDateRange,
     formattedRangeLabel,
+    role,
+    setRole,
     onClearFilters,
     handleSortingChange,
-  } = useEscrowsBySigner();
+  } = useEscrowsByRole();
 
   const columns = React.useMemo<ColumnDef<Escrow>[]>(
     () => [
@@ -173,20 +180,24 @@ export function EscrowsBySignerTable() {
         title={title}
         engagementId={engagementId}
         isActive={isActive}
+        validateOnChain={validateOnChain}
         type={type}
         status={status}
         minAmount={minAmount}
         maxAmount={maxAmount}
         dateRange={dateRange}
         formattedRangeLabel={formattedRangeLabel}
+        role={role}
         setTitle={setTitle}
         setEngagementId={setEngagementId}
         setIsActive={setIsActive}
+        setValidateOnChain={setValidateOnChain}
         setType={(v) => setType(v as typeof type)}
         setStatus={(v) => setStatus(v as typeof status)}
         setMinAmount={setMinAmount}
         setMaxAmount={setMaxAmount}
         setDateRange={setDateRange}
+        setRole={(v) => setRole(v as Role)}
         onClearFilters={onClearFilters}
         onRefresh={() => refetch()}
         isRefreshing={isFetching}
@@ -372,4 +383,4 @@ export function EscrowsBySignerTable() {
   );
 }
 
-export default EscrowsBySignerTable;
+export default EscrowsByRoleTable;

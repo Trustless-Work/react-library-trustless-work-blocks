@@ -5,8 +5,8 @@ import { startOfDay, endOfDay, format } from "date-fns";
 import type { DateRange as DayPickerDateRange } from "react-day-picker";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { SortingState } from "@tanstack/react-table";
-import { useWalletContext } from "../wallet-kit/WalletProvider";
-import { useEscrowsByRoleQuery } from "../tanstak/useEscrowsByRoleQuery";
+import { useWalletContext } from "../../../wallet-kit/WalletProvider";
+import { useEscrowsByRoleQuery } from "../../../tanstak/useEscrowsByRoleQuery";
 import type { GetEscrowsFromIndexerByRoleParams } from "@trustless-work/escrow";
 
 export type EscrowOrderBy = "createdAt" | "updatedAt" | "amount";
@@ -35,6 +35,7 @@ export function useEscrowsByRole() {
   const [title, setTitle] = React.useState<string>("");
   const [engagementId, setEngagementId] = React.useState<string>("");
   const [isActive, setIsActive] = React.useState<boolean>(true);
+  const [validateOnChain, setValidateOnChain] = React.useState<boolean>(true);
   const [type, setType] = React.useState<EscrowType>("all");
   const [status, setStatus] = React.useState<EscrowStatus>("all");
   const [minAmount, setMinAmount] = React.useState<string>("");
@@ -71,6 +72,7 @@ export function useEscrowsByRole() {
     const qpTitle = qp.get("title") || "";
     const qpEng = qp.get("engagementId") || "";
     const qpActive = qp.get("isActive");
+    const qpValidateOnChain = qp.get("validateOnChain");
     const qpType = (qp.get("type") as EscrowType) || "all";
     const qpStatus = (qp.get("status") as EscrowStatus) || "all";
     const qpMin = qp.get("minAmount") || "";
@@ -89,6 +91,9 @@ export function useEscrowsByRole() {
     setTitle(qpTitle);
     setEngagementId(qpEng);
     setIsActive(qpActive === null ? true : qpActive === "true");
+    setValidateOnChain(
+      qpValidateOnChain === null ? true : qpValidateOnChain === "true"
+    );
     setType(qpType);
     setStatus(qpStatus);
     setMinAmount(qpMin);
@@ -112,6 +117,7 @@ export function useEscrowsByRole() {
       title: debouncedTitle,
       engagementId: debouncedEngagementId,
       isActive,
+      validateOnChain,
       type,
       status,
       minAmount: debouncedMinAmount,
@@ -139,6 +145,7 @@ export function useEscrowsByRole() {
     if (debouncedSearchParams.engagementId)
       qp.set("engagementId", debouncedSearchParams.engagementId);
     qp.set("isActive", String(debouncedSearchParams.isActive));
+    qp.set("validateOnChain", String(debouncedSearchParams.validateOnChain));
     if (type && type !== "all") qp.set("type", type);
     if (status && status !== "all") qp.set("status", status);
     if (debouncedSearchParams.minAmount)
@@ -162,6 +169,7 @@ export function useEscrowsByRole() {
     debouncedSearchParams.title,
     debouncedSearchParams.engagementId,
     debouncedSearchParams.isActive,
+    debouncedSearchParams.validateOnChain,
     type,
     status,
     debouncedSearchParams.minAmount,
@@ -190,6 +198,7 @@ export function useEscrowsByRole() {
       title: debouncedTitle || undefined,
       engagementId: debouncedEngagementId || undefined,
       isActive,
+      validateOnChain,
       type: (type === "all" ? undefined : type) as
         | undefined
         | "single-release"
@@ -218,6 +227,7 @@ export function useEscrowsByRole() {
     debouncedTitle,
     debouncedEngagementId,
     isActive,
+    validateOnChain,
     type,
     status,
     debouncedMinAmount,
@@ -233,10 +243,24 @@ export function useEscrowsByRole() {
     page: page + 1,
   });
 
+  // Ensure refetch when toggling validateOnChain back to a previously cached value
+  const didMountValidateRef = React.useRef(false);
+  React.useEffect(() => {
+    if (!didMountValidateRef.current) {
+      didMountValidateRef.current = true;
+      return;
+    }
+    query.refetch();
+    // keep next page in sync too
+    nextPageQuery.refetch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [validateOnChain]);
+
   const onClearFilters = React.useCallback(() => {
     setTitle("");
     setEngagementId("");
     setIsActive(true);
+    setValidateOnChain(true);
     setType("all");
     setStatus("all");
     setMinAmount("");
@@ -302,6 +326,8 @@ export function useEscrowsByRole() {
     setEngagementId,
     isActive,
     setIsActive,
+    validateOnChain,
+    setValidateOnChain,
     type,
     setType,
     status,

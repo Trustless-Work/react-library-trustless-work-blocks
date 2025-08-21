@@ -11,6 +11,7 @@ type UseEscrowsByRoleQueryParams = Omit<
 > & {
   role?: GetEscrowsFromIndexerByRoleParams["role"];
   enabled?: boolean;
+  validateOnChain?: boolean;
 };
 
 export const useEscrowsByRoleQuery = ({
@@ -29,6 +30,7 @@ export const useEscrowsByRoleQuery = ({
   status,
   type,
   enabled = true,
+  validateOnChain = true,
 }: UseEscrowsByRoleQueryParams) => {
   const { getEscrowsByRole } = useGetEscrowsFromIndexerByRole();
 
@@ -49,6 +51,7 @@ export const useEscrowsByRoleQuery = ({
       engagementId,
       status,
       type,
+      validateOnChain,
     ],
     queryFn: async (): Promise<Escrow[]> => {
       if (!role) {
@@ -69,7 +72,7 @@ export const useEscrowsByRoleQuery = ({
         engagementId,
         status,
         type,
-        validateOnChain: true,
+        validateOnChain,
       });
 
       if (!escrows) {

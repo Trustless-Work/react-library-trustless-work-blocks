@@ -20,7 +20,7 @@ import {
 } from "__UI_BASE__/table";
 import { FileX, Loader2, Wallet, RefreshCw, AlertTriangle } from "lucide-react";
 import Filters from "./Filters";
-import { useEscrowsByRole } from "./useEsrowsByRole";
+import { useEscrowsBySigner } from "./useEsrowsBySigner";
 
 function formatTimestamp(ts?: { _seconds: number; _nanoseconds: number }) {
   if (!ts) return "-";
@@ -28,7 +28,7 @@ function formatTimestamp(ts?: { _seconds: number; _nanoseconds: number }) {
   return d.toLocaleString();
 }
 
-export function EscrowsByRoleTable() {
+export function EscrowsBySignerTable() {
   const {
     walletAddress,
     data,
@@ -51,6 +51,8 @@ export function EscrowsByRoleTable() {
     setEngagementId,
     isActive,
     setIsActive,
+    validateOnChain,
+    setValidateOnChain,
     type,
     setType,
     status,
@@ -62,11 +64,9 @@ export function EscrowsByRoleTable() {
     dateRange,
     setDateRange,
     formattedRangeLabel,
-    role,
-    setRole,
     onClearFilters,
     handleSortingChange,
-  } = useEscrowsByRole();
+  } = useEscrowsBySigner();
 
   const columns = React.useMemo<ColumnDef<Escrow>[]>(
     () => [
@@ -175,22 +175,22 @@ export function EscrowsByRoleTable() {
         title={title}
         engagementId={engagementId}
         isActive={isActive}
+        validateOnChain={validateOnChain}
         type={type}
         status={status}
         minAmount={minAmount}
         maxAmount={maxAmount}
         dateRange={dateRange}
         formattedRangeLabel={formattedRangeLabel}
-        role={role}
         setTitle={setTitle}
         setEngagementId={setEngagementId}
         setIsActive={setIsActive}
+        setValidateOnChain={setValidateOnChain}
         setType={(v) => setType(v as typeof type)}
         setStatus={(v) => setStatus(v as typeof status)}
         setMinAmount={setMinAmount}
         setMaxAmount={setMaxAmount}
         setDateRange={setDateRange}
-        setRole={setRole}
         onClearFilters={onClearFilters}
         onRefresh={() => refetch()}
         isRefreshing={isFetching}
@@ -376,4 +376,4 @@ export function EscrowsByRoleTable() {
   );
 }
 
-export default EscrowsByRoleTable;
+export default EscrowsBySignerTable;

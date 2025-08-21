@@ -8,11 +8,12 @@ import { GetEscrowsFromIndexerResponse as Escrow } from "@trustless-work/escrow/
 interface UseEscrowsBySignerQueryParams
   extends GetEscrowsFromIndexerBySignerParams {
   enabled?: boolean;
+  validateOnChain?: boolean;
 }
 
 export const useEscrowsBySignerQuery = ({
   signer,
-  isActive = true,
+  isActive,
   page,
   orderDirection,
   orderBy,
@@ -25,6 +26,7 @@ export const useEscrowsBySignerQuery = ({
   status,
   type,
   enabled = true,
+  validateOnChain = true,
 }: UseEscrowsBySignerQueryParams) => {
   const { getEscrowsBySigner } = useGetEscrowsFromIndexerBySigner();
 
@@ -44,6 +46,7 @@ export const useEscrowsBySignerQuery = ({
       engagementId,
       status,
       type,
+      validateOnChain,
     ],
     queryFn: async (): Promise<Escrow[]> => {
       const escrows = await getEscrowsBySigner({
@@ -60,7 +63,7 @@ export const useEscrowsBySignerQuery = ({
         engagementId,
         status,
         type,
-        validateOnChain: true,
+        validateOnChain,
       });
 
       if (!escrows) {

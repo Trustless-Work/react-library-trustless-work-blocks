@@ -21,7 +21,7 @@ import { Textarea } from "__UI_BASE__/textarea";
 import { useInitializeEscrow } from "./useInitializeEscrow";
 import { Trash2, DollarSign, Percent, Loader2 } from "lucide-react";
 import Link from "next/link";
-import { trustlineOptions } from "../../wallet-kit/trustlines";
+import { trustlineOptions } from "@/components/tw-blocks/wallet-kit/trustlines";
 
 export function InitializeEscrow() {
   const {
