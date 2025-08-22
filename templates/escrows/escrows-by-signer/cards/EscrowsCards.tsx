@@ -9,9 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "__UI_BASE__/card";
 import { Badge } from "__UI_BASE__/badge";
 import { Separator } from "__UI_BASE__/separator";
 import {
-  DollarSign,
   Shield,
-  User,
   CalendarDays,
   Wallet,
   Loader2,
@@ -225,7 +223,7 @@ export function EscrowsBySignerCards() {
                         {escrow.title}
                       </CardTitle>
                       <Badge
-                        variant={isActive ? "default" : "secondary"}
+                        variant={isActive ? "default" : "destructive"}
                         className="shrink-0"
                       >
                         {isActive ? "Active" : "Inactive"}
@@ -240,21 +238,9 @@ export function EscrowsBySignerCards() {
                     {/* Amount Section */}
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <DollarSign className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-sm font-medium">Amount</span>
-                        </div>
+                        <span className="text-sm font-medium">Amount</span>
                         <span className="font-semibold">
                           {formatCurrency(escrow.amount)}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-muted-foreground">
-                          Platform Fee
-                        </span>
-                        <span className="text-muted-foreground">
-                          {formatCurrency(escrow.platformFee)}
                         </span>
                       </div>
 
@@ -266,6 +252,15 @@ export function EscrowsBySignerCards() {
                           </span>
                         </div>
                       )}
+
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">
+                          Platform Fee
+                        </span>
+                        <span className="text-muted-foreground">
+                          {escrow.platformFee}%
+                        </span>
+                      </div>
                     </div>
 
                     <Separator />
@@ -277,14 +272,6 @@ export function EscrowsBySignerCards() {
                         <span className="text-sm font-medium">Trustline</span>
                         <Badge variant="outline" className="text-xs">
                           {escrow.trustline.name}
-                        </Badge>
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        <User className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm font-medium">Role</span>
-                        <Badge variant="outline" className="text-xs capitalize">
-                          {String(escrow.roles).toLowerCase()}
                         </Badge>
                       </div>
 
