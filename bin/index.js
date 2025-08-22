@@ -157,30 +157,6 @@ function readProjectPackageJson() {
   }
 }
 
-function getInstalledVersion(pkgName) {
-  const pkg = readProjectPackageJson();
-  if (!pkg) return null;
-  const all = { ...(pkg.dependencies || {}), ...(pkg.devDependencies || {}) };
-  return all[pkgName] || null;
-}
-
-function getMajorVersion(range) {
-  if (!range) return null;
-  // crude parse for ranges like ^4.1.0, ~4.0.0, 4.0.0, >=4
-  const m = range.match(/(\d+)\./) || range.match(/^(\d+)$/);
-  return m ? parseInt(m[1], 10) : null;
-}
-
-function hasTailwindConfig() {
-  const candidates = [
-    "tailwind.config.ts",
-    "tailwind.config.js",
-    "tailwind.config.mjs",
-    "tailwind.config.cjs",
-  ];
-  return candidates.some((f) => fs.existsSync(path.join(PROJECT_ROOT, f)));
-}
-
 function installDeps({ dependencies = {}, devDependencies = {} }) {
   const pm = detectPM();
   const BLOCKED = new Set([
@@ -300,6 +276,98 @@ function copyTemplate(name, { uiBase, shouldInstall = false } = {}) {
   }
 }
 
+function findLayoutFile() {
+  const candidates = [
+    path.join(PROJECT_ROOT, "app", "layout.tsx"),
+    path.join(PROJECT_ROOT, "app", "layout.ts"),
+    path.join(PROJECT_ROOT, "app", "layout.jsx"),
+    path.join(PROJECT_ROOT, "app", "layout.js"),
+    path.join(PROJECT_ROOT, "src", "app", "layout.tsx"),
+    path.join(PROJECT_ROOT, "src", "app", "layout.ts"),
+    path.join(PROJECT_ROOT, "src", "app", "layout.jsx"),
+    path.join(PROJECT_ROOT, "src", "app", "layout.js"),
+  ];
+  return candidates.find((p) => fs.existsSync(p)) || null;
+}
+
+function injectProvidersIntoLayout(layoutPath) {
+  try {
+    let content = fs.readFileSync(layoutPath, "utf8");
+
+    const importRQ =
+      'import ReactQueryClientProvider from "@/components/tw-blocks/providers/ReactQueryClientProvider";\n';
+    const importTW =
+      'import { TrustlessWorkProvider } from "@/components/tw-blocks/providers/TrustlessWork";\n';
+    const commentText =
+      "// Use these providers to wrap your application  (<ReactQueryClientProvider> y <TrustlessWorkProvider>)\n";
+
+    const hasImportRQ =
+      /import\s+[^;]*ReactQueryClientProvider[^;]*from\s+['\"][^'\"]+['\"];?/.test(
+        content
+      );
+    const hasImportTW =
+      /import\s+[^;]*TrustlessWorkProvider[^;]*from\s+['\"][^'\"]+['\"];?/.test(
+        content
+      );
+    const hasProvidersComment =
+      /Use these providers to wrap your application/.test(content);
+
+    let importsToAdd = "";
+    if (!hasImportRQ) importsToAdd += importRQ;
+    if (!hasImportTW) importsToAdd += importTW;
+    if (importsToAdd) {
+      const importStmtRegex = /^import.*;\s*$/gm;
+      let last = null;
+      for (const m of content.matchAll(importStmtRegex)) last = m;
+      if (last) {
+        const idx = last.index + last[0].length;
+        content =
+          content.slice(0, idx) +
+          "\n" +
+          importsToAdd +
+          commentText +
+          content.slice(idx);
+      } else {
+        content = importsToAdd + commentText + content;
+      }
+    } else if (!hasProvidersComment) {
+      // Imports already exist; ensure the comment is present just after the last import
+      const importStmtRegex = /^import.*;\s*$/gm;
+      let last = null;
+      for (const m of content.matchAll(importStmtRegex)) last = m;
+      if (last) {
+        const idx = last.index + last[0].length;
+        content =
+          content.slice(0, idx) + "\n" + commentText + content.slice(idx);
+      }
+    }
+
+    const hasUsageRQ = /<ReactQueryClientProvider[\s>]/.test(content);
+    const hasUsageTW = /<TrustlessWorkProvider[\s>]/.test(content);
+
+    if (!hasUsageRQ && !hasUsageTW) {
+      const openMatch = content.match(/<body[^>]*>/);
+      const closeIdx = content.lastIndexOf("</body>");
+      if (openMatch && closeIdx !== -1) {
+        const openIdx = openMatch.index + openMatch[0].length;
+        content =
+          content.slice(0, openIdx) +
+          "\n<ReactQueryClientProvider>\n<TrustlessWorkProvider>\n" +
+          content.slice(openIdx, closeIdx) +
+          "\n</TrustlessWorkProvider>\n</ReactQueryClientProvider>\n" +
+          content.slice(closeIdx);
+      }
+    }
+
+    fs.writeFileSync(layoutPath, content, "utf8");
+    logCheck(
+      `Updated ${path.relative(PROJECT_ROOT, layoutPath)} with providers`
+    );
+  } catch (e) {
+    console.error("❌ Failed to update layout with providers:", e.message);
+  }
+}
+
 if (args[0] === "init") {
   console.log("\n▶ Setting up shadcn/ui components...");
   const doInit = await promptYesNo("Run shadcn init now?", true);
@@ -370,6 +438,28 @@ if (args[0] === "init") {
   }
   console.log("\x1b[32m✔\x1b[0m shadcn/ui components step completed");
 
+  const wantProviders = await promptYesNo(
+    "Install TanStack Query and Trustless Work providers and wire app/layout?",
+    true
+  );
+  if (wantProviders) {
+    await withSpinner("Installing providers", async () => {
+      copyTemplate("providers");
+    });
+    const layoutPath = findLayoutFile();
+    if (layoutPath) {
+      await withSpinner("Updating app/layout with providers", async () => {
+        injectProvidersIntoLayout(layoutPath);
+      });
+    } else {
+      console.warn(
+        "⚠️  Could not find app/layout file. Skipped automatic wiring."
+      );
+    }
+  } else {
+    console.log("\x1b[90m– Skipped installing providers\x1b[0m");
+  }
+
   printBannerTRUSTLESSWORK();
   console.log("\n\nResources");
   console.log("- " + oscHyperlink("Website", "https://trustlesswork.com"));
@@ -417,20 +507,74 @@ if (args[0] === "init") {
   });
 } else {
   console.log(`
-Usage:
+  
+  Usage:
+
   trustless-work init
   trustless-work add <template> [--install]
-Options:
+  
+  Options:
+
   --ui-base <path>      Base import path to your shadcn/ui components (default: "@/components/ui")
   --install, -i         Also install dependencies (normally use 'init' once instead)
 
-Examples:
+  Examples:
+
+  --- Get started ---
   trustless-work init
-  trustless-work add ui/Button
-  trustless-work add forms/Form1
-  trustless-work add ui/Button --ui-base "@/components/ui"
-  trustless-work add forms/InitializeEscrow --ui-base "@/components/ui"
-  trustless-work add single-release/fund-escrow --ui-base "@/components/ui"
-  trustless-work add wallet-kit --ui-base "@/components/ui"
+
+  --- Providers ---
+  trustless-work add providers
+
+  --- Wallet-kit ---
+  trustless-work add wallet-kit
+
+  --- Handle-errors ---
+  trustless-work add handle-errors
+
+  --- Tanstack ---
+  trustless-work add tanstak
+
+  --- Escrows ---
+  trustless-work add escrows
+
+  --- Escrow context ---
+  trustless-work add escrows/escrow-context
+
+  --- Escrows by role ---
+  trustless-work add escrows/escrows-by-role
+  trustless-work add escrows/escrows-by-role/table
+  trustless-work add escrows/escrows-by-role/cards
+
+  --- Escrows by signer ---
+  trustless-work add escrows/escrows-by-signer
+  trustless-work add escrows/escrows-by-signer/table
+  trustless-work add escrows/escrows-by-signer/cards
+
+  ----------------------
+  --- SINGLE-RELEASE ---
+  trustless-work add escrows/single-release
+
+  --- Initialize escrow ---
+  - trustless-work add escrows/single-release/initialize-escrow
+
+  --- Fund escrow ---
+  - trustless-work add escrows/single-release/fund-escrow
+  - trustless-work add escrows/single-release/fund-escrow/form
+  - trustless-work add escrows/single-release/fund-escrow/button
+  - trustless-work add escrows/single-release/fund-escrow/dialog
+
+  ---------------------
+  --- MULTI-RELEASE ---
+  trustless-work add escrows/multi-release
+  
+   --- Initialize escrow ---
+  - trustless-work add escrows/multi-release/initialize-escrow
+
+  --- Fund escrow ---
+  - trustless-work add escrows/multi-release/fund-escrow
+  - trustless-work add escrows/multi-release/fund-escrow/form
+  - trustless-work add escrows/multi-release/fund-escrow/button
+  - trustless-work add escrows/multi-release/fund-escrow/dialog
 `);
 }
