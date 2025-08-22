@@ -2,7 +2,10 @@
 
 import React from "react";
 import { Button } from "__UI_BASE__/button";
-import type { GetEscrowsFromIndexerResponse as Escrow } from "@trustless-work/escrow/types";
+import type {
+  GetEscrowsFromIndexerResponse as Escrow,
+  MultiReleaseMilestone,
+} from "@trustless-work/escrow/types";
 import Filters from "./Filters";
 import { useEscrowsBySigner } from "./useEsrowsBySigner";
 import { Card, CardContent, CardHeader, CardTitle } from "__UI_BASE__/card";
@@ -240,7 +243,16 @@ export function EscrowsBySignerCards() {
                       <div className="flex items-center justify-between">
                         <span className="text-sm font-medium">Amount</span>
                         <span className="font-semibold">
-                          {formatCurrency(escrow.amount)}
+                          {escrow.type === "single-release"
+                            ? formatCurrency(escrow.amount)
+                            : formatCurrency(
+                                escrow.milestones.reduce(
+                                  (acc, milestone) =>
+                                    acc +
+                                    (milestone as MultiReleaseMilestone).amount,
+                                  0
+                                )
+                              )}
                         </span>
                       </div>
 
