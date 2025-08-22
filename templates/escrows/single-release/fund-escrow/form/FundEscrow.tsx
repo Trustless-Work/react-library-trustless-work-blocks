@@ -12,7 +12,7 @@ import { Button } from "__UI_BASE__/button";
 import { useFundEscrow } from "./useFundEscrow";
 import { Loader2 } from "lucide-react";
 
-export default function FundEscrow() {
+export default function FundEscrowForm() {
   const { form, handleSubmit, isSubmitting } = useFundEscrow();
 
   return (
