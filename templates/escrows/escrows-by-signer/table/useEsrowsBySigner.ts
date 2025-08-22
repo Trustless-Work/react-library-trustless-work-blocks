@@ -7,6 +7,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { SortingState } from "@tanstack/react-table";
 import { useWalletContext } from "../../../wallet-kit/WalletProvider";
 import { useEscrowsBySignerQuery } from "../../../tanstak/useEscrowsBySignerQuery";
+import { GetEscrowsFromIndexerResponse as Escrow } from "@trustless-work/escrow/types";
 
 export type EscrowOrderBy = "createdAt" | "updatedAt" | "amount";
 export type EscrowOrderDirection = "asc" | "desc";
@@ -289,7 +290,7 @@ export function useEscrowsBySigner() {
   return {
     // data
     walletAddress,
-    data: query.data ?? [],
+    data: query.data ?? ([] as Escrow[]),
     isLoading: query.isLoading,
     isError: query.isError,
     isFetching: query.isFetching,

@@ -3,7 +3,10 @@
 import React from "react";
 import { Card } from "__UI_BASE__/card";
 import { Button } from "__UI_BASE__/button";
-import type { GetEscrowsFromIndexerResponse as Escrow } from "@trustless-work/escrow/types";
+import type {
+  GetEscrowsFromIndexerResponse as Escrow,
+  MultiReleaseMilestone,
+} from "@trustless-work/escrow/types";
 import {
   ColumnDef,
   flexRender,
@@ -101,7 +104,18 @@ export function EscrowsBySignerTable() {
         header: "Amount",
         accessorKey: "amount",
         enableSorting: true,
-        cell: ({ row }) => row.original.amount,
+        cell: ({ row }) => {
+          // single release
+          if (row.original.type === "single-release") {
+            return row.original.amount;
+          }
+          // multi release
+          return row.original.milestones.reduce(
+            (acc, milestone) =>
+              acc + (milestone as MultiReleaseMilestone).amount,
+            0
+          );
+        },
       },
       {
         header: "Balance",
