@@ -290,12 +290,15 @@ function findLayoutFile() {
   return candidates.find((p) => fs.existsSync(p)) || null;
 }
 
-function injectProvidersIntoLayout(layoutPath) {
+function injectProvidersIntoLayout(
+  layoutPath,
+  { reactQuery = false, trustless = false, wallet = false, escrow = false } = {}
+) {
   try {
     let content = fs.readFileSync(layoutPath, "utf8");
 
     const importRQ =
-      'import ReactQueryClientProvider from "@/components/tw-blocks/providers/ReactQueryClientProvider";\n';
+      'import { ReactQueryClientProvider } from "@/components/tw-blocks/providers/ReactQueryClientProvider";\n';
     const importTW =
       'import { TrustlessWorkProvider } from "@/components/tw-blocks/providers/TrustlessWork";\n';
     const importEscrow =
@@ -305,30 +308,19 @@ function injectProvidersIntoLayout(layoutPath) {
     const commentText =
       "// Use these imports to wrap your application (<ReactQueryClientProvider>, <TrustlessWorkProvider>, <WalletProvider> y <EscrowProvider>)\n";
 
-    const hasImportRQ =
-      /import\s+[^;]*ReactQueryClientProvider[^;]*from\s+['\"][^'\"]+['\"];?/.test(
-        content
-      );
-    const hasImportTW =
-      /import\s+[^;]*TrustlessWorkProvider[^;]*from\s+['\"][^'\"]+['\"];?/.test(
-        content
-      );
-    const hasImportEscrow =
-      /import\s+[^;]*EscrowProvider[^;]*from\s+['\"][^'\"]+['\"];?/.test(
-        content
-      );
-    const hasImportWallet =
-      /import\s+[^;]*WalletProvider[^;]*from\s+['\"][^'\"]+['\"];?/.test(
-        content
-      );
-    const hasProvidersComment =
-      /Use these imports to wrap your application/.test(content);
+    const needImport = (name) =>
+      !new RegExp(
+        `import\\s+[^;]*${name}[^;]*from\\s+['\"][^'\"]+['\"];?`
+      ).test(content);
 
     let importsToAdd = "";
-    if (!hasImportRQ) importsToAdd += importRQ;
-    if (!hasImportTW) importsToAdd += importTW;
-    if (!hasImportWallet) importsToAdd += importWallet;
-    if (!hasImportEscrow) importsToAdd += importEscrow;
+    if (reactQuery && needImport("ReactQueryClientProvider"))
+      importsToAdd += importRQ;
+    if (trustless && needImport("TrustlessWorkProvider"))
+      importsToAdd += importTW;
+    if (wallet && needImport("WalletProvider")) importsToAdd += importWallet;
+    if (escrow && needImport("EscrowProvider")) importsToAdd += importEscrow;
+
     if (importsToAdd) {
       const importStmtRegex = /^import.*;\s*$/gm;
       let last = null;
@@ -344,36 +336,54 @@ function injectProvidersIntoLayout(layoutPath) {
       } else {
         content = importsToAdd + commentText + content;
       }
-    } else if (!hasProvidersComment) {
-      // Imports already exist; ensure the comment is present just after the last import
-      const importStmtRegex = /^import.*;\s*$/gm;
-      let last = null;
-      for (const m of content.matchAll(importStmtRegex)) last = m;
-      if (last) {
-        const idx = last.index + last[0].length;
-        content =
-          content.slice(0, idx) + "\n" + commentText + content.slice(idx);
-      }
     }
 
-    const hasUsageRQ = /<ReactQueryClientProvider[\s>]/.test(content);
-    const hasUsageTW = /<TrustlessWorkProvider[\s>]/.test(content);
-    const hasUsageEscrow = /<EscrowProvider[\s>]/.test(content);
-    const hasUsageWallet = /<WalletProvider[\s>]/.test(content);
+    const hasTag = (tag) => new RegExp(`<${tag}[\\s>]`).test(content);
+    const wrapInside = (containerTag, newTag) => {
+      const open = content.match(new RegExp(`<${containerTag}(\\s[^>]*)?>`));
+      if (!open) return false;
+      const openIdx = open.index + open[0].length;
+      const closeIdx = content.indexOf(`</${containerTag}>`, openIdx);
+      if (closeIdx === -1) return false;
+      content =
+        content.slice(0, openIdx) +
+        `\n<${newTag}>\n` +
+        content.slice(openIdx, closeIdx) +
+        `\n</${newTag}>\n` +
+        content.slice(closeIdx);
+      return true;
+    };
 
-    if (!hasUsageRQ && !hasUsageTW && !hasUsageEscrow && !hasUsageWallet) {
-      const openMatch = content.match(/<body[^>]*>/);
-      const closeIdx = content.lastIndexOf("</body>");
-      if (openMatch && closeIdx !== -1) {
-        const openIdx = openMatch.index + openMatch[0].length;
-        content =
-          content.slice(0, openIdx) +
-          "\n<ReactQueryClientProvider>\n<TrustlessWorkProvider>\n<WalletProvider>\n<EscrowProvider>\n" +
-          content.slice(openIdx, closeIdx) +
-          "\n</EscrowProvider>\n</WalletProvider>\n</TrustlessWorkProvider>\n</ReactQueryClientProvider>\n" +
-          content.slice(closeIdx);
+    const ensureTag = (tag) => {
+      if (hasTag(tag)) return;
+      const bodyOpen = content.match(/<body[^>]*>/);
+      const bodyCloseIdx = content.lastIndexOf("</body>");
+      if (!bodyOpen || bodyCloseIdx === -1) return;
+      const bodyOpenIdx = bodyOpen.index + bodyOpen[0].length;
+      if (tag === "TrustlessWorkProvider") {
+        if (wrapInside("ReactQueryClientProvider", tag)) return;
       }
-    }
+      if (tag === "WalletProvider") {
+        if (wrapInside("TrustlessWorkProvider", tag)) return;
+        if (wrapInside("ReactQueryClientProvider", tag)) return;
+      }
+      if (tag === "EscrowProvider") {
+        if (wrapInside("WalletProvider", tag)) return;
+        if (wrapInside("TrustlessWorkProvider", tag)) return;
+        if (wrapInside("ReactQueryClientProvider", tag)) return;
+      }
+      content =
+        content.slice(0, bodyOpenIdx) +
+        `\n<${tag}>\n` +
+        content.slice(bodyOpenIdx, bodyCloseIdx) +
+        `\n</${tag}>\n` +
+        content.slice(bodyCloseIdx);
+    };
+
+    if (reactQuery) ensureTag("ReactQueryClientProvider");
+    if (trustless) ensureTag("TrustlessWorkProvider");
+    if (wallet) ensureTag("WalletProvider");
+    if (escrow) ensureTag("EscrowProvider");
 
     fs.writeFileSync(layoutPath, content, "utf8");
     logCheck(
@@ -465,7 +475,10 @@ if (args[0] === "init") {
     const layoutPath = findLayoutFile();
     if (layoutPath) {
       await withSpinner("Updating app/layout with providers", async () => {
-        injectProvidersIntoLayout(layoutPath);
+        injectProvidersIntoLayout(layoutPath, {
+          reactQuery: true,
+          trustless: true,
+        });
       });
     } else {
       console.warn(
@@ -521,6 +534,20 @@ if (args[0] === "init") {
     uiBase: flags.uiBase,
     shouldInstall: !!flags.install,
   });
+
+  // Post-add wiring for specific templates
+  const layoutPath = findLayoutFile();
+  if (layoutPath) {
+    if (args[1] === "wallet-kit" || args[1].startsWith("wallet-kit/")) {
+      injectProvidersIntoLayout(layoutPath, { wallet: true });
+    }
+    if (
+      args[1] === "escrows/escrow-context" ||
+      args[1].startsWith("escrows/escrow-context/")
+    ) {
+      injectProvidersIntoLayout(layoutPath, { escrow: true });
+    }
+  }
 } else {
   console.log(`
   
