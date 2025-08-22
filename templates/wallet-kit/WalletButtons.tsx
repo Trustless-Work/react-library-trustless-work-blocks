@@ -39,45 +39,65 @@ export const WalletButton = () => {
         <PopoverTrigger asChild>
           <Button
             variant="outline"
-            size="lg"
-            className="w-full sm:w-auto justify-between sm:justify-center"
+            className="h-10 px-4 gap-2 font-medium bg-transparent"
           >
-            <span className="inline-flex items-center gap-2 truncate max-w-[220px] sm:max-w-none">
-              <Wallet className="opacity-80" />
-              <span className="hidden xs:inline">{walletName}</span>
-              <span className="text-muted-foreground">{shortAddress}</span>
+            <Wallet className="h-4 w-4" />
+            <span className="hidden sm:inline">{walletName}</span>
+            <span className="font-mono text-sm text-muted-foreground">
+              {shortAddress}
             </span>
-            <ChevronDown className="ml-2" />
+            <ChevronDown className="h-4 w-4 ml-1" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-80 p-3 sm:w-96">
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <p className="text-sm font-medium leading-none">{walletName}</p>
-              <p className="mt-1 text-xs text-muted-foreground break-all">
-                {walletAddress}
-              </p>
+        <PopoverContent className="w-80 p-0" align="end">
+          <div className="p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Wallet className="h-4 w-4 text-muted-foreground" />
+                <span className="font-medium">{walletName}</span>
+              </div>
+              <span className="text-xs px-2 py-1 rounded-md bg-muted text-muted-foreground">
+                Testnet
+              </span>
             </div>
-            <span className="text-xs rounded px-1.5 py-0.5 bg-secondary text-secondary-foreground shrink-0">
-              Testnet
-            </span>
+
+            <div className="p-3 rounded-lg bg-muted/50 border">
+              <p className="text-xs text-muted-foreground mb-1">Address</p>
+              <p className="font-mono text-sm break-all">{walletAddress}</p>
+            </div>
           </div>
-          <div className="mt-3 grid grid-cols-2 gap-2 sm:flex sm:items-center sm:justify-end">
-            <Button
-              onClick={copyAddress}
-              variant="ghost"
-              className="w-full sm:w-auto cursor-pointer"
-            >
-              {copied ? <Check className="mr-2" /> : <Copy className="mr-2" />}
-              {copied ? "Copied" : "Copy address"}
-            </Button>
-            <Button
-              onClick={handleDisconnect}
-              variant="destructive"
-              className="w-full sm:w-auto cursor-pointer"
-            >
-              <LogOut className="mr-2" /> Disconnect
-            </Button>
+
+          <div className="border-t p-4">
+            <div className="flex gap-2">
+              <Button
+                onClick={copyAddress}
+                variant="ghost"
+                size="sm"
+                className="flex-1 cursor-pointer"
+                disabled={copied}
+              >
+                {copied ? (
+                  <>
+                    <Check className="h-4 w-4 mr-2" />
+                    Copied
+                  </>
+                ) : (
+                  <>
+                    <Copy className="h-4 w-4 mr-2" />
+                    Copy
+                  </>
+                )}
+              </Button>
+              <Button
+                onClick={handleDisconnect}
+                variant="outline"
+                size="sm"
+                className="flex-1 text-destructive hover:text-destructive bg-transparent cursor-pointer"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Disconnect
+              </Button>
+            </div>
           </div>
         </PopoverContent>
       </Popover>
@@ -85,8 +105,12 @@ export const WalletButton = () => {
   }
 
   return (
-    <Button onClick={handleConnect} size="lg" className="w-full sm:w-auto">
-      <Wallet className="mr-2" /> Connect wallet
+    <Button
+      className="h-10 px-6 gap-2 font-medium cursor-pointer"
+      onClick={handleConnect}
+    >
+      <Wallet className="h-4 w-4" />
+      Connect Wallet
     </Button>
   );
 };
