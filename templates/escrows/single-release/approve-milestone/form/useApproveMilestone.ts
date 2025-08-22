@@ -1,0 +1,57 @@
+import * as React from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { approveMilestoneSchema, type ApproveMilestoneValues } from "./schema";
+import { toast } from "sonner";
+import { ApproveMilestonePayload } from "@trustless-work/escrow";
+import { useEscrowContext } from "../../../escrow-context/EscrowProvider";
+import { useEscrowsMutations } from "@/components/tw-blocks/tanstak/useEscrowsMutations";
+import {
+  ErrorResponse,
+  handleError,
+} from "@/components/tw-blocks/handle-errors/handle";
+import { useWalletContext } from "@/components/tw-blocks/wallet-kit/WalletProvider";
+
+export function useApproveMilestone() {
+  const { approveMilestone } = useEscrowsMutations();
+  const { escrow } = useEscrowContext();
+  const { walletAddress } = useWalletContext();
+
+  const form = useForm<ApproveMilestoneValues>({
+    resolver: zodResolver(approveMilestoneSchema),
+    defaultValues: {
+      milestoneIndex: "0",
+    },
+    mode: "onChange",
+  });
+
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+
+  const handleSubmit = form.handleSubmit(async (payload) => {
+    try {
+      setIsSubmitting(true);
+
+      const finalPayload: ApproveMilestonePayload = {
+        contractId: escrow?.contractId || "",
+        milestoneIndex: payload.milestoneIndex,
+        approver: walletAddress || "",
+        newFlag: true,
+      };
+
+      await approveMilestone.mutateAsync({
+        payload: finalPayload,
+        type: "single-release",
+        address: walletAddress || "",
+      });
+
+      toast.success("Milestone approved flag updated successfully");
+    } catch (error) {
+      toast.error(handleError(error as ErrorResponse).message);
+    } finally {
+      setIsSubmitting(false);
+      form.reset();
+    }
+  });
+
+  return { form, handleSubmit, isSubmitting };
+}
