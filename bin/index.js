@@ -298,8 +298,12 @@ function injectProvidersIntoLayout(layoutPath) {
       'import ReactQueryClientProvider from "@/components/tw-blocks/providers/ReactQueryClientProvider";\n';
     const importTW =
       'import { TrustlessWorkProvider } from "@/components/tw-blocks/providers/TrustlessWork";\n';
+    const importEscrow =
+      'import { EscrowProvider } from "@/components/tw-blocks/escrows/escrow-context/EscrowProvider";\n';
+    const importWallet =
+      'import { WalletProvider } from "@/components/tw-blocks/wallet-kit/WalletProvider";\n';
     const commentText =
-      "// Use these providers to wrap your application  (<ReactQueryClientProvider> y <TrustlessWorkProvider>)\n";
+      "// Use these imports to wrap your application (<ReactQueryClientProvider>, <TrustlessWorkProvider>, <WalletProvider> y <EscrowProvider>)\n";
 
     const hasImportRQ =
       /import\s+[^;]*ReactQueryClientProvider[^;]*from\s+['\"][^'\"]+['\"];?/.test(
@@ -309,12 +313,22 @@ function injectProvidersIntoLayout(layoutPath) {
       /import\s+[^;]*TrustlessWorkProvider[^;]*from\s+['\"][^'\"]+['\"];?/.test(
         content
       );
+    const hasImportEscrow =
+      /import\s+[^;]*EscrowProvider[^;]*from\s+['\"][^'\"]+['\"];?/.test(
+        content
+      );
+    const hasImportWallet =
+      /import\s+[^;]*WalletProvider[^;]*from\s+['\"][^'\"]+['\"];?/.test(
+        content
+      );
     const hasProvidersComment =
-      /Use these providers to wrap your application/.test(content);
+      /Use these imports to wrap your application/.test(content);
 
     let importsToAdd = "";
     if (!hasImportRQ) importsToAdd += importRQ;
     if (!hasImportTW) importsToAdd += importTW;
+    if (!hasImportWallet) importsToAdd += importWallet;
+    if (!hasImportEscrow) importsToAdd += importEscrow;
     if (importsToAdd) {
       const importStmtRegex = /^import.*;\s*$/gm;
       let last = null;
@@ -344,17 +358,19 @@ function injectProvidersIntoLayout(layoutPath) {
 
     const hasUsageRQ = /<ReactQueryClientProvider[\s>]/.test(content);
     const hasUsageTW = /<TrustlessWorkProvider[\s>]/.test(content);
+    const hasUsageEscrow = /<EscrowProvider[\s>]/.test(content);
+    const hasUsageWallet = /<WalletProvider[\s>]/.test(content);
 
-    if (!hasUsageRQ && !hasUsageTW) {
+    if (!hasUsageRQ && !hasUsageTW && !hasUsageEscrow && !hasUsageWallet) {
       const openMatch = content.match(/<body[^>]*>/);
       const closeIdx = content.lastIndexOf("</body>");
       if (openMatch && closeIdx !== -1) {
         const openIdx = openMatch.index + openMatch[0].length;
         content =
           content.slice(0, openIdx) +
-          "\n<ReactQueryClientProvider>\n<TrustlessWorkProvider>\n" +
+          "\n<ReactQueryClientProvider>\n<TrustlessWorkProvider>\n<WalletProvider>\n<EscrowProvider>\n" +
           content.slice(openIdx, closeIdx) +
-          "\n</TrustlessWorkProvider>\n</ReactQueryClientProvider>\n" +
+          "\n</EscrowProvider>\n</WalletProvider>\n</TrustlessWorkProvider>\n</ReactQueryClientProvider>\n" +
           content.slice(closeIdx);
       }
     }
