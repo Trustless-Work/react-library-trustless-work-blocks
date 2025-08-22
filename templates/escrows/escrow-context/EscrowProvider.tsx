@@ -11,10 +11,14 @@ import {
 } from "react";
 import { GetEscrowsFromIndexerResponse } from "@trustless-work/escrow/types";
 
-type Escrow = Omit<
-  GetEscrowsFromIndexerResponse,
-  "type" | "updatedAt" | "createdAt" | "user" | "trustline"
->;
+type Escrow = {
+  [K in keyof Omit<
+    GetEscrowsFromIndexerResponse,
+    "type" | "updatedAt" | "createdAt" | "user"
+  >]: K extends "trustline"
+    ? Omit<NonNullable<GetEscrowsFromIndexerResponse["trustline"]>, "name">
+    : GetEscrowsFromIndexerResponse[K];
+};
 
 type EscrowContextType = {
   escrow: Escrow | null;
