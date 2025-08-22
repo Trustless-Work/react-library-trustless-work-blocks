@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import { useWallet } from "./useWallet";
 import { useWalletContext } from "./WalletProvider";
