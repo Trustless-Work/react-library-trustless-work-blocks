@@ -404,7 +404,7 @@ if (args[0] === "init") {
   }
 
   const addShadcn = await promptYesNo(
-    "Add shadcn components (button, input, form, card, sonner, checkbox, dialog, textarea, sonner, select, table, calendar, popover, separator, calendar-05)?",
+    "Add shadcn components (button, input, form, card, sonner, checkbox, dialog, textarea, sonner, select, table, calendar, popover, separator, calendar-05, badge)?",
     true
   );
   if (addShadcn) {
@@ -427,6 +427,7 @@ if (args[0] === "init") {
         "popover",
         "separator",
         "calendar-05",
+        "badge",
       ]);
     });
   } else {
@@ -439,7 +440,7 @@ if (args[0] === "init") {
   }
   const meta = JSON.parse(fs.readFileSync(GLOBAL_DEPS_FILE, "utf8"));
   const installLibs = await promptYesNo(
-    "Install (react-hook-form, zod, @tanstack/react-query, @tanstack/react-query-devtools, @trustless-work/escrow, @hookform/resolvers, axios, @creit.tech/stellar-wallets-kit, react-day-picker & zod) dependencies now?",
+    "Install (react-hook-form, @tanstack/react-query, @tanstack/react-query-devtools, @trustless-work/escrow, @hookform/resolvers, axios, @creit.tech/stellar-wallets-kit, react-day-picker & zod) dependencies now?",
     true
   );
   if (installLibs) {
@@ -465,7 +466,7 @@ if (args[0] === "init") {
   console.log("\x1b[32m✔\x1b[0m shadcn/ui components step completed");
 
   const wantProviders = await promptYesNo(
-    "Install TanStack Query and Trustless Work providers and wire app/layout?",
+    "Install TanStack Query and Trustless Work providers and wrap app/layout with them?",
     true
   );
   if (wantProviders) {
