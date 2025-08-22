@@ -6,6 +6,7 @@ import { Button } from "__UI_BASE__/button";
 import type {
   GetEscrowsFromIndexerResponse as Escrow,
   Role,
+  MultiReleaseMilestone,
 } from "@trustless-work/escrow/types";
 import {
   ColumnDef,
@@ -106,7 +107,18 @@ export function EscrowsByRoleTable() {
         header: "Amount",
         accessorKey: "amount",
         enableSorting: true,
-        cell: ({ row }) => row.original.amount,
+        cell: ({ row }) => {
+          // single release
+          if (row.original.type === "single-release") {
+            return row.original.amount;
+          }
+          // multi release
+          return row.original.milestones.reduce(
+            (acc, milestone) =>
+              acc + (milestone as MultiReleaseMilestone).amount,
+            0
+          );
+        },
       },
       {
         header: "Balance",
