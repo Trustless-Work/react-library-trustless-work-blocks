@@ -14,7 +14,7 @@ const queryClient = new QueryClient({
   },
 });
 
-export default function ReactQueryClientProvider({
+export function ReactQueryClientProvider({
   children,
 }: {
   children: React.ReactNode;
