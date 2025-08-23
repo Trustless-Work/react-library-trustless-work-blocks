@@ -214,10 +214,10 @@ export function EscrowsBySignerCards() {
               </div>
             </div>
           ) : (
-            <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {escrows.map((escrow) => (
                 <Card
-                  key={(escrow as any).engagementId ?? (escrow as any).title}
+                  key={escrow.contractId}
                   className="w-full max-w-md mx-auto hover:shadow-lg transition-shadow duration-200"
                 >
                   <CardHeader className="pb-3">
@@ -307,7 +307,7 @@ export function EscrowsBySignerCards() {
                   </CardContent>
                 </Card>
               ))}
-            </>
+            </div>
           )}
         </div>
 
