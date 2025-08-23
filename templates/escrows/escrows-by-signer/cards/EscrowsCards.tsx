@@ -5,6 +5,7 @@ import { Button } from "__UI_BASE__/button";
 import type {
   GetEscrowsFromIndexerResponse as Escrow,
   MultiReleaseMilestone,
+  SingleReleaseMilestone,
 } from "@trustless-work/escrow/types";
 import Filters from "./Filters";
 import { useEscrowsBySigner } from "./useEsrowsBySigner";
@@ -12,8 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "__UI_BASE__/card";
 import { Badge } from "__UI_BASE__/badge";
 import { Separator } from "__UI_BASE__/separator";
 import {
-  Shield,
-  CalendarDays,
+  Goal,
   Wallet,
   Loader2,
   AlertTriangle,
@@ -61,18 +61,35 @@ export function EscrowsBySignerCards() {
     handleSortingChange,
   } = useEscrowsBySigner();
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 2,
-    }).format(value);
+  const formatCurrency = (value: number, currency: string) => {
+    return `${currency} ${value.toFixed(2)}`;
   };
 
   function formatTimestamp(ts?: { _seconds: number; _nanoseconds: number }) {
     if (!ts) return "-";
     const d = new Date(ts._seconds * 1000);
     return d.toLocaleString();
+  }
+
+  function allMilestonesReleasedOrResolved(
+    milestones: MultiReleaseMilestone[]
+  ) {
+    return milestones.every(
+      (milestone) => milestone.flags?.released || milestone.flags?.resolved
+    );
+  }
+
+  function allMilestonesApproved(milestones: SingleReleaseMilestone[]) {
+    return milestones.every((milestone) => milestone.approved);
+  }
+
+  function getSingleReleaseStatus(
+    flags: { disputed?: boolean; resolved?: boolean; released?: boolean } = {}
+  ) {
+    if (flags.disputed) return { label: "Disputed", variant: "destructive" };
+    if (flags.resolved) return { label: "Resolved", variant: "outline" };
+    if (flags.released) return { label: "Released", variant: "outline" };
+    return { label: "Working", variant: "outline" };
   }
 
   const escrows: Escrow[] = data ?? [];
@@ -214,7 +231,7 @@ export function EscrowsBySignerCards() {
               </div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 py-2">
               {escrows.map((escrow) => (
                 <Card
                   key={escrow.contractId}
@@ -244,14 +261,18 @@ export function EscrowsBySignerCards() {
                         <span className="text-sm font-medium">Amount</span>
                         <span className="font-semibold">
                           {escrow.type === "single-release"
-                            ? formatCurrency(escrow.amount)
+                            ? formatCurrency(
+                                escrow.amount,
+                                escrow.trustline.name
+                              )
                             : formatCurrency(
                                 escrow.milestones.reduce(
                                   (acc, milestone) =>
                                     acc +
                                     (milestone as MultiReleaseMilestone).amount,
                                   0
-                                )
+                                ),
+                                escrow.trustline.name
                               )}
                         </span>
                       </div>
@@ -259,8 +280,11 @@ export function EscrowsBySignerCards() {
                       {escrow.balance !== undefined && (
                         <div className="flex items-center justify-between text-sm">
                           <span className="text-muted-foreground">Balance</span>
-                          <span className="font-medium text-green-600 dark:text-green-400">
-                            {formatCurrency(escrow.balance)}
+                          <span className="font-medium text-green-800 dark:text-green-600">
+                            {formatCurrency(
+                              escrow.balance,
+                              escrow.trustline.name
+                            )}
                           </span>
                         </div>
                       )}
@@ -279,30 +303,121 @@ export function EscrowsBySignerCards() {
 
                     {/* Details Section */}
                     <div className="space-y-3">
-                      <div className="flex items-center gap-2">
-                        <Shield className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm font-medium">Trustline</span>
-                        <Badge variant="outline" className="text-xs">
-                          {escrow.trustline.name}
-                        </Badge>
-                      </div>
+                      <div className="flex flex-col gap-2">
+                        <div className="flex items-center gap-2">
+                          <Goal className="h-4 w-4 text-muted-foreground" />
+                          <span className="text-sm font-medium">
+                            Milestones
+                          </span>
+                        </div>
+                        <ul className="list-disc list-inside flex flex-col gap-1">
+                          {escrow.milestones.slice(0, 3).map((milestone) => (
+                            <li
+                              key={milestone.description.slice(0, 5)}
+                              className="text-xs flex justify-between"
+                            >
+                              {milestone.description}
 
-                      <div className="flex items-center gap-2">
-                        <CalendarDays className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm text-muted-foreground">
-                          Created {formatTimestamp(escrow.createdAt)}
-                        </span>
+                              {escrow.type === "multi-release" &&
+                                "amount" in milestone && (
+                                  <>
+                                    <div className="flex items-center gap-1">
+                                      <span className="text-muted-foreground">
+                                        {formatCurrency(
+                                          milestone.amount,
+                                          escrow.trustline.name
+                                        )}
+                                      </span>
+
+                                      <span
+                                        className={`bg-red-800 rounded-full h-2 w-2 ml-1 ${
+                                          milestone.flags?.disputed
+                                            ? "block"
+                                            : "hidden"
+                                        }`}
+                                      />
+
+                                      <span
+                                        className={`bg-green-800 rounded-full h-2 w-2 ml-1 ${
+                                          milestone.flags?.resolved ||
+                                          milestone.flags?.released
+                                            ? "block"
+                                            : "hidden"
+                                        }`}
+                                      />
+
+                                      <span
+                                        className={`bg-yellow-800 rounded-full h-2 w-2 ml-1 ${
+                                          milestone.flags?.approved &&
+                                          !milestone.flags?.disputed &&
+                                          !milestone.flags?.resolved &&
+                                          !milestone.flags?.released
+                                            ? "block"
+                                            : "hidden"
+                                        }`}
+                                      />
+                                    </div>
+                                  </>
+                                )}
+                            </li>
+                          ))}
+
+                          {escrow.milestones.length > 3 && (
+                            <li className="text-xs">
+                              {escrow.milestones.length - 3} more
+                            </li>
+                          )}
+                        </ul>
                       </div>
                     </div>
 
                     {/* Type Badge */}
-                    <div className="pt-2">
-                      <Badge variant="secondary" className="text-xs">
-                        {escrow.type
-                          .replace("_", " ")
-                          .toLowerCase()
-                          .replace(/\b\w/g, (l) => l.toUpperCase())}
-                      </Badge>
+                    <div className="pt-2 flex items-end justify-between">
+                      <div className="flex flex-col gap-2">
+                        <Badge variant="secondary" className="text-xs">
+                          {escrow.type
+                            .replace("_", " ")
+                            .toLowerCase()
+                            .replace(/\b\w/g, (l) => l.toUpperCase())}
+                        </Badge>
+
+                        {escrow.type === "single-release" &&
+                          !allMilestonesApproved(
+                            escrow.milestones as SingleReleaseMilestone[]
+                          ) && (
+                            <Badge
+                              variant={
+                                getSingleReleaseStatus(escrow.flags ?? {})
+                                  .variant as "destructive" | "outline"
+                              }
+                              className="text-xs"
+                            >
+                              {getSingleReleaseStatus(escrow.flags ?? {}).label}
+                            </Badge>
+                          )}
+
+                        {escrow.type === "single-release" &&
+                          allMilestonesApproved(
+                            escrow.milestones as SingleReleaseMilestone[]
+                          ) && (
+                            <Badge variant="outline" className="text-xs">
+                              Pending Release
+                            </Badge>
+                          )}
+
+                        {escrow.type === "multi-release" &&
+                          allMilestonesReleasedOrResolved(
+                            escrow.milestones as MultiReleaseMilestone[]
+                          ) && (
+                            <Badge variant="outline" className="text-xs">
+                              Finished
+                            </Badge>
+                          )}
+                      </div>
+
+                      <span className="text-xs text-muted-foreground">
+                        {formatTimestamp(escrow.createdAt)}
+                      </span>
                     </div>
                   </CardContent>
                 </Card>
