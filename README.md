@@ -28,6 +28,8 @@ What init does:
 Environment:
 - Create `NEXT_PUBLIC_API_KEY` in your env. The library uses `TrustlessWorkProvider` with `development` base URL by default.
 
+Tutorial at <a href="https://dapp.trustlesswork.com" target="_blank">backoffice's landing</a>
+
 ## Quick Start
 
 1. Initialize
@@ -157,6 +159,9 @@ export function DeployButton({ address }: { address: string }) {
 In order to see all of them, just run this script:
 
 ```shell
+
+npx trustless-work list
+
 # Scaffold top-level groups
 npx trustless-work add providers
 npx trustless-work add wallet-kit
