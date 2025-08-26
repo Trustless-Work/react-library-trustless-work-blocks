@@ -682,60 +682,49 @@ function copySharedDetailsInto(targetRelativeDir, { uiBase } = {}) {
   }
 }
 
-function copySharedRoleSignerHooks() {
-  const srcDir = path.join(TEMPLATES_DIR, "tanstak");
+function copySharedRoleSignerHooks(kind = "both") {
   const outRoot = path.join(PROJECT_ROOT, "src", "components", "tw-blocks");
 
-  const files = [
-    {
-      shared: "useEscrowsByRole.shared.ts",
-      targets: [
-        path.join(
-          outRoot,
-          "escrows",
-          "escrows-by-role",
-          "cards",
-          "useEsrowsByRole.ts"
-        ),
-        path.join(
-          outRoot,
-          "escrows",
-          "escrows-by-role",
-          "table",
-          "useEsrowsByRole.ts"
-        ),
-      ],
-    },
-    {
-      shared: "useEscrowsBySigner.shared.ts",
-      targets: [
-        path.join(
-          outRoot,
-          "escrows",
-          "escrows-by-signer",
-          "cards",
-          "useEsrowsBySigner.ts"
-        ),
-        path.join(
-          outRoot,
-          "escrows",
-          "escrows-by-signer",
-          "table",
-          "useEsrowsBySigner.ts"
-        ),
-      ],
-    },
-  ];
+  const mappings = [];
+  if (kind === "both" || kind === "role") {
+    mappings.push({
+      src: path.join(
+        TEMPLATES_DIR,
+        "escrows",
+        "escrows-by-role",
+        "useEscrowsByRole.shared.ts"
+      ),
+      dest: path.join(
+        outRoot,
+        "escrows",
+        "escrows-by-role",
+        "useEscrowsByRole.shared.ts"
+      ),
+    });
+  }
+  if (kind === "both" || kind === "signer") {
+    mappings.push({
+      src: path.join(
+        TEMPLATES_DIR,
+        "escrows",
+        "escrows-by-signer",
+        "useEscrowsBySigner.shared.ts"
+      ),
+      dest: path.join(
+        outRoot,
+        "escrows",
+        "escrows-by-signer",
+        "useEscrowsBySigner.shared.ts"
+      ),
+    });
+  }
 
-  for (const group of files) {
-    const src = path.join(srcDir, group.shared);
+  for (const { src, dest } of mappings) {
     if (!fs.existsSync(src)) continue;
     const raw = fs.readFileSync(src, "utf8");
-    for (const dest of group.targets) {
-      fs.mkdirSync(path.dirname(dest), { recursive: true });
-      fs.writeFileSync(dest, raw, "utf8");
-      console.log(`✅ ${path.relative(PROJECT_ROOT, dest)} created`);
-    }
+    fs.mkdirSync(path.dirname(dest), { recursive: true });
+    fs.writeFileSync(dest, raw, "utf8");
+    console.log(`✅ ${path.relative(PROJECT_ROOT, dest)} created`);
   }
 }
 
@@ -1025,7 +1014,7 @@ if (args[0] === "init") {
       copySharedDetailsInto("escrows/escrows-by-signer/details", {
         uiBase: flags.uiBase,
       });
-      copySharedRoleSignerHooks();
+      copySharedRoleSignerHooks("both");
     }
     if (
       args[1] === "escrows/escrows-by-role" ||
@@ -1034,7 +1023,7 @@ if (args[0] === "init") {
       copySharedDetailsInto("escrows/escrows-by-role/details", {
         uiBase: flags.uiBase,
       });
-      copySharedRoleSignerHooks();
+      copySharedRoleSignerHooks("role");
     }
     if (
       args[1] === "escrows/escrows-by-signer" ||
@@ -1043,7 +1032,7 @@ if (args[0] === "init") {
       copySharedDetailsInto("escrows/escrows-by-signer/details", {
         uiBase: flags.uiBase,
       });
-      copySharedRoleSignerHooks();
+      copySharedRoleSignerHooks("signer");
     }
   } catch (e) {
     console.warn("⚠️  Failed to copy shared details:", e?.message || e);
