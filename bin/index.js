@@ -579,6 +579,52 @@ function copyTemplate(name, { uiBase, shouldInstall = false } = {}) {
         e?.message || e
       );
     }
+
+    // If adding the root escrows bundle, also materialize single-release shared files
+    try {
+      if (name === "escrows") {
+        const modules = [
+          "initialize-escrow",
+          "approve-milestone",
+          "change-milestone-status",
+          "fund-escrow",
+          "resolve-dispute",
+          "update-escrow",
+        ];
+
+        const baseTarget = path.join(destDir, "single-release");
+        for (const mod of modules) {
+          const srcSharedDir = path.join(
+            TEMPLATES_DIR,
+            "escrows",
+            "single-release",
+            mod,
+            "shared"
+          );
+          if (!fs.existsSync(srcSharedDir)) continue;
+
+          const targets = [
+            path.join(baseTarget, mod, "dialog"),
+            path.join(baseTarget, mod, "form"),
+          ];
+
+          const entries = fs.readdirSync(srcSharedDir, { withFileTypes: true });
+          for (const entry of entries) {
+            if (!/\.(tsx?|jsx?)$/i.test(entry.name)) continue;
+            const entrySrc = path.join(srcSharedDir, entry.name);
+            for (const t of targets) {
+              const entryDest = path.join(t, entry.name);
+              writeTransformed(entrySrc, entryDest);
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.warn(
+        "⚠️  Failed to materialize shared files for escrows root:",
+        e?.message || e
+      );
+    }
   } else if (fs.existsSync(srcFile)) {
     fs.mkdirSync(outRoot, { recursive: true });
     const destFile = path.join(outRoot, name + ".tsx");

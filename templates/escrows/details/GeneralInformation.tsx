@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { Card } from "__UI_BASE__/card";
 import { cn } from "@/lib/utils";
 import { MultiReleaseMilestone } from "@trustless-work/escrow";
@@ -26,6 +26,11 @@ import {
 } from "@trustless-work/escrow/types";
 import { useEscrowAmountContext } from "../../escrow-context/EscrowAmountProvider";
 import { StatisticsCard } from "./StatisticsCard";
+import {
+  formatAddress,
+  formatCurrency,
+} from "@/components/tw-blocks/helpers/format.helper";
+import { useCopy } from "@/components/tw-blocks/helpers/useCopy";
 
 interface GeneralInformationProps {
   selectedEscrow: GetEscrowsFromIndexerResponse;
@@ -42,9 +47,9 @@ export const GeneralInformation = ({
   areAllMilestonesApproved,
   activeRole,
 }: GeneralInformationProps) => {
-  const [copiedKeyId, setCopiedKeyId] = useState(false);
   const { trustlessWorkAmount, receiverAmount, platformFeeAmount } =
     useEscrowAmountContext();
+  const { copiedKeyId, copyToClipboard } = useCopy();
 
   const totalAmount = useMemo(() => {
     if (!selectedEscrow) return 0;
@@ -58,22 +63,6 @@ export const GeneralInformation = ({
       );
     }
   }, [selectedEscrow]);
-
-  function formatCurrency(amount: number, currency: string) {
-    return `${currency} ${amount.toFixed(2)}`;
-  }
-
-  const copyToClipboard = async (text: string) => {
-    await navigator.clipboard.writeText(text);
-    setCopiedKeyId(true);
-    setTimeout(() => setCopiedKeyId(false), 1500);
-  };
-
-  const formatAddress = (address: string) => {
-    if (!address) return "";
-    if (address.length <= 10) return address;
-    return `${address.slice(0, 6)}…${address.slice(-4)}`;
-  };
 
   return (
     <div className="space-y-6 h-full">

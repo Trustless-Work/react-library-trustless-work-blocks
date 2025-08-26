@@ -24,6 +24,7 @@ import {
 import { useEscrowContext } from "../../escrow-context/EscrowProvider";
 import { useEscrowDialogs } from "../../escrow-context/EscrowDialogsProvider";
 import EscrowDetailDialog from "../../escrows-by-role/details/EscrowDetailDialog";
+import { formatTimestamp } from "../../../helpers/format.helper";
 
 export function EscrowsBySignerCards() {
   const {
@@ -72,12 +73,6 @@ export function EscrowsBySignerCards() {
   const formatCurrency = (value: number, currency: string) => {
     return `${currency} ${value.toFixed(2)}`;
   };
-
-  function formatTimestamp(ts?: { _seconds: number; _nanoseconds: number }) {
-    if (!ts) return "-";
-    const d = new Date(ts._seconds * 1000);
-    return d.toLocaleString();
-  }
 
   function allMilestonesReleasedOrResolved(
     milestones: MultiReleaseMilestone[]

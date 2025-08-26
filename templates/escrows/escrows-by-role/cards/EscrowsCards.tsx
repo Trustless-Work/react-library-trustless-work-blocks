@@ -24,6 +24,10 @@ import Filters from "./Filters";
 import EscrowDetailDialog from "../details/EscrowDetailDialog";
 import { useEscrowContext } from "../../escrow-context/EscrowProvider";
 import { useEscrowDialogs } from "../../escrow-context/EscrowDialogsProvider";
+import {
+  formatCurrency,
+  formatTimestamp,
+} from "../../../helpers/format.helper";
 
 export function EscrowsByRoleCards() {
   const {
@@ -70,16 +74,6 @@ export function EscrowsByRoleCards() {
   const { setSelectedEscrow } = useEscrowContext();
 
   const dialogStates = useEscrowDialogs();
-
-  const formatCurrency = (value: number, currency: string) => {
-    return `${currency} ${value.toFixed(2)}`;
-  };
-
-  function formatTimestamp(ts?: { _seconds: number; _nanoseconds: number }) {
-    if (!ts) return "-";
-    const d = new Date(ts._seconds * 1000);
-    return d.toLocaleString();
-  }
 
   function allMilestonesReleasedOrResolved(
     milestones: MultiReleaseMilestone[]

@@ -1,11 +1,13 @@
 "use client";
 
+import React from "react";
 import type { ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "__UI_BASE__/button";
 import { Card, CardContent } from "__UI_BASE__/card";
 import { Badge } from "__UI_BASE__/badge";
+import { formatText } from "@/components/tw-blocks/helpers/format.helper";
 
 interface StatisticsCardProps {
   title: string;
@@ -32,10 +34,6 @@ export const StatisticsCard = ({
   iconSize = 30,
   fundedBy,
 }: StatisticsCardProps) => {
-  function formatText(text: string) {
-    return text.charAt(0).toUpperCase() + text.slice(1);
-  }
-
   return (
     <Card
       className={cn(

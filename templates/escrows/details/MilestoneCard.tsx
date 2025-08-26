@@ -25,6 +25,7 @@ import ResolveDisputeDialog from "../../single-release/resolve-dispute/dialog/Re
 import DisputeEscrowButton from "../../single-release/dispute-escrow/button/DisputeEscrow";
 import ReleaseEscrowButton from "../../single-release/release-escrow/button/ReleaseEscrow";
 import ChangeMilestoneStatusDialog from "../../single-release/change-milestone-status/dialog/ChangeMilestoneStatus";
+import { formatCurrency } from "@/components/tw-blocks/helpers/format.helper";
 
 interface MilestoneCardProps {
   milestone: SingleReleaseMilestone | MultiReleaseMilestone;
@@ -175,10 +176,6 @@ const MilestoneCardComponent = ({
     }
 
     return buttons;
-  };
-
-  const formatCurrency = (value: number, currency: string) => {
-    return `${currency} ${value.toFixed(2)}`;
   };
 
   return (

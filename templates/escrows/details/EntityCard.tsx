@@ -6,6 +6,10 @@ import { Card, CardContent } from "__UI_BASE__/card";
 import { Badge } from "__UI_BASE__/badge";
 import { Separator } from "__UI_BASE__/separator";
 import Link from "next/link";
+import {
+  formatAddress,
+  formatRole,
+} from "@/components/tw-blocks/helpers/format.helper";
 
 interface EntityCardProps {
   entity?: string;
@@ -28,17 +32,6 @@ const EntityCard = ({
   currency,
   inDispute,
 }: EntityCardProps) => {
-  const formatAddress = (address: string) => {
-    return `${address.slice(0, 10)}...${address.slice(-4)}`;
-  };
-
-  const formatRole = (role: string) => {
-    return role
-      .replace(/([A-Z])/g, " $1")
-      .replace(/^./, (str) => str.toUpperCase())
-      .trim();
-  };
-
   return (
     <Card className="w-full overflow-hidden transition-all duration-200 hover:shadow-md py-2">
       <Link href={`/dashboard/public-profile/${entity}`} target="_blank">

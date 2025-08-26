@@ -28,12 +28,7 @@ import EscrowDetailDialog from "../details/EscrowDetailDialog";
 import { useEscrowDialogs } from "../../escrow-context/EscrowDialogsProvider";
 import { useEscrowContext } from "../../escrow-context/EscrowProvider";
 import { useEscrowsByRole } from "../useEscrowsByRole.shared";
-
-function formatTimestamp(ts?: { _seconds: number; _nanoseconds: number }) {
-  if (!ts) return "-";
-  const d = new Date(ts._seconds * 1000);
-  return d.toLocaleString();
-}
+import { formatTimestamp } from "../../../helpers/format.helper";
 
 export function EscrowsByRoleTable() {
   const {
