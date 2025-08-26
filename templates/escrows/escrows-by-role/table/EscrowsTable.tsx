@@ -24,10 +24,10 @@ import {
 } from "__UI_BASE__/table";
 import { FileX, Loader2, Wallet, RefreshCw, AlertTriangle } from "lucide-react";
 import Filters from "./Filters";
-import { useEscrowsByRole } from "./useEsrowsByRole";
 import EscrowDetailDialog from "../details/EscrowDetailDialog";
 import { useEscrowDialogs } from "../../escrow-context/EscrowDialogsProvider";
 import { useEscrowContext } from "../../escrow-context/EscrowProvider";
+import { useEscrowsByRole } from "../useEscrowsByRole.shared";
 
 function formatTimestamp(ts?: { _seconds: number; _nanoseconds: number }) {
   if (!ts) return "-";

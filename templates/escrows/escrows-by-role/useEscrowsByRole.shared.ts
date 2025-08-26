@@ -5,8 +5,8 @@ import { startOfDay, endOfDay, format } from "date-fns";
 import type { DateRange as DayPickerDateRange } from "react-day-picker";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { SortingState } from "@tanstack/react-table";
-import { useWalletContext } from "../../../wallet-kit/WalletProvider";
-import { useEscrowsByRoleQuery } from "../../../tanstak/useEscrowsByRoleQuery";
+import { useWalletContext } from "../../wallet-kit/WalletProvider";
+import { useEscrowsByRoleQuery } from "../../tanstak/useEscrowsByRoleQuery";
 import type { GetEscrowsFromIndexerByRoleParams } from "@trustless-work/escrow";
 import { GetEscrowsFromIndexerResponse as Escrow } from "@trustless-work/escrow/types";
 
@@ -62,7 +62,6 @@ export function useEscrowsByRole() {
   const debouncedMinAmount = useDebouncedValue(minAmount, 400);
   const debouncedMaxAmount = useDebouncedValue(maxAmount, 400);
 
-  // URL -> state on mount
   React.useEffect(() => {
     if (!searchParams) return;
     const qp = new URLSearchParams(searchParams.toString());
@@ -109,7 +108,6 @@ export function useEscrowsByRole() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // state -> URL (debounced for text/number)
   const debouncedSearchParams = useDebouncedValue(
     {
       page,
@@ -237,14 +235,8 @@ export function useEscrowsByRole() {
   ]);
 
   const query = useEscrowsByRoleQuery(params);
+  const nextPageQuery = useEscrowsByRoleQuery({ ...params, page: page + 1 });
 
-  // Prefetch next page for "Next" button enabled state without extra renders
-  const nextPageQuery = useEscrowsByRoleQuery({
-    ...params,
-    page: page + 1,
-  });
-
-  // Ensure refetch when toggling validateOnChain back to a previously cached value
   const didMountValidateRef = React.useRef(false);
   React.useEffect(() => {
     if (!didMountValidateRef.current) {
@@ -252,7 +244,6 @@ export function useEscrowsByRole() {
       return;
     }
     query.refetch();
-    // keep next page in sync too
     nextPageQuery.refetch();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [validateOnChain]);
@@ -302,7 +293,6 @@ export function useEscrowsByRole() {
   );
 
   return {
-    // data
     walletAddress,
     data: query.data ?? ([] as Escrow[]),
     isLoading: query.isLoading,
@@ -311,8 +301,6 @@ export function useEscrowsByRole() {
     refetch: query.refetch,
     nextData: nextPageQuery.data ?? [],
     isFetchingNext: nextPageQuery.isFetching,
-
-    // filters & state
     page,
     setPage,
     orderBy,
@@ -342,7 +330,6 @@ export function useEscrowsByRole() {
     formattedRangeLabel,
     role,
     setRole,
-
     onClearFilters,
     handleSortingChange,
   } as const;

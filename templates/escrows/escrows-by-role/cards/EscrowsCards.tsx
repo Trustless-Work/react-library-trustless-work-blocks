@@ -19,7 +19,7 @@ import {
   RefreshCw,
   FileX,
 } from "lucide-react";
-import { useEscrowsByRole } from "./useEsrowsByRole";
+import { useEscrowsByRole } from "../useEscrowsByRole.shared";
 import Filters from "./Filters";
 import EscrowDetailDialog from "../details/EscrowDetailDialog";
 import { useEscrowContext } from "../../escrow-context/EscrowProvider";

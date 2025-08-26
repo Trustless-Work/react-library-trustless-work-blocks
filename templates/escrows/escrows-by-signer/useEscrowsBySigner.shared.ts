@@ -5,9 +5,8 @@ import { startOfDay, endOfDay, format } from "date-fns";
 import type { DateRange as DayPickerDateRange } from "react-day-picker";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { SortingState } from "@tanstack/react-table";
-import { useWalletContext } from "../../../wallet-kit/WalletProvider";
-import { useEscrowsByRoleQuery } from "../../../tanstak/useEscrowsByRoleQuery";
-import type { GetEscrowsFromIndexerByRoleParams } from "@trustless-work/escrow";
+import { useWalletContext } from "../../wallet-kit/WalletProvider";
+import { useEscrowsBySignerQuery } from "../../tanstak/useEscrowsBySignerQuery";
 import { GetEscrowsFromIndexerResponse as Escrow } from "@trustless-work/escrow/types";
 
 export type EscrowOrderBy = "createdAt" | "updatedAt" | "amount";
@@ -22,7 +21,7 @@ export type EscrowStatus =
   | "all";
 export type DateRange = DayPickerDateRange;
 
-export function useEscrowsByRole() {
+export function useEscrowsBySigner() {
   const { walletAddress } = useWalletContext();
   const router = useRouter();
   const pathname = usePathname();
@@ -45,8 +44,6 @@ export function useEscrowsByRole() {
     from: undefined,
     to: undefined,
   });
-  const [role, setRole] =
-    React.useState<GetEscrowsFromIndexerByRoleParams["role"]>("approver");
 
   function useDebouncedValue<T>(value: T, delayMs: number) {
     const [debounced, setDebounced] = React.useState<T>(value);
@@ -62,7 +59,6 @@ export function useEscrowsByRole() {
   const debouncedMinAmount = useDebouncedValue(minAmount, 400);
   const debouncedMaxAmount = useDebouncedValue(maxAmount, 400);
 
-  // URL -> state on mount
   React.useEffect(() => {
     if (!searchParams) return;
     const qp = new URLSearchParams(searchParams.toString());
@@ -80,7 +76,6 @@ export function useEscrowsByRole() {
     const qpMax = qp.get("maxAmount") || "";
     const qpStart = qp.get("startDate");
     const qpEnd = qp.get("endDate");
-    const qpRole = qp.get("role");
 
     setPage(Number.isFinite(qpPage) && qpPage > 0 ? qpPage : 1);
     setOrderBy(
@@ -103,13 +98,9 @@ export function useEscrowsByRole() {
       from: qpStart ? new Date(qpStart) : undefined,
       to: qpEnd ? new Date(qpEnd) : undefined,
     });
-    setRole(
-      (qpRole as GetEscrowsFromIndexerByRoleParams["role"]) || "approver"
-    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // state -> URL (debounced for text/number)
   const debouncedSearchParams = useDebouncedValue(
     {
       page,
@@ -127,7 +118,6 @@ export function useEscrowsByRole() {
         ? startOfDay(dateRange.from).toISOString()
         : undefined,
       endDate: dateRange.to ? endOfDay(dateRange.to).toISOString() : undefined,
-      role,
     },
     200
   );
@@ -157,8 +147,6 @@ export function useEscrowsByRole() {
       qp.set("startDate", String(debouncedSearchParams.startDate));
     if (debouncedSearchParams.endDate)
       qp.set("endDate", String(debouncedSearchParams.endDate));
-    if (debouncedSearchParams.role)
-      qp.set("role", String(debouncedSearchParams.role));
 
     router.replace(`${pathname}?${qp.toString()}`);
   }, [
@@ -177,7 +165,6 @@ export function useEscrowsByRole() {
     debouncedSearchParams.maxAmount,
     debouncedSearchParams.startDate,
     debouncedSearchParams.endDate,
-    debouncedSearchParams.role,
   ]);
 
   const formattedRangeLabel = React.useMemo(() => {
@@ -191,8 +178,7 @@ export function useEscrowsByRole() {
 
   const params = React.useMemo(() => {
     return {
-      roleAddress: walletAddress ?? "",
-      role,
+      signer: walletAddress ?? "",
       page,
       orderBy,
       orderDirection,
@@ -217,11 +203,10 @@ export function useEscrowsByRole() {
         ? startOfDay(dateRange.from).toISOString()
         : undefined,
       endDate: dateRange.to ? endOfDay(dateRange.to).toISOString() : undefined,
-      enabled: Boolean(walletAddress && role),
+      enabled: Boolean(walletAddress),
     };
   }, [
     walletAddress,
-    role,
     page,
     orderBy,
     orderDirection,
@@ -236,15 +221,9 @@ export function useEscrowsByRole() {
     dateRange,
   ]);
 
-  const query = useEscrowsByRoleQuery(params);
+  const query = useEscrowsBySignerQuery(params);
+  const nextPageQuery = useEscrowsBySignerQuery({ ...params, page: page + 1 });
 
-  // Prefetch next page for "Next" button enabled state without extra renders
-  const nextPageQuery = useEscrowsByRoleQuery({
-    ...params,
-    page: page + 1,
-  });
-
-  // Ensure refetch when toggling validateOnChain back to a previously cached value
   const didMountValidateRef = React.useRef(false);
   React.useEffect(() => {
     if (!didMountValidateRef.current) {
@@ -252,7 +231,6 @@ export function useEscrowsByRole() {
       return;
     }
     query.refetch();
-    // keep next page in sync too
     nextPageQuery.refetch();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [validateOnChain]);
@@ -271,7 +249,6 @@ export function useEscrowsByRole() {
     setOrderBy("createdAt");
     setOrderDirection("desc");
     setSorting([]);
-    setRole("approver");
   }, []);
 
   const handleSortingChange = React.useCallback(
@@ -302,7 +279,6 @@ export function useEscrowsByRole() {
   );
 
   return {
-    // data
     walletAddress,
     data: query.data ?? ([] as Escrow[]),
     isLoading: query.isLoading,
@@ -311,8 +287,6 @@ export function useEscrowsByRole() {
     refetch: query.refetch,
     nextData: nextPageQuery.data ?? [],
     isFetchingNext: nextPageQuery.isFetching,
-
-    // filters & state
     page,
     setPage,
     orderBy,
@@ -340,9 +314,6 @@ export function useEscrowsByRole() {
     dateRange,
     setDateRange,
     formattedRangeLabel,
-    role,
-    setRole,
-
     onClearFilters,
     handleSortingChange,
   } as const;

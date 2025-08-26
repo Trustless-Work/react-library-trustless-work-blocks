@@ -9,7 +9,7 @@ import type {
   SingleReleaseMilestone,
 } from "@trustless-work/escrow/types";
 import Filters from "./Filters";
-import { useEscrowsBySigner } from "./useEsrowsBySigner";
+import { useEscrowsBySigner } from "../useEscrowsBySigner.shared";
 import { Card, CardContent, CardHeader, CardTitle } from "__UI_BASE__/card";
 import { Badge } from "__UI_BASE__/badge";
 import { Separator } from "__UI_BASE__/separator";
@@ -21,9 +21,9 @@ import {
   RefreshCw,
   FileX,
 } from "lucide-react";
-import EscrowDetailDialog from "../details/EscrowDetailDialog";
 import { useEscrowContext } from "../../escrow-context/EscrowProvider";
 import { useEscrowDialogs } from "../../escrow-context/EscrowDialogsProvider";
+import EscrowDetailDialog from "../../escrows-by-role/details/EscrowDetailDialog";
 
 export function EscrowsBySignerCards() {
   const {
