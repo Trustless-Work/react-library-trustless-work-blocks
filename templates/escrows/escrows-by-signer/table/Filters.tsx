@@ -29,7 +29,7 @@ import {
   SelectContent as OrderSelectContent,
   SelectItem as OrderSelectItem,
   SelectValue as OrderSelectValue,
-} from "__UI_BASE__/select";
+} from "@/components/ui/select";
 
 type FiltersProps = {
   // values

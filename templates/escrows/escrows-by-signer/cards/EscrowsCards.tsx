@@ -5,6 +5,7 @@ import { Button } from "__UI_BASE__/button";
 import type {
   GetEscrowsFromIndexerResponse as Escrow,
   MultiReleaseMilestone,
+  Role,
   SingleReleaseMilestone,
 } from "@trustless-work/escrow/types";
 import Filters from "./Filters";
@@ -20,7 +21,9 @@ import {
   RefreshCw,
   FileX,
 } from "lucide-react";
-import EscrowDetailsSheet from "./EscrowDetailsSheet";
+import EscrowDetailDialog from "../../escrows-by-role/details/EscrowDetailDialog";
+import { useEscrowContext } from "../../escrow-context/EscrowProvider";
+import { useEscrowDialogs } from "../../escrow-context/EscrowDialogsProvider";
 
 export function EscrowsBySignerCards() {
   const {
@@ -62,6 +65,10 @@ export function EscrowsBySignerCards() {
     handleSortingChange,
   } = useEscrowsBySigner();
 
+  const { setSelectedEscrow } = useEscrowContext();
+
+  const dialogStates = useEscrowDialogs();
+
   const formatCurrency = (value: number, currency: string) => {
     return `${currency} ${value.toFixed(2)}`;
   };
@@ -93,8 +100,6 @@ export function EscrowsBySignerCards() {
     return { label: "Working", variant: "outline" };
   }
 
-  const escrows: Escrow[] = data ?? [];
-
   const currentSort = sorting?.[0];
   const sortField =
     (currentSort?.id as "amount" | "createdAt" | "updatedAt" | undefined) ??
@@ -111,132 +116,146 @@ export function EscrowsBySignerCards() {
 
   const clearSort = () => handleSortingChange([]);
 
-  return (
-    <div className="w-full flex flex-col gap-4">
-      <Filters
-        title={title}
-        engagementId={engagementId}
-        isActive={isActive}
-        validateOnChain={validateOnChain}
-        type={type}
-        status={status}
-        minAmount={minAmount}
-        maxAmount={maxAmount}
-        dateRange={dateRange}
-        formattedRangeLabel={formattedRangeLabel}
-        setTitle={setTitle}
-        setEngagementId={setEngagementId}
-        setIsActive={setIsActive}
-        setValidateOnChain={setValidateOnChain}
-        setType={(v) => setType(v as typeof type)}
-        setStatus={(v) => setStatus(v as typeof status)}
-        setMinAmount={setMinAmount}
-        setMaxAmount={setMaxAmount}
-        setDateRange={setDateRange}
-        onClearFilters={onClearFilters}
-        onRefresh={() => refetch()}
-        isRefreshing={isFetching}
-        orderBy={orderBy}
-        orderDirection={orderDirection}
-        setOrderBy={(v) => setOrderBy(v)}
-        setOrderDirection={(v) => setOrderDirection(v)}
-      />
+  const onCardClick = (escrow: Escrow) => {
+    setSelectedEscrow(escrow);
+    dialogStates.second.setIsOpen(true);
+  };
 
-      <div className="w-full p-2 sm:p-4">
-        <div className="mb-2 sm:mb-3 flex items-center justify-end gap-2">
-          <span className="text-xs text-muted-foreground">Sort</span>
-          <Button
-            className="cursor-pointer"
-            variant={sortField === "createdAt" ? "default" : "outline"}
-            size="sm"
-            onClick={() => setSort("createdAt")}
-          >
-            Created {sortField === "createdAt" ? (sortDesc ? "▼" : "▲") : ""}
-          </Button>
-          <Button
-            className="cursor-pointer"
-            variant={sortField === "updatedAt" ? "default" : "outline"}
-            size="sm"
-            onClick={() => setSort("updatedAt")}
-          >
-            Updated {sortField === "updatedAt" ? (sortDesc ? "▼" : "▲") : ""}
-          </Button>
-          <Button
-            className="cursor-pointer"
-            variant={sortField === "amount" ? "default" : "outline"}
-            size="sm"
-            onClick={() => setSort("amount")}
-          >
-            Amount {sortField === "amount" ? (sortDesc ? "▼" : "▲") : ""}
-          </Button>
-          <Button
-            className="cursor-pointer"
-            variant="ghost"
-            size="sm"
-            onClick={clearSort}
-            disabled={!currentSort}
-          >
-            Reset
-          </Button>
-        </div>
-        <div className="mt-2 sm:mt-4 overflow-x-auto">
-          {!walletAddress ? (
-            <div>
-              <div className="p-6 md:p-8 flex flex-col items-center justify-center text-center">
-                <Wallet className="h-8 w-8 md:h-12 md:w-12 text-primary mb-3" />
-                <h3 className="font-medium text-foreground mb-2">
-                  Connect your wallet
-                </h3>
-                <p className="text-sm text-muted-foreground max-w-sm">
-                  To continue, connect your wallet and authorize the
-                  application.
-                </p>
+  const activeRole: Role[] = ["approver"];
+  const escrows: Escrow[] = data ?? [];
+
+  return (
+    <>
+      <div className="w-full flex flex-col gap-4">
+        <Filters
+          title={title}
+          engagementId={engagementId}
+          isActive={isActive}
+          validateOnChain={validateOnChain}
+          type={type}
+          status={status}
+          minAmount={minAmount}
+          maxAmount={maxAmount}
+          dateRange={dateRange}
+          formattedRangeLabel={formattedRangeLabel}
+          setTitle={setTitle}
+          setEngagementId={setEngagementId}
+          setIsActive={setIsActive}
+          setValidateOnChain={setValidateOnChain}
+          setType={(v) => setType(v as typeof type)}
+          setStatus={(v) => setStatus(v as typeof status)}
+          setMinAmount={setMinAmount}
+          setMaxAmount={setMaxAmount}
+          setDateRange={setDateRange}
+          onClearFilters={onClearFilters}
+          onRefresh={() => refetch()}
+          isRefreshing={isFetching}
+          orderBy={orderBy}
+          orderDirection={orderDirection}
+          setOrderBy={(v) => setOrderBy(v)}
+          setOrderDirection={(v) => setOrderDirection(v)}
+        />
+
+        <div className="w-full p-2 sm:p-4">
+          <div className="mb-2 sm:mb-3 flex items-center justify-end gap-2">
+            <span className="text-xs text-muted-foreground">Sort</span>
+            <Button
+              className="cursor-pointer"
+              variant={sortField === "createdAt" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setSort("createdAt")}
+            >
+              Created {sortField === "createdAt" ? (sortDesc ? "▼" : "▲") : ""}
+            </Button>
+            <Button
+              className="cursor-pointer"
+              variant={sortField === "updatedAt" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setSort("updatedAt")}
+            >
+              Updated {sortField === "updatedAt" ? (sortDesc ? "▼" : "▲") : ""}
+            </Button>
+            <Button
+              className="cursor-pointer"
+              variant={sortField === "amount" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setSort("amount")}
+            >
+              Amount {sortField === "amount" ? (sortDesc ? "▼" : "▲") : ""}
+            </Button>
+            <Button
+              className="cursor-pointer"
+              variant="ghost"
+              size="sm"
+              onClick={clearSort}
+              disabled={!currentSort}
+            >
+              Reset
+            </Button>
+          </div>
+          <div className="mt-2 sm:mt-4 overflow-x-auto">
+            {!walletAddress ? (
+              <div>
+                <div className="p-6 md:p-8 flex flex-col items-center justify-center text-center">
+                  <Wallet className="h-8 w-8 md:h-12 md:w-12 text-primary mb-3" />
+                  <h3 className="font-medium text-foreground mb-2">
+                    Connect your wallet
+                  </h3>
+                  <p className="text-sm text-muted-foreground max-w-sm">
+                    To continue, connect your wallet and authorize the
+                    application.
+                  </p>
+                </div>
               </div>
-            </div>
-          ) : isLoading ? (
-            <div>
-              <div className="p-6 md:p-8 flex flex-col items-center justify-center text-center">
-                <Loader2 className="h-6 w-6 md:h-8 md:w-8 animate-spin text-primary mb-3" />
-                <p className="text-sm text-muted-foreground">
-                  Loading escrows…
-                </p>
+            ) : isLoading ? (
+              <div>
+                <div className="p-6 md:p-8 flex flex-col items-center justify-center text-center">
+                  <Loader2 className="h-6 w-6 md:h-8 md:w-8 animate-spin text-primary mb-3" />
+                  <p className="text-sm text-muted-foreground">
+                    Loading escrows…
+                  </p>
+                </div>
               </div>
-            </div>
-          ) : isError ? (
-            <div>
-              <div className="p-6 md:p-8 flex flex-col items-center justify-center text-center">
-                <AlertTriangle className="h-8 w-8 md:h-10 md:w-10 text-destructive mb-3" />
-                <h3 className="font-medium text-foreground mb-2">
-                  Error loading data
-                </h3>
-                <p className="text-sm text-muted-foreground max-w-sm mb-4">
-                  An error occurred while loading the information. Please try
-                  again.
-                </p>
-                <Button variant="outline" size="sm" onClick={() => refetch()}>
-                  <RefreshCw className="h-4 w-4 mr-2" />
-                  Retry
-                </Button>
+            ) : isError ? (
+              <div>
+                <div className="p-6 md:p-8 flex flex-col items-center justify-center text-center">
+                  <AlertTriangle className="h-8 w-8 md:h-10 md:w-10 text-destructive mb-3" />
+                  <h3 className="font-medium text-foreground mb-2">
+                    Error loading data
+                  </h3>
+                  <p className="text-sm text-muted-foreground max-w-sm mb-4">
+                    An error occurred while loading the information. Please try
+                    again.
+                  </p>
+                  <Button variant="outline" size="sm" onClick={() => refetch()}>
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Retry
+                  </Button>
+                </div>
               </div>
-            </div>
-          ) : escrows.length === 0 ? (
-            <div>
-              <div className="p-6 md:p-8 flex flex-col items-center justify-center text-center">
-                <FileX className="h-8 w-8 md:h-10 md:w-10 text-muted-foreground/60 mb-3" />
-                <h3 className="font-medium text-foreground mb-2">
-                  No data available
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  No escrows found for the selected filters.
-                </p>
+            ) : escrows.length === 0 ? (
+              <div>
+                <div className="p-6 md:p-8 flex flex-col items-center justify-center text-center">
+                  <FileX className="h-8 w-8 md:h-10 md:w-10 text-muted-foreground/60 mb-3" />
+                  <h3 className="font-medium text-foreground mb-2">
+                    No data available
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    No escrows found for the selected filters.
+                  </p>
+                </div>
               </div>
-            </div>
-          ) : (
-            <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 py-2">
-              {escrows.map((escrow) => (
-                <React.Fragment key={escrow.contractId}>
-                  <EscrowDetailsSheet escrow={escrow}>
-                    <Card className="w-full max-w-md mx-auto hover:shadow-lg transition-shadow duration-200">
+            ) : (
+              <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 py-2">
+                {escrows.map((escrow) => (
+                  <React.Fragment key={escrow.contractId}>
+                    <Card
+                      className="w-full max-w-md mx-auto hover:shadow-lg transition-shadow duration-200"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onCardClick(escrow);
+                      }}
+                    >
                       <CardHeader className="pb-3">
                         <div className="flex items-start justify-between gap-2">
                           <CardTitle className="text-lg font-semibold leading-tight line-clamp-2">
@@ -440,40 +459,48 @@ export function EscrowsBySignerCards() {
                         </div>
                       </CardContent>
                     </Card>
-                  </EscrowDetailsSheet>
-                </React.Fragment>
-              ))}
-            </div>
-          )}
-        </div>
-
-        <div className="mt-3 sm:mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-          <div className="text-xs sm:text-sm text-muted-foreground">
-            Page {page}
+                  </React.Fragment>
+                ))}
+              </div>
+            )}
           </div>
-          <div className="flex items-center gap-2 self-end sm:self-auto">
-            <Button
-              variant="outline"
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={page === 1 || isFetching}
-            >
-              Previous
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => setPage((p) => p + 1)}
-              disabled={
-                isFetching ||
-                !walletAddress ||
-                ((nextData?.length ?? 0) === 0 && !isFetchingNext)
-              }
-            >
-              Next
-            </Button>
+
+          <div className="mt-3 sm:mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <div className="text-xs sm:text-sm text-muted-foreground">
+              Page {page}
+            </div>
+            <div className="flex items-center gap-2 self-end sm:self-auto">
+              <Button
+                variant="outline"
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page === 1 || isFetching}
+              >
+                Previous
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => setPage((p) => p + 1)}
+                disabled={
+                  isFetching ||
+                  !walletAddress ||
+                  ((nextData?.length ?? 0) === 0 && !isFetchingNext)
+                }
+              >
+                Next
+              </Button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+
+      {/* Dialog */}
+      <EscrowDetailDialog
+        activeRole={activeRole}
+        isDialogOpen={dialogStates.second.isOpen}
+        setIsDialogOpen={dialogStates.second.setIsOpen}
+        setSelectedEscrow={setSelectedEscrow}
+      />
+    </>
   );
 }
 
