@@ -22,7 +22,6 @@ export function useInitializeEscrow() {
   const formSchema = getSingleReleaseFormSchema();
 
   const { walletAddress } = useWalletContext();
-  // const { setSelectedEscrow } = useEscrowContext();
   const { deployEscrow } = useEscrowsMutations();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -94,12 +93,8 @@ export function useInitializeEscrow() {
           address: walletAddress || "",
         })) as InitializeSingleReleaseEscrowResponse;
 
-      // setSelectedEscrow({ ...response.escrow, contractId: response.contractId });
-
       console.log("response", response);
       toast.success("Escrow initialized successfully");
-
-      // do something with the response ...
     } catch (error) {
       toast.error(handleError(error as ErrorResponse).message);
     } finally {
@@ -113,7 +108,6 @@ export function useInitializeEscrow() {
     isSubmitting,
     milestones,
     isAnyMilestoneEmpty,
-
     handleSubmit,
     handleAddMilestone,
     handleRemoveMilestone,

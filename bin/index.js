@@ -249,9 +249,13 @@ function copyTemplate(name, { uiBase, shouldInstall = false } = {}) {
       const entries = fs.readdirSync(current, { withFileTypes: true });
       for (const entry of entries) {
         const entryRel = path.join(rel, entry.name);
+        // Skip copying any shared/ directory entirely
+        const parts = entryRel.split(path.sep);
+        const top = parts[0] || "";
+        if (top === "shared") {
+          continue;
+        }
         if (skipDetails) {
-          const parts = entryRel.split(path.sep);
-          const top = parts[0] || "";
           const firstTwo = parts.slice(0, 2).join(path.sep);
           if (
             top === "details" ||
@@ -276,6 +280,49 @@ function copyTemplate(name, { uiBase, shouldInstall = false } = {}) {
           console.log(`✅ ${path.relative(PROJECT_ROOT, entryDest)} created`);
         }
       }
+    }
+
+    // Post-copy: materialize shared initialize-escrow files into dialog/form
+    try {
+      const isSingleReleaseInitRoot =
+        name === "escrows/single-release/initialize-escrow";
+      const isSingleReleaseInitDialog =
+        name === "escrows/single-release/initialize-escrow/dialog";
+      const isSingleReleaseInitForm =
+        name === "escrows/single-release/initialize-escrow/form";
+
+      const srcSharedDir = path.join(
+        TEMPLATES_DIR,
+        "escrows",
+        "single-release",
+        "initialize-escrow",
+        "shared"
+      );
+
+      function copySharedInto(targetDir) {
+        if (!fs.existsSync(srcSharedDir)) return;
+        const entries = fs.readdirSync(srcSharedDir, { withFileTypes: true });
+        for (const entry of entries) {
+          if (!/\.(tsx?|jsx?)$/i.test(entry.name)) continue;
+          const entrySrc = path.join(srcSharedDir, entry.name);
+          const entryDest = path.join(targetDir, entry.name);
+          writeTransformed(entrySrc, entryDest);
+        }
+      }
+
+      if (isSingleReleaseInitRoot) {
+        copySharedInto(path.join(destDir, "dialog"));
+        copySharedInto(path.join(destDir, "form"));
+      } else if (isSingleReleaseInitDialog) {
+        copySharedInto(destDir);
+      } else if (isSingleReleaseInitForm) {
+        copySharedInto(destDir);
+      }
+    } catch (e) {
+      console.warn(
+        "⚠️  Failed to materialize shared initialize-escrow files:",
+        e?.message || e
+      );
     }
   } else if (fs.existsSync(srcFile)) {
     fs.mkdirSync(outRoot, { recursive: true });

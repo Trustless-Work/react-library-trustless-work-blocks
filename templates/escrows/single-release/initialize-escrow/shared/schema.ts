@@ -73,10 +73,9 @@ export const useInitializeEscrowSchema = () => {
         .union([z.string(), z.number()])
         .refine(
           (val) => {
-            // Allow partial input like "0." or "0.5"
             if (typeof val === "string") {
               if (val === "" || val === "." || val.endsWith(".")) {
-                return true; // Allow partial input
+                return true;
               }
               const numVal = Number(val);
               return !isNaN(numVal) && numVal > 0;
@@ -91,7 +90,7 @@ export const useInitializeEscrowSchema = () => {
           (val) => {
             if (typeof val === "string") {
               if (val === "" || val === "." || val.endsWith(".")) {
-                return true; // Allow partial input
+                return true;
               }
               const numVal = Number(val);
               if (isNaN(numVal)) return false;
@@ -127,10 +126,9 @@ export const useInitializeEscrowSchema = () => {
         .union([z.string(), z.number()])
         .refine(
           (val) => {
-            // Allow partial input like "0." or "0.5"
             if (typeof val === "string") {
               if (val === "" || val === "." || val.endsWith(".")) {
-                return true; // Allow partial input
+                return true;
               }
               const numVal = Number(val);
               return !isNaN(numVal) && numVal > 0;
@@ -145,7 +143,7 @@ export const useInitializeEscrowSchema = () => {
           (val) => {
             if (typeof val === "string") {
               if (val === "" || val === "." || val.endsWith(".")) {
-                return true; // Allow partial input
+                return true;
               }
               const numVal = Number(val);
               if (isNaN(numVal)) return false;
@@ -186,10 +184,9 @@ export const useInitializeEscrowSchema = () => {
               .union([z.string(), z.number()])
               .refine(
                 (val) => {
-                  // Allow partial input like "0." or "0.5"
                   if (typeof val === "string") {
                     if (val === "" || val === "." || val.endsWith(".")) {
-                      return true; // Allow partial input
+                      return true;
                     }
                     const numVal = Number(val);
                     return !isNaN(numVal) && numVal > 0;
@@ -204,7 +201,7 @@ export const useInitializeEscrowSchema = () => {
                 (val) => {
                   if (typeof val === "string") {
                     if (val === "" || val === "." || val.endsWith(".")) {
-                      return true; // Allow partial input
+                      return true;
                     }
                     const numVal = Number(val);
                     if (isNaN(numVal)) return false;
