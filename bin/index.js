@@ -249,13 +249,13 @@ function copyTemplate(name, { uiBase, shouldInstall = false } = {}) {
       const entries = fs.readdirSync(current, { withFileTypes: true });
       for (const entry of entries) {
         const entryRel = path.join(rel, entry.name);
-        // Skip copying any shared/ directory entirely
+        // Skip copying any shared directory at any depth
         const parts = entryRel.split(path.sep);
-        const top = parts[0] || "";
-        if (top === "shared") {
+        if (parts.includes("shared")) {
           continue;
         }
         if (skipDetails) {
+          const top = parts[0] || "";
           const firstTwo = parts.slice(0, 2).join(path.sep);
           if (
             top === "details" ||
@@ -363,6 +363,219 @@ function copyTemplate(name, { uiBase, shouldInstall = false } = {}) {
     } catch (e) {
       console.warn(
         "⚠️  Failed to materialize shared approve-milestone files:",
+        e?.message || e
+      );
+    }
+
+    try {
+      const isSingleReleaseInitRoot =
+        name === "escrows/single-release/change-milestone-status";
+      const isSingleReleaseInitDialog =
+        name === "escrows/single-release/change-milestone-status/dialog";
+      const isSingleReleaseInitForm =
+        name === "escrows/single-release/change-milestone-status/form";
+
+      const srcSharedDir = path.join(
+        TEMPLATES_DIR,
+        "escrows",
+        "single-release",
+        "change-milestone-status",
+        "shared"
+      );
+
+      function copySharedInto(targetDir) {
+        if (!fs.existsSync(srcSharedDir)) return;
+        const entries = fs.readdirSync(srcSharedDir, { withFileTypes: true });
+        for (const entry of entries) {
+          if (!/\.(tsx?|jsx?)$/i.test(entry.name)) continue;
+          const entrySrc = path.join(srcSharedDir, entry.name);
+          const entryDest = path.join(targetDir, entry.name);
+          writeTransformed(entrySrc, entryDest);
+        }
+      }
+
+      if (isSingleReleaseInitRoot) {
+        copySharedInto(path.join(destDir, "dialog"));
+        copySharedInto(path.join(destDir, "form"));
+      } else if (isSingleReleaseInitDialog) {
+        copySharedInto(destDir);
+      } else if (isSingleReleaseInitForm) {
+        copySharedInto(destDir);
+      }
+    } catch (e) {
+      console.warn(
+        "⚠️  Failed to materialize shared change-milestone-status files:",
+        e?.message || e
+      );
+    }
+
+    try {
+      const isSingleReleaseInitRoot =
+        name === "escrows/single-release/fund-escrow";
+      const isSingleReleaseInitDialog =
+        name === "escrows/single-release/fund-escrow/dialog";
+      const isSingleReleaseInitForm =
+        name === "escrows/single-release/fund-escrow/form";
+
+      const srcSharedDir = path.join(
+        TEMPLATES_DIR,
+        "escrows",
+        "single-release",
+        "fund-escrow",
+        "shared"
+      );
+
+      function copySharedInto(targetDir) {
+        if (!fs.existsSync(srcSharedDir)) return;
+        const entries = fs.readdirSync(srcSharedDir, { withFileTypes: true });
+        for (const entry of entries) {
+          if (!/\.(tsx?|jsx?)$/i.test(entry.name)) continue;
+          const entrySrc = path.join(srcSharedDir, entry.name);
+          const entryDest = path.join(targetDir, entry.name);
+          writeTransformed(entrySrc, entryDest);
+        }
+      }
+
+      if (isSingleReleaseInitRoot) {
+        copySharedInto(path.join(destDir, "dialog"));
+        copySharedInto(path.join(destDir, "form"));
+      } else if (isSingleReleaseInitDialog) {
+        copySharedInto(destDir);
+      } else if (isSingleReleaseInitForm) {
+        copySharedInto(destDir);
+      }
+    } catch (e) {
+      console.warn(
+        "⚠️  Failed to materialize shared fund-escrow files:",
+        e?.message || e
+      );
+    }
+
+    try {
+      const isSingleReleaseInitRoot =
+        name === "escrows/single-release/resolve-dispute";
+      const isSingleReleaseInitDialog =
+        name === "escrows/single-release/resolve-dispute/dialog";
+      const isSingleReleaseInitForm =
+        name === "escrows/single-release/resolve-dispute/form";
+
+      const srcSharedDir = path.join(
+        TEMPLATES_DIR,
+        "escrows",
+        "single-release",
+        "resolve-dispute",
+        "shared"
+      );
+
+      function copySharedInto(targetDir) {
+        if (!fs.existsSync(srcSharedDir)) return;
+        const entries = fs.readdirSync(srcSharedDir, { withFileTypes: true });
+        for (const entry of entries) {
+          if (!/\.(tsx?|jsx?)$/i.test(entry.name)) continue;
+          const entrySrc = path.join(srcSharedDir, entry.name);
+          const entryDest = path.join(targetDir, entry.name);
+          writeTransformed(entrySrc, entryDest);
+        }
+      }
+
+      if (isSingleReleaseInitRoot) {
+        copySharedInto(path.join(destDir, "dialog"));
+        copySharedInto(path.join(destDir, "form"));
+      } else if (isSingleReleaseInitDialog) {
+        copySharedInto(destDir);
+      } else if (isSingleReleaseInitForm) {
+        copySharedInto(destDir);
+      }
+    } catch (e) {
+      console.warn(
+        "⚠️  Failed to materialize shared resolve-dispute files:",
+        e?.message || e
+      );
+    }
+
+    try {
+      const isSingleReleaseInitRoot =
+        name === "escrows/single-release/update-escrow";
+      const isSingleReleaseInitDialog =
+        name === "escrows/single-release/update-escrow/dialog";
+      const isSingleReleaseInitForm =
+        name === "escrows/single-release/update-escrow/form";
+
+      const srcSharedDir = path.join(
+        TEMPLATES_DIR,
+        "escrows",
+        "single-release",
+        "update-escrow",
+        "shared"
+      );
+
+      function copySharedInto(targetDir) {
+        if (!fs.existsSync(srcSharedDir)) return;
+        const entries = fs.readdirSync(srcSharedDir, { withFileTypes: true });
+        for (const entry of entries) {
+          if (!/\.(tsx?|jsx?)$/i.test(entry.name)) continue;
+          const entrySrc = path.join(srcSharedDir, entry.name);
+          const entryDest = path.join(targetDir, entry.name);
+          writeTransformed(entrySrc, entryDest);
+        }
+      }
+
+      if (isSingleReleaseInitRoot) {
+        copySharedInto(path.join(destDir, "dialog"));
+        copySharedInto(path.join(destDir, "form"));
+      } else if (isSingleReleaseInitDialog) {
+        copySharedInto(destDir);
+      } else if (isSingleReleaseInitForm) {
+        copySharedInto(destDir);
+      }
+    } catch (e) {
+      console.warn(
+        "⚠️  Failed to materialize shared update-escrow files:",
+        e?.message || e
+      );
+    }
+
+    // If adding the whole single-release bundle, materialize all shared files
+    try {
+      if (name === "escrows/single-release") {
+        const modules = [
+          "initialize-escrow",
+          "approve-milestone",
+          "change-milestone-status",
+          "fund-escrow",
+          "resolve-dispute",
+          "update-escrow",
+        ];
+
+        for (const mod of modules) {
+          const srcSharedDir = path.join(
+            TEMPLATES_DIR,
+            "escrows",
+            "single-release",
+            mod,
+            "shared"
+          );
+          if (!fs.existsSync(srcSharedDir)) continue;
+
+          const targets = [
+            path.join(destDir, mod, "dialog"),
+            path.join(destDir, mod, "form"),
+          ];
+
+          const entries = fs.readdirSync(srcSharedDir, { withFileTypes: true });
+          for (const entry of entries) {
+            if (!/\.(tsx?|jsx?)$/i.test(entry.name)) continue;
+            const entrySrc = path.join(srcSharedDir, entry.name);
+            for (const t of targets) {
+              const entryDest = path.join(t, entry.name);
+              writeTransformed(entrySrc, entryDest);
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.warn(
+        "⚠️  Failed to materialize shared files for single-release bundle:",
         e?.message || e
       );
     }
