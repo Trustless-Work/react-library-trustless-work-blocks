@@ -5,9 +5,15 @@
   "keywords": [
     "react",
     "hooks",
-    "trustless",
+    "trustless work",
     "escrow",
-    "api"
+    "api",
+    "blocks",
+    "ui",
+    "components",
+    "helpers",
+    "templates",
+    "blockchain"
   ],
   "bin": {
     "trustless-work": "bin/index.js"
