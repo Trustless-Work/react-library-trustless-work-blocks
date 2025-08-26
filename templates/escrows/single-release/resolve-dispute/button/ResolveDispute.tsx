@@ -21,7 +21,7 @@ export default function ResolveDisputeButton({
   receiverFunds,
 }: ResolveDisputeButtonProps) {
   const { resolveDispute } = useEscrowsMutations();
-  const { escrow } = useEscrowContext();
+  const { selectedEscrow, updateEscrow } = useEscrowContext();
   const { walletAddress } = useWalletContext();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
@@ -45,7 +45,7 @@ export default function ResolveDisputeButton({
       setIsSubmitting(true);
 
       const payload: SingleReleaseResolveDisputePayload = {
-        contractId: escrow?.contractId || "",
+        contractId: selectedEscrow?.contractId || "",
         disputeResolver: walletAddress || "",
         approverFunds: Number(approverFunds),
         receiverFunds: Number(receiverFunds),
@@ -58,6 +58,15 @@ export default function ResolveDisputeButton({
       });
 
       toast.success("Dispute resolved successfully");
+      updateEscrow({
+        ...selectedEscrow,
+        flags: {
+          ...selectedEscrow?.flags,
+          disputed: false,
+          resolved: true,
+        },
+        balance: selectedEscrow?.balance || 0,
+      });
     } catch (error) {
       toast.error(handleError(error as ErrorResponse).message);
     } finally {
@@ -70,7 +79,7 @@ export default function ResolveDisputeButton({
       type="button"
       disabled={isSubmitting}
       onClick={handleClick}
-      className="cursor-pointer"
+      className="cursor-pointer w-full"
     >
       {isSubmitting ? (
         <div className="flex items-center">

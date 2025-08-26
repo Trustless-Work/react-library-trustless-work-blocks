@@ -22,7 +22,7 @@ export default function FundEscrowButton({
   className,
 }: FundEscrowButtonProps) {
   const { fundEscrow } = useEscrowsMutations();
-  const { escrow, updateEscrow } = useEscrowContext();
+  const { selectedEscrow, updateEscrow } = useEscrowContext();
   const { walletAddress } = useWalletContext();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
@@ -42,7 +42,7 @@ export default function FundEscrowButton({
 
       const payload: FundEscrowPayload = {
         amount: Number(amount),
-        contractId: escrow?.contractId || "",
+        contractId: selectedEscrow?.contractId || "",
         signer: walletAddress || "",
       };
 
@@ -53,8 +53,8 @@ export default function FundEscrowButton({
       });
 
       updateEscrow({
-        ...escrow,
-        amount: (escrow?.amount || 0) + payload.amount,
+        ...selectedEscrow,
+        amount: (selectedEscrow?.amount || 0) + payload.amount,
       });
       toast.success("Escrow funded successfully");
     } catch (error) {
@@ -69,7 +69,7 @@ export default function FundEscrowButton({
       type="button"
       disabled={isSubmitting}
       onClick={handleClick}
-      className={cn(className, "cursor-pointer")}
+      className={cn(className, "cursor-pointer w-full")}
     >
       {isSubmitting ? (
         <div className="flex items-center">

@@ -25,7 +25,7 @@ export default function FundEscrowDialog() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button type="button" className="cursor-pointer">
+        <Button type="button" className="cursor-pointer w-full">
           Fund
         </Button>
       </DialogTrigger>

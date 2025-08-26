@@ -13,7 +13,7 @@ import { Loader2 } from "lucide-react";
 
 export default function DisputeEscrowButton() {
   const { startDispute } = useEscrowsMutations();
-  const { escrow } = useEscrowContext();
+  const { selectedEscrow, updateEscrow } = useEscrowContext();
   const { walletAddress } = useWalletContext();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
@@ -22,7 +22,7 @@ export default function DisputeEscrowButton() {
       setIsSubmitting(true);
 
       const payload: SingleReleaseStartDisputePayload = {
-        contractId: escrow?.contractId || "",
+        contractId: selectedEscrow?.contractId || "",
         signer: walletAddress || "",
       };
 
@@ -33,6 +33,14 @@ export default function DisputeEscrowButton() {
       });
 
       toast.success("Escrow disputed successfully");
+
+      updateEscrow({
+        ...selectedEscrow,
+        flags: {
+          ...selectedEscrow?.flags,
+          disputed: true,
+        },
+      });
     } catch (error) {
       toast.error(handleError(error as ErrorResponse).message);
     } finally {
@@ -43,9 +51,9 @@ export default function DisputeEscrowButton() {
   return (
     <Button
       type="button"
-      disabled={isSubmitting}
+      disabled={isSubmitting || !selectedEscrow?.balance}
       onClick={handleClick}
-      className="cursor-pointer"
+      className="cursor-pointer w-full"
     >
       {isSubmitting ? (
         <div className="flex items-center">

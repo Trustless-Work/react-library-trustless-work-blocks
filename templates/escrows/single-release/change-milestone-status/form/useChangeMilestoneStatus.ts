@@ -17,7 +17,7 @@ import { useWalletContext } from "@/components/tw-blocks/wallet-kit/WalletProvid
 
 export function useChangeMilestoneStatus() {
   const { changeMilestoneStatus } = useEscrowsMutations();
-  const { escrow } = useEscrowContext();
+  const { selectedEscrow, updateEscrow } = useEscrowContext();
   const { walletAddress } = useWalletContext();
 
   const form = useForm<ChangeMilestoneStatusValues>({
@@ -37,7 +37,7 @@ export function useChangeMilestoneStatus() {
       setIsSubmitting(true);
 
       const finalPayload: ChangeMilestoneStatusPayload = {
-        contractId: escrow?.contractId || "",
+        contractId: selectedEscrow?.contractId || "",
         milestoneIndex: payload.milestoneIndex,
         newStatus: payload.status,
         newEvidence: payload.evidence || undefined,
@@ -51,6 +51,20 @@ export function useChangeMilestoneStatus() {
       });
 
       toast.success("Milestone status updated successfully");
+
+      updateEscrow({
+        ...selectedEscrow,
+        milestones: selectedEscrow?.milestones.map((milestone, index) => {
+          if (index === Number(payload.milestoneIndex)) {
+            return {
+              ...milestone,
+              status: payload.status,
+              evidence: payload.evidence || undefined,
+            };
+          }
+          return milestone;
+        }),
+      });
     } catch (error) {
       toast.error(handleError(error as ErrorResponse).message);
     } finally {

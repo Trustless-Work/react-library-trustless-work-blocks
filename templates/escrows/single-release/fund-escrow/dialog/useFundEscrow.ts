@@ -14,7 +14,7 @@ import { useWalletContext } from "@/components/tw-blocks/wallet-kit/WalletProvid
 
 export function useFundEscrow() {
   const { fundEscrow } = useEscrowsMutations();
-  const { escrow, updateEscrow } = useEscrowContext();
+  const { selectedEscrow, updateEscrow } = useEscrowContext();
   const { walletAddress } = useWalletContext();
 
   const form = useForm<FundEscrowValues>({
@@ -36,7 +36,7 @@ export function useFundEscrow() {
           typeof payload.amount === "string"
             ? Number(payload.amount)
             : payload.amount,
-        contractId: escrow?.contractId || "",
+        contractId: selectedEscrow?.contractId || "",
         signer: walletAddress || "",
       };
 
@@ -47,8 +47,8 @@ export function useFundEscrow() {
       });
 
       updateEscrow({
-        ...escrow,
-        amount: (escrow?.amount || 0) + finalPayload.amount,
+        ...selectedEscrow,
+        balance: (selectedEscrow?.balance || 0) + finalPayload.amount,
       });
 
       toast.success("Escrow funded successfully");

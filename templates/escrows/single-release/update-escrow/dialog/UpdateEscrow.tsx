@@ -46,7 +46,7 @@ export default function UpdateEscrowDialog() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button type="button" className="cursor-pointer">
+        <Button type="button" className="cursor-pointer w-full">
           Update
         </Button>
       </DialogTrigger>

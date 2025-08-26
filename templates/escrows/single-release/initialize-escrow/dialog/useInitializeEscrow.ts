@@ -8,7 +8,6 @@ import {
   InitializeSingleReleaseEscrowResponse,
 } from "@trustless-work/escrow/types";
 import { toast } from "sonner";
-import { useEscrowContext } from "../../../escrow-context/EscrowProvider";
 import { useWalletContext } from "@/components/tw-blocks/wallet-kit/WalletProvider";
 import { useEscrowsMutations } from "@/components/tw-blocks/tanstak/useEscrowsMutations";
 import {
@@ -23,7 +22,7 @@ export function useInitializeEscrow() {
   const formSchema = getSingleReleaseFormSchema();
 
   const { walletAddress } = useWalletContext();
-  const { setEscrow } = useEscrowContext();
+  // const { setSelectedEscrow } = useEscrowContext();
   const { deployEscrow } = useEscrowsMutations();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -95,7 +94,7 @@ export function useInitializeEscrow() {
           address: walletAddress || "",
         })) as InitializeSingleReleaseEscrowResponse;
 
-      setEscrow({ ...response.escrow, contractId: response.contractId });
+      // setSelectedEscrow({ ...response.escrow, contractId: response.contractId });
 
       console.log("response", response);
       toast.success("Escrow initialized successfully");

@@ -25,6 +25,7 @@ import {
 import { FileX, Loader2, Wallet, RefreshCw, AlertTriangle } from "lucide-react";
 import Filters from "./Filters";
 import { useEscrowsByRole } from "./useEsrowsByRole";
+import EscrowDetailsSheet from "./EscrowDetailsSheet";
 
 function formatTimestamp(ts?: { _seconds: number; _nanoseconds: number }) {
   if (!ts) return "-";
@@ -167,6 +168,12 @@ export function EscrowsByRoleTable() {
         enableSorting: true,
         meta: { className: "hidden xl:table-cell" },
         cell: ({ row }) => formatTimestamp(row.original.updatedAt),
+      },
+      {
+        header: "Actions",
+        id: "actions",
+        enableSorting: false,
+        cell: ({ row }) => <EscrowDetailsSheet escrow={row.original} />,
       },
     ],
     []

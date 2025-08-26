@@ -28,12 +28,12 @@ import {
 
 export default function ApproveMilestoneDialog() {
   const { form, handleSubmit, isSubmitting } = useApproveMilestone();
-  const { escrow } = useEscrowContext();
+  const { selectedEscrow } = useEscrowContext();
 
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button type="button" className="cursor-pointer">
+        <Button type="button" className="cursor-pointer w-full">
           Approve Milestone
         </Button>
       </DialogTrigger>
@@ -65,7 +65,7 @@ export default function ApproveMilestoneDialog() {
                         <SelectValue placeholder="Select milestone" />
                       </SelectTrigger>
                       <SelectContent>
-                        {(escrow?.milestones || []).map((m, idx) => (
+                        {(selectedEscrow?.milestones || []).map((m, idx) => (
                           <SelectItem key={`ms-${idx}`} value={String(idx)}>
                             {m?.description || `Milestone ${idx + 1}`}
                           </SelectItem>

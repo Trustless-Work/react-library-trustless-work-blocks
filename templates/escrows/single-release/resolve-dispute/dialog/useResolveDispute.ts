@@ -14,7 +14,7 @@ import { useWalletContext } from "@/components/tw-blocks/wallet-kit/WalletProvid
 
 export function useResolveDispute() {
   const { resolveDispute } = useEscrowsMutations();
-  const { escrow } = useEscrowContext();
+  const { selectedEscrow } = useEscrowContext();
   const { walletAddress } = useWalletContext();
 
   const form = useForm<ResolveDisputeValues>({
@@ -33,7 +33,7 @@ export function useResolveDispute() {
       setIsSubmitting(true);
 
       const finalPayload: SingleReleaseResolveDisputePayload = {
-        contractId: escrow?.contractId || "",
+        contractId: selectedEscrow?.contractId || "",
         disputeResolver: walletAddress || "",
         approverFunds: Number(payload.approverFunds),
         receiverFunds: Number(payload.receiverFunds),

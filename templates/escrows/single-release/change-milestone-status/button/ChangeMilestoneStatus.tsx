@@ -23,7 +23,7 @@ export default function ChangeMilestoneStatusButton({
   milestoneIndex,
 }: ChangeMilestoneStatusButtonProps) {
   const { changeMilestoneStatus } = useEscrowsMutations();
-  const { escrow } = useEscrowContext();
+  const { selectedEscrow } = useEscrowContext();
   const { walletAddress } = useWalletContext();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
@@ -37,7 +37,7 @@ export default function ChangeMilestoneStatusButton({
       setIsSubmitting(true);
 
       const payload: ChangeMilestoneStatusPayload = {
-        contractId: escrow?.contractId || "",
+        contractId: selectedEscrow?.contractId || "",
         milestoneIndex: String(milestoneIndex),
         newStatus: status,
         newEvidence: evidence || undefined,
@@ -63,7 +63,7 @@ export default function ChangeMilestoneStatusButton({
       type="button"
       disabled={isSubmitting}
       onClick={handleClick}
-      className="cursor-pointer"
+      className="cursor-pointer w-full"
     >
       {isSubmitting ? (
         <div className="flex items-center">

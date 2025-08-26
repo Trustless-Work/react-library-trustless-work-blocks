@@ -1,18 +1,18 @@
 "use client";
 
 import React from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "__UI_BASE__/button";
+import { Input } from "__UI_BASE__/input";
+import { Checkbox } from "__UI_BASE__/checkbox";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
+} from "__UI_BASE__/select";
+import { Popover, PopoverContent, PopoverTrigger } from "__UI_BASE__/popover";
+import { Calendar } from "__UI_BASE__/calendar";
 import type { DateRange as DayPickerDateRange } from "react-day-picker";
 import {
   RefreshCcw,
@@ -29,7 +29,7 @@ import {
   SelectContent as OrderSelectContent,
   SelectItem as OrderSelectItem,
   SelectValue as OrderSelectValue,
-} from "@/components/ui/select";
+} from "__UI_BASE__/select";
 import type { Role } from "@trustless-work/escrow/types";
 
 type FiltersProps = {

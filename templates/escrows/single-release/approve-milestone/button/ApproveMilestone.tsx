@@ -19,7 +19,7 @@ export default function ApproveMilestoneButton({
   milestoneIndex,
 }: ApproveMilestoneButtonProps) {
   const { approveMilestone } = useEscrowsMutations();
-  const { escrow } = useEscrowContext();
+  const { selectedEscrow, updateEscrow } = useEscrowContext();
   const { walletAddress } = useWalletContext();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
@@ -28,7 +28,7 @@ export default function ApproveMilestoneButton({
       setIsSubmitting(true);
 
       const payload: ApproveMilestonePayload = {
-        contractId: escrow?.contractId || "",
+        contractId: selectedEscrow?.contractId || "",
         milestoneIndex: String(milestoneIndex),
         approver: walletAddress || "",
         newFlag: true,
@@ -41,6 +41,16 @@ export default function ApproveMilestoneButton({
       });
 
       toast.success("Milestone approved flag updated successfully");
+
+      updateEscrow({
+        ...selectedEscrow,
+        milestones: selectedEscrow?.milestones.map((milestone, index) => {
+          if (index === Number(milestoneIndex)) {
+            return { ...milestone, approved: true };
+          }
+          return milestone;
+        }),
+      });
     } catch (error) {
       toast.error(handleError(error as ErrorResponse).message);
     } finally {
@@ -53,7 +63,7 @@ export default function ApproveMilestoneButton({
       type="button"
       disabled={isSubmitting}
       onClick={handleClick}
-      className="cursor-pointer"
+      className="cursor-pointer w-full"
     >
       {isSubmitting ? (
         <div className="flex items-center">

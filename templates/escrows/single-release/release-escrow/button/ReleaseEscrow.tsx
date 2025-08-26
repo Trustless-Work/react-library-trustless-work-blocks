@@ -13,7 +13,7 @@ import { Loader2 } from "lucide-react";
 
 export default function ReleaseEscrowButton() {
   const { releaseFunds } = useEscrowsMutations();
-  const { escrow } = useEscrowContext();
+  const { selectedEscrow, updateEscrow } = useEscrowContext();
   const { walletAddress } = useWalletContext();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
@@ -22,7 +22,7 @@ export default function ReleaseEscrowButton() {
       setIsSubmitting(true);
 
       const payload: SingleReleaseReleaseFundsPayload = {
-        contractId: escrow?.contractId || "",
+        contractId: selectedEscrow?.contractId || "",
         releaseSigner: walletAddress || "",
       };
 
@@ -33,6 +33,12 @@ export default function ReleaseEscrowButton() {
       });
 
       toast.success("Escrow released successfully");
+
+      updateEscrow({
+        ...selectedEscrow,
+        flags: { ...selectedEscrow?.flags, released: true },
+        balance: (selectedEscrow?.balance || 0) - (selectedEscrow?.amount || 0),
+      });
     } catch (error) {
       toast.error(handleError(error as ErrorResponse).message);
     } finally {
@@ -45,7 +51,7 @@ export default function ReleaseEscrowButton() {
       type="button"
       disabled={isSubmitting}
       onClick={handleClick}
-      className="cursor-pointer"
+      className="cursor-pointer w-full"
     >
       {isSubmitting ? (
         <div className="flex items-center">

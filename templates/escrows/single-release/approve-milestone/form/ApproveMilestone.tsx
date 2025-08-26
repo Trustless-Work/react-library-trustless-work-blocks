@@ -21,7 +21,7 @@ import {
 
 export default function ApproveMilestoneForm() {
   const { form, handleSubmit, isSubmitting } = useApproveMilestone();
-  const { escrow } = useEscrowContext();
+  const { selectedEscrow } = useEscrowContext();
 
   return (
     <Form {...form}>
@@ -45,7 +45,7 @@ export default function ApproveMilestoneForm() {
                     <SelectValue placeholder="Select milestone" />
                   </SelectTrigger>
                   <SelectContent>
-                    {(escrow?.milestones || []).map((m, idx) => (
+                    {(selectedEscrow?.milestones || []).map((m, idx) => (
                       <SelectItem key={`ms-${idx}`} value={String(idx)}>
                         {m?.description || `Milestone ${idx + 1}`}
                       </SelectItem>
