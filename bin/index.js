@@ -235,6 +235,10 @@ function copyTemplate(name, { uiBase, shouldInstall = false } = {}) {
   }
 
   if (fs.existsSync(srcDir) && fs.lstatSync(srcDir).isDirectory()) {
+    const skipDetails =
+      name === "escrows/escrows-by-role" ||
+      name === "escrows/escrows-by-signer" ||
+      name === "escrows";
     // Copy directory recursively
     const destDir = path.join(outRoot, name);
     fs.mkdirSync(destDir, { recursive: true });
@@ -245,6 +249,18 @@ function copyTemplate(name, { uiBase, shouldInstall = false } = {}) {
       const entries = fs.readdirSync(current, { withFileTypes: true });
       for (const entry of entries) {
         const entryRel = path.join(rel, entry.name);
+        if (skipDetails) {
+          const parts = entryRel.split(path.sep);
+          const top = parts[0] || "";
+          const firstTwo = parts.slice(0, 2).join(path.sep);
+          if (
+            top === "details" ||
+            firstTwo === path.join("escrows-by-role", "details") ||
+            firstTwo === path.join("escrows-by-signer", "details")
+          ) {
+            continue;
+          }
+        }
         const entrySrc = path.join(srcDir, entryRel);
         const entryDest = path.join(destDir, entryRel);
         if (entry.isDirectory()) {
@@ -273,6 +289,48 @@ function copyTemplate(name, { uiBase, shouldInstall = false } = {}) {
   if (shouldInstall && fs.existsSync(GLOBAL_DEPS_FILE)) {
     const meta = JSON.parse(fs.readFileSync(GLOBAL_DEPS_FILE, "utf8"));
     installDeps(meta);
+  }
+}
+
+function copySharedDetailsInto(targetRelativeDir, { uiBase } = {}) {
+  const srcDir = path.join(TEMPLATES_DIR, "escrows", "details");
+  const outRoot = path.join(PROJECT_ROOT, "src", "components", "tw-blocks");
+  const destDir = path.join(outRoot, targetRelativeDir);
+  const config = loadConfig();
+  const effectiveUiBase = uiBase || config.uiBase || "@/components/ui";
+
+  if (!fs.existsSync(srcDir)) return;
+  fs.mkdirSync(destDir, { recursive: true });
+
+  function writeTransformed(srcPath, destPath) {
+    const raw = fs.readFileSync(srcPath, "utf8");
+    const transformed = raw.replaceAll("__UI_BASE__", effectiveUiBase);
+    fs.mkdirSync(path.dirname(destPath), { recursive: true });
+    fs.writeFileSync(destPath, transformed, "utf8");
+    console.log(`✅ ${path.relative(PROJECT_ROOT, destPath)} created`);
+  }
+
+  const stack = [""];
+  while (stack.length) {
+    const rel = stack.pop();
+    const current = path.join(srcDir, rel);
+    const entries = fs.readdirSync(current, { withFileTypes: true });
+    for (const entry of entries) {
+      const entryRel = path.join(rel, entry.name);
+      const entrySrc = path.join(srcDir, entryRel);
+      const entryDest = path.join(destDir, entryRel);
+      if (entry.isDirectory()) {
+        stack.push(entryRel);
+        continue;
+      }
+      if (/\.(tsx?|jsx?)$/i.test(entry.name)) {
+        writeTransformed(entrySrc, entryDest);
+      } else {
+        fs.mkdirSync(path.dirname(entryDest), { recursive: true });
+        fs.copyFileSync(entrySrc, entryDest);
+        console.log(`✅ ${path.relative(PROJECT_ROOT, entryDest)} created`);
+      }
+    }
   }
 }
 
@@ -551,6 +609,36 @@ if (args[0] === "init") {
     ) {
       injectProvidersIntoLayout(layoutPath, { escrow: true });
     }
+  }
+
+  // Copy shared details into role/signer targets when applicable
+  try {
+    if (args[1] === "escrows") {
+      copySharedDetailsInto("escrows/escrows-by-role/details", {
+        uiBase: flags.uiBase,
+      });
+      copySharedDetailsInto("escrows/escrows-by-signer/details", {
+        uiBase: flags.uiBase,
+      });
+    }
+    if (
+      args[1] === "escrows/escrows-by-role" ||
+      args[1].startsWith("escrows/escrows-by-role/")
+    ) {
+      copySharedDetailsInto("escrows/escrows-by-role/details", {
+        uiBase: flags.uiBase,
+      });
+    }
+    if (
+      args[1] === "escrows/escrows-by-signer" ||
+      args[1].startsWith("escrows/escrows-by-signer/")
+    ) {
+      copySharedDetailsInto("escrows/escrows-by-signer/details", {
+        uiBase: flags.uiBase,
+      });
+    }
+  } catch (e) {
+    console.warn("⚠️  Failed to copy shared details:", e?.message || e);
   }
 } else {
   console.log(`

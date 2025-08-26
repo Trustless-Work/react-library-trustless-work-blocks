@@ -27,7 +27,7 @@ import Filters from "./Filters";
 import { useEscrowsBySigner } from "./useEsrowsBySigner";
 import { useEscrowDialogs } from "../../escrow-context/EscrowDialogsProvider";
 import { useEscrowContext } from "../../escrow-context/EscrowProvider";
-import EscrowDetailDialog from "../../escrows-by-role/details/EscrowDetailDialog";
+import EscrowDetailDialog from "../details/EscrowDetailDialog";
 
 function formatTimestamp(ts?: { _seconds: number; _nanoseconds: number }) {
   if (!ts) return "-";

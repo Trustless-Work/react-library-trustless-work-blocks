@@ -21,7 +21,7 @@ import {
   RefreshCw,
   FileX,
 } from "lucide-react";
-import EscrowDetailDialog from "../../escrows-by-role/details/EscrowDetailDialog";
+import EscrowDetailDialog from "../details/EscrowDetailDialog";
 import { useEscrowContext } from "../../escrow-context/EscrowProvider";
 import { useEscrowDialogs } from "../../escrow-context/EscrowDialogsProvider";
 
