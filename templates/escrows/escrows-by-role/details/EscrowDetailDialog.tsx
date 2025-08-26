@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import {
   Dialog,
   DialogContent,
@@ -22,6 +23,7 @@ import { Milestones } from "./Milestones";
 import { Entities } from "./Entities";
 import { GeneralInformation } from "./GeneralInformation";
 import { useEscrowContext } from "../../escrow-context/EscrowProvider";
+import SuccessReleaseDialog from "./SuccessReleaseDialog";
 
 interface EscrowDetailDialogProps {
   isDialogOpen: boolean;
@@ -38,11 +40,7 @@ const EscrowDetailDialog = ({
 }: EscrowDetailDialogProps) => {
   const { selectedEscrow } = useEscrowContext();
   const dialogStates = useEscrowDialogs();
-  // const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
-  // const [isRestoreConfirmOpen, setIsRestoreConfirmOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("general");
-
-  // const { softDeleteEscrow, restoreEscrow } = useGlobalBoundedStore();
 
   const {
     handleClose,
@@ -87,7 +85,6 @@ const EscrowDetailDialog = ({
           </DialogHeader>
 
           {/* Main Content with Tabs */}
-
           <Tabs
             defaultValue="general"
             className="w-full"
@@ -153,63 +150,10 @@ const EscrowDetailDialog = ({
       </Dialog>
 
       {/* External Dialogs */}
-      {/* <FundEscrowDialog
-        isSecondDialogOpen={dialogStates.second.isOpen}
-        setIsSecondDialogOpen={dialogStates.second.setIsOpen}
-      />
-
-      <CompleteMilestoneDialog
-        isCompleteMilestoneDialogOpen={dialogStates.completeMilestone.isOpen}
-        setIsCompleteMilestoneDialogOpen={
-          dialogStates.completeMilestone.setIsOpen
-        }
-      />
-
-      <QREscrowDialog
-        isQRDialogOpen={dialogStates.qr.isOpen}
-        setIsQRDialogOpen={dialogStates.qr.setIsOpen}
-      />
-
-      <ResolveDisputeEscrowDialog
-        isResolveDisputeDialogOpen={dialogStates.resolveDispute.isOpen}
-      />
-
-      <EditMilestonesDialog
-        isEditMilestoneDialogOpen={dialogStates.editMilestone.isOpen}
-        setIsEditMilestoneDialogOpen={dialogStates.editMilestone.setIsOpen}
-      />
-
-      <EditEntitiesDialog
-        isEditEntitiesDialogOpen={dialogStates.editEntities.isOpen}
-        setIsEditEntitiesDialogOpen={dialogStates.editEntities.setIsOpen}
-      />
-
-      <EditBasicPropertiesDialog
-        isEditBasicPropertiesDialogOpen={
-          dialogStates.editBasicProperties.isOpen
-        }
-        setIsEditBasicPropertiesDialogOpen={
-          dialogStates.editBasicProperties.setIsOpen
-        }
-      />
-
       <SuccessReleaseDialog
-        isSuccessReleaseDialogOpen={dialogStates.successRelease.isOpen}
-        setIsSuccessReleaseDialogOpen={dialogStates.successRelease.setIsOpen}
-        title=""
-        description="releasedDescription"
+        isOpen={dialogStates.successRelease.isOpen}
+        onOpenChange={dialogStates.successRelease.setIsOpen}
       />
-
-      <SuccessResolveDisputeDialog
-        isSuccessResolveDisputeDialogOpen={
-          dialogStates.successResolveDispute.isOpen
-        }
-        setIsSuccessResolveDisputeDialogOpen={
-          dialogStates.successResolveDispute.setIsOpen
-        }
-        title=""
-        description="resolvedDescription"
-      /> */}
     </>
   );
 };

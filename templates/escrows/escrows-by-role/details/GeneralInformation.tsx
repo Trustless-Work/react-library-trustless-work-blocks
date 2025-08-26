@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { Card } from "__UI_BASE__/card";
 import { cn } from "@/lib/utils";
 import { useMemo, useState } from "react";
@@ -107,10 +108,6 @@ export const GeneralInformation = ({
               icon={Handshake}
               iconColor="text-green-800"
               value="Resolved"
-              actionLabel="See Details"
-              onAction={() =>
-                dialogStates.successResolveDispute.setIsOpen(true)
-              }
             />
           )}
 

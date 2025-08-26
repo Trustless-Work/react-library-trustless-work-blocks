@@ -9,7 +9,6 @@ import {
   Wallet,
   Settings,
   Briefcase,
-  Pencil,
 } from "lucide-react";
 import {
   GetEscrowsFromIndexerResponse as Escrow,

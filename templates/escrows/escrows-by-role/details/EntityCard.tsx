@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { Avatar, AvatarFallback } from "__UI_BASE__/avatar";
 import { Card, CardContent } from "__UI_BASE__/card";
 import { Badge } from "__UI_BASE__/badge";
@@ -11,9 +12,10 @@ interface EntityCardProps {
   type: string;
   hasPercentage?: boolean;
   percentage?: number;
+  hasAmount?: boolean;
   amount?: number;
+  currency?: string;
   inDispute?: boolean;
-  isNet?: boolean;
 }
 
 const EntityCard = ({
@@ -21,9 +23,10 @@ const EntityCard = ({
   type,
   hasPercentage,
   percentage,
+  hasAmount,
   amount,
+  currency,
   inDispute,
-  isNet,
 }: EntityCardProps) => {
   const formatAddress = (address: string) => {
     return `${address.slice(0, 10)}...${address.slice(-4)}`;
@@ -41,19 +44,28 @@ const EntityCard = ({
       <Link href={`/dashboard/public-profile/${entity}`} target="_blank">
         <CardContent className="p-3">
           <div className="flex items-center justify-between mb-2">
-            <div className="flex w-full items-center justify-between gap-2">
+            <div className="flex w-2/4 items-center justify-between gap-2">
               <span className="text-xs font-medium text-muted-foreground">
                 {formatRole(type)}
               </span>
               {inDispute && <Badge variant="destructive">In Dispute</Badge>}
             </div>
 
-            <div className="flex items-center gap-2 text-xs">
+            <div className="flex w-2/4 items-center justify-end gap-2 text-xs">
               {hasPercentage && (
                 <div className="flex items-center">
                   <span className="text-muted-foreground mr-1">Fee:</span>
                   <span className="font-medium text-emerald-600">
                     {percentage}%
+                  </span>
+                </div>
+              )}
+              {hasAmount && (
+                <div className="flex items-center">
+                  <span className="text-muted-foreground mr-1">Amount:</span>
+                  <span className="font-medium">
+                    {currency ? `${currency} ` : ""}
+                    {typeof amount === "number" ? amount.toFixed(2) : "-"}
                   </span>
                 </div>
               )}
