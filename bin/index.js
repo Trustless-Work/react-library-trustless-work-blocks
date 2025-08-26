@@ -324,6 +324,48 @@ function copyTemplate(name, { uiBase, shouldInstall = false } = {}) {
         e?.message || e
       );
     }
+
+    try {
+      const isSingleReleaseInitRoot =
+        name === "escrows/single-release/approve-milestone";
+      const isSingleReleaseInitDialog =
+        name === "escrows/single-release/approve-milestone/dialog";
+      const isSingleReleaseInitForm =
+        name === "escrows/single-release/approve-milestone/form";
+
+      const srcSharedDir = path.join(
+        TEMPLATES_DIR,
+        "escrows",
+        "single-release",
+        "approve-milestone",
+        "shared"
+      );
+
+      function copySharedInto(targetDir) {
+        if (!fs.existsSync(srcSharedDir)) return;
+        const entries = fs.readdirSync(srcSharedDir, { withFileTypes: true });
+        for (const entry of entries) {
+          if (!/\.(tsx?|jsx?)$/i.test(entry.name)) continue;
+          const entrySrc = path.join(srcSharedDir, entry.name);
+          const entryDest = path.join(targetDir, entry.name);
+          writeTransformed(entrySrc, entryDest);
+        }
+      }
+
+      if (isSingleReleaseInitRoot) {
+        copySharedInto(path.join(destDir, "dialog"));
+        copySharedInto(path.join(destDir, "form"));
+      } else if (isSingleReleaseInitDialog) {
+        copySharedInto(destDir);
+      } else if (isSingleReleaseInitForm) {
+        copySharedInto(destDir);
+      }
+    } catch (e) {
+      console.warn(
+        "⚠️  Failed to materialize shared approve-milestone files:",
+        e?.message || e
+      );
+    }
   } else if (fs.existsSync(srcFile)) {
     fs.mkdirSync(outRoot, { recursive: true });
     const destFile = path.join(outRoot, name + ".tsx");
