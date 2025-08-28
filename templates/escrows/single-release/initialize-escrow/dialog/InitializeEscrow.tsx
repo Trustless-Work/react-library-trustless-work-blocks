@@ -84,7 +84,7 @@ export function InitializeEscrowDialog() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button type="button" className="cursor-pointer">
+        <Button type="button" className="cursor-pointer w-full">
           Initialize
         </Button>
       </DialogTrigger>
