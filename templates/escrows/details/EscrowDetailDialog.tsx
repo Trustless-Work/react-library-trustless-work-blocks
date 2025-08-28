@@ -59,7 +59,7 @@ const EscrowDetailDialog = ({
   return (
     <>
       <Dialog open={isDialogOpen} onOpenChange={handleClose}>
-        <DialogContent className="w-11/12 sm:w-3/4 h-[95vh] overflow-hidden flex flex-col !max-w-none">
+        <DialogContent className="!w-full sm:!max-w-4xl max-h-[95vh] overflow-y-auto">
           <DialogHeader className="flex-shrink-0">
             <div className="w-full">
               <div className="flex flex-col gap-2">
