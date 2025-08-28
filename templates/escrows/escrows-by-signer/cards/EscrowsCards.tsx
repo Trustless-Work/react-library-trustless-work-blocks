@@ -116,7 +116,18 @@ export function EscrowsBySignerCards() {
     dialogStates.second.setIsOpen(true);
   };
 
+  /**
+   * Based on the provided roles -> https://docs.trustlesswork.com/trustless-work/technology-overview/roles-in-trustless-work
+   *
+   * You must pass one or more roles according to requirements
+   *
+   * For example:
+   * - If the user is a freelancer, you must pass the "serviceProvider" and "receiver" role
+   *
+   * Depending of the role, you'll have different actions buttons
+   */
   const activeRole: Role[] = ["approver"];
+
   const escrows: Escrow[] = data ?? [];
 
   return (
