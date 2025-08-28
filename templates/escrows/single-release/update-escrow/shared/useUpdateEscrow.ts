@@ -10,7 +10,7 @@ import {
 import { toast } from "sonner";
 import { useEscrowContext } from "../../../escrow-context/EscrowProvider";
 import { useWalletContext } from "@/components/tw-blocks/wallet-kit/WalletProvider";
-import { useEscrowsMutations } from "@/components/tw-blocks/tanstak/useEscrowsMutations";
+import { useEscrowsMutations } from "@/components/tw-blocks/tanstack/useEscrowsMutations";
 import {
   ErrorResponse,
   handleError,

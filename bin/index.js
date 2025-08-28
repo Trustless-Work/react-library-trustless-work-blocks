@@ -1068,7 +1068,7 @@ if (args[0] === "init") {
   trustless-work add helpers
   
   --- Tanstack ---
-  trustless-work add tanstak
+  trustless-work add tanstack
   
   --- Escrows ---
   trustless-work add escrows

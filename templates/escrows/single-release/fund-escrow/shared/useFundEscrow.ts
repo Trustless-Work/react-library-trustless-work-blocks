@@ -5,7 +5,7 @@ import { fundEscrowSchema, type FundEscrowValues } from "./schema";
 import { toast } from "sonner";
 import { FundEscrowPayload } from "@trustless-work/escrow";
 import { useEscrowContext } from "../../../escrow-context/EscrowProvider";
-import { useEscrowsMutations } from "@/components/tw-blocks/tanstak/useEscrowsMutations";
+import { useEscrowsMutations } from "@/components/tw-blocks/tanstack/useEscrowsMutations";
 import {
   ErrorResponse,
   handleError,

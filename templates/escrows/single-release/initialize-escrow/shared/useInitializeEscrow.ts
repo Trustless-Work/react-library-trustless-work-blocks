@@ -9,7 +9,7 @@ import {
 } from "@trustless-work/escrow/types";
 import { toast } from "sonner";
 import { useWalletContext } from "@/components/tw-blocks/wallet-kit/WalletProvider";
-import { useEscrowsMutations } from "@/components/tw-blocks/tanstak/useEscrowsMutations";
+import { useEscrowsMutations } from "@/components/tw-blocks/tanstack/useEscrowsMutations";
 import {
   ErrorResponse,
   handleError,

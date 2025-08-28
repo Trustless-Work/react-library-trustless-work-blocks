@@ -6,7 +6,7 @@ import type { DateRange as DayPickerDateRange } from "react-day-picker";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { SortingState } from "@tanstack/react-table";
 import { useWalletContext } from "../../wallet-kit/WalletProvider";
-import { useEscrowsByRoleQuery } from "../../tanstak/useEscrowsByRoleQuery";
+import { useEscrowsByRoleQuery } from "../../tanstack/useEscrowsByRoleQuery";
 import type { GetEscrowsFromIndexerByRoleParams } from "@trustless-work/escrow";
 import { GetEscrowsFromIndexerResponse as Escrow } from "@trustless-work/escrow/types";
 

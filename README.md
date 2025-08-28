@@ -115,7 +115,7 @@ This library works with any state solution. It exposes React Context providers a
 
 ```tsx
 // Fetch escrows by role
-import { useEscrowsByRoleQuery } from "@/components/tw-blocks/tanstak/useEscrowsByRoleQuery";
+import { useEscrowsByRoleQuery } from "@/components/tw-blocks/tanstack/useEscrowsByRoleQuery";
 
 export function MyEscrows({ roleAddress }: { roleAddress: string }) {
   const { data, isLoading, isError, refetch } = useEscrowsByRoleQuery({
@@ -134,7 +134,7 @@ export function MyEscrows({ roleAddress }: { roleAddress: string }) {
 }
 
 // Mutations (deploy/fund/update/approve/change-status/release/dispute/resolve)
-import { useEscrowsMutations } from "@/components/tw-blocks/tanstak/useEscrowsMutations";
+import { useEscrowsMutations } from "@/components/tw-blocks/tanstack/useEscrowsMutations";
 
 export function DeployButton({ address }: { address: string }) {
   const { deployEscrow } = useEscrowsMutations();
@@ -167,7 +167,7 @@ npx trustless-work add providers
 npx trustless-work add wallet-kit
 npx trustless-work add handle-errors
 npx trustless-work add helpers
-npx trustless-work add tanstak
+npx trustless-work add tanstack
 npx trustless-work add escrows
 
 # Escrow context providers

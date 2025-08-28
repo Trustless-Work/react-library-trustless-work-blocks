@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Button } from "__UI_BASE__/button";
-import { useEscrowsMutations } from "@/components/tw-blocks/tanstak/useEscrowsMutations";
+import { useEscrowsMutations } from "@/components/tw-blocks/tanstack/useEscrowsMutations";
 import { useWalletContext } from "@/components/tw-blocks/wallet-kit/WalletProvider";
 import { SingleReleaseStartDisputePayload } from "@trustless-work/escrow/types";
 import { toast } from "sonner";
