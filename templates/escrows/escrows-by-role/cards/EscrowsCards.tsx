@@ -155,9 +155,11 @@ export function EscrowsByRoleCards() {
           setOrderDirection={(v) => setOrderDirection(v)}
         />
 
-        <div className="w-full p-2 sm:p-4">
+        <div className="w-full py-2 sm:py-4">
           <div className="mb-2 sm:mb-3 flex items-center justify-end gap-2">
-            <span className="text-xs text-muted-foreground">Sort</span>
+            <span className="hidden sm:block text-xs text-muted-foreground">
+              Sort
+            </span>
             <Button
               className="cursor-pointer"
               variant={sortField === "createdAt" ? "default" : "outline"}

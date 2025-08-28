@@ -239,7 +239,7 @@ export function EscrowsByRoleTable() {
           setOrderDirection={(v) => setOrderDirection(v)}
         />
 
-        <Card className="w-full p-2 sm:p-4">
+        <Card className="w-full py-2 sm:py-4">
           <div className="mt-2 sm:mt-4 overflow-x-auto">
             <Table>
               <TableHeader>
