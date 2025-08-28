@@ -17,7 +17,7 @@ export default function FundEscrowForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="flex flex-col space-y-6 w-full">
         <FormField
           control={form.control}
           name="amount"
