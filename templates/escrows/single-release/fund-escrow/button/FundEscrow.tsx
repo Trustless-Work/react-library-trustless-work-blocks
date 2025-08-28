@@ -9,18 +9,13 @@ import {
   handleError,
 } from "@/components/tw-blocks/handle-errors/handle";
 import { useEscrowContext } from "../../../escrow-context/EscrowProvider";
-import { cn } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
 
 type FundEscrowButtonProps = {
   amount: number;
-  className?: string;
 };
 
-export default function FundEscrowButton({
-  amount,
-  className,
-}: FundEscrowButtonProps) {
+export default function FundEscrowButton({ amount }: FundEscrowButtonProps) {
   const { fundEscrow } = useEscrowsMutations();
   const { selectedEscrow, updateEscrow } = useEscrowContext();
   const { walletAddress } = useWalletContext();
@@ -69,7 +64,7 @@ export default function FundEscrowButton({
       type="button"
       disabled={isSubmitting}
       onClick={handleClick}
-      className={cn(className, "cursor-pointer w-full")}
+      className="cursor-pointer w-full"
     >
       {isSubmitting ? (
         <div className="flex items-center">
