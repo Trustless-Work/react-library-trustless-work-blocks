@@ -10,14 +10,7 @@ export type DialogState = {
 
 export type DialogStates = {
   second: DialogState;
-  completeMilestone: DialogState;
-  qr: DialogState;
-  resolveDispute: DialogState;
-  editMilestone: DialogState;
-  editEntities: DialogState;
-  editBasicProperties: DialogState;
   successRelease: DialogState;
-  successResolveDispute: DialogState;
 };
 
 export type StatusStates = {};
@@ -34,60 +27,17 @@ export function EscrowDialogsProvider({
   children: React.ReactNode;
 }) {
   const [secondOpen, setSecondOpen] = useState(false);
-  const [completeMilestoneOpen, setCompleteMilestoneOpen] = useState(false);
-  const [qrOpen, setQrOpen] = useState(false);
-  const [resolveDisputeOpen, setResolveDisputeOpen] = useState(false);
-  const [editMilestoneOpen, setEditMilestoneOpen] = useState(false);
-  const [editEntitiesOpen, setEditEntitiesOpen] = useState(false);
-  const [editBasicPropertiesOpen, setEditBasicPropertiesOpen] = useState(false);
   const [successReleaseOpen, setSuccessReleaseOpen] = useState(false);
-  const [successResolveDisputeOpen, setSuccessResolveDisputeOpen] =
-    useState(false);
 
   const value = useMemo<EscrowDialogsContextType>(
     () => ({
-      second: { isOpen: secondOpen, setIsOpen: setSecondOpen },
-      completeMilestone: {
-        isOpen: completeMilestoneOpen,
-        setIsOpen: setCompleteMilestoneOpen,
-      },
-      qr: { isOpen: qrOpen, setIsOpen: setQrOpen },
-      resolveDispute: {
-        isOpen: resolveDisputeOpen,
-        setIsOpen: setResolveDisputeOpen,
-      },
-      editMilestone: {
-        isOpen: editMilestoneOpen,
-        setIsOpen: setEditMilestoneOpen,
-      },
-      editEntities: {
-        isOpen: editEntitiesOpen,
-        setIsOpen: setEditEntitiesOpen,
-      },
-      editBasicProperties: {
-        isOpen: editBasicPropertiesOpen,
-        setIsOpen: setEditBasicPropertiesOpen,
-      },
+      second: { isOpen: secondOpen, setIsOpen: setSecondOpen }, //
       successRelease: {
         isOpen: successReleaseOpen,
         setIsOpen: setSuccessReleaseOpen,
       },
-      successResolveDispute: {
-        isOpen: successResolveDisputeOpen,
-        setIsOpen: setSuccessResolveDisputeOpen,
-      },
     }),
-    [
-      secondOpen,
-      completeMilestoneOpen,
-      qrOpen,
-      resolveDisputeOpen,
-      editMilestoneOpen,
-      editEntitiesOpen,
-      editBasicPropertiesOpen,
-      successReleaseOpen,
-      successResolveDisputeOpen,
-    ]
+    [secondOpen, successReleaseOpen]
   );
 
   return (
