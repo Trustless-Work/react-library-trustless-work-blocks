@@ -36,6 +36,14 @@ export default function ChangeMilestoneStatusButton({
 
       setIsSubmitting(true);
 
+      /**
+       * Create the payload for the change milestone status mutation
+       *
+       * @param status - The status to change
+       * @param evidence - The evidence to change
+       * @param milestoneIndex - The index of the milestone to change
+       * @returns The payload for the change milestone status mutation
+       */
       const payload: ChangeMilestoneStatusPayload = {
         contractId: selectedEscrow?.contractId || "",
         milestoneIndex: String(milestoneIndex),
@@ -44,6 +52,13 @@ export default function ChangeMilestoneStatusButton({
         serviceProvider: walletAddress || "",
       };
 
+      /**
+       * Call the change milestone status mutation
+       *
+       * @param payload - The payload for the change milestone status mutation
+       * @param type - The type of the escrow
+       * @param address - The address of the escrow
+       */
       await changeMilestoneStatus.mutateAsync({
         payload,
         type: "single-release",

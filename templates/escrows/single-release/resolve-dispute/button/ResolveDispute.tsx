@@ -44,6 +44,11 @@ export default function ResolveDisputeButton({
 
       setIsSubmitting(true);
 
+      /**
+       * Create the payload for the resolve dispute mutation
+       *
+       * @returns The payload for the resolve dispute mutation
+       */
       const payload: SingleReleaseResolveDisputePayload = {
         contractId: selectedEscrow?.contractId || "",
         disputeResolver: walletAddress || "",
@@ -51,6 +56,13 @@ export default function ResolveDisputeButton({
         receiverFunds: Number(receiverFunds),
       };
 
+      /**
+       * Call the resolve dispute mutation
+       *
+       * @param payload - The payload for the resolve dispute mutation
+       * @param type - The type of the escrow
+       * @param address - The address of the escrow
+       */
       await resolveDispute.mutateAsync({
         payload,
         type: "single-release",

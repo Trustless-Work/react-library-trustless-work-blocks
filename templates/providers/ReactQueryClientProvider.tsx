@@ -3,6 +3,14 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
+/**
+ * Query Client, you can configure the default options for the query client
+ *
+ * - Stale Time: 5 minutes
+ * - GC Time: 30 minutes
+ * - Retry: 1
+ * - Refetch on Window Focus: false
+ */
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -14,6 +22,12 @@ const queryClient = new QueryClient({
   },
 });
 
+/**
+ * React Query Client Provider
+ *
+ * @param children - The children
+ * @returns The React Query Client Provider
+ */
 export function ReactQueryClientProvider({
   children,
 }: {

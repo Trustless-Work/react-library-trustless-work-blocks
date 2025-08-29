@@ -27,6 +27,12 @@ export default function ApproveMilestoneButton({
     try {
       setIsSubmitting(true);
 
+      /**
+       * Create the payload for the approve milestone mutation
+       *
+       * @param milestoneIndex - The index of the milestone to approve
+       * @returns The payload for the approve milestone mutation
+       */
       const payload: ApproveMilestonePayload = {
         contractId: selectedEscrow?.contractId || "",
         milestoneIndex: String(milestoneIndex),
@@ -34,6 +40,13 @@ export default function ApproveMilestoneButton({
         newFlag: true,
       };
 
+      /**
+       * Call the approve milestone mutation
+       *
+       * @param payload - The payload for the approve milestone mutation
+       * @param type - The type of the escrow
+       * @param address - The address of the escrow
+       */
       await approveMilestone.mutateAsync({
         payload,
         type: "single-release",

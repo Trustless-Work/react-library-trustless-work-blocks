@@ -14,12 +14,14 @@ import {
   ErrorResponse,
   handleError,
 } from "@/components/tw-blocks/handle-errors/handle";
+import { useEscrowContext } from "../../../escrow-context/EscrowProvider";
 
 export function useInitializeEscrow() {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const { getSingleReleaseFormSchema } = useInitializeEscrowSchema();
   const formSchema = getSingleReleaseFormSchema();
+  const { setSelectedEscrow } = useEscrowContext();
 
   const { walletAddress } = useWalletContext();
   const { deployEscrow } = useEscrowsMutations();
@@ -71,6 +73,12 @@ export function useInitializeEscrow() {
     try {
       setIsSubmitting(true);
 
+      /**
+       * Create the final payload for the initialize escrow mutation
+       *
+       * @param payload - The payload from the form
+       * @returns The final payload for the initialize escrow mutation
+       */
       const finalPayload: InitializeSingleReleaseEscrowPayload = {
         ...payload,
         amount:
@@ -86,6 +94,13 @@ export function useInitializeEscrow() {
         milestones: payload.milestones,
       };
 
+      /**
+       * Call the initialize escrow mutation
+       *
+       * @param payload - The final payload for the initialize escrow mutation
+       * @param type - The type of the escrow
+       * @param address - The address of the escrow
+       */
       const response: InitializeSingleReleaseEscrowResponse =
         (await deployEscrow.mutateAsync({
           payload: finalPayload,
@@ -93,8 +108,9 @@ export function useInitializeEscrow() {
           address: walletAddress || "",
         })) as InitializeSingleReleaseEscrowResponse;
 
-      console.log("response", response);
       toast.success("Escrow initialized successfully");
+
+      setSelectedEscrow(response);
     } catch (error) {
       toast.error(handleError(error as ErrorResponse).message);
     } finally {

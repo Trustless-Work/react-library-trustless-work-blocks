@@ -140,6 +140,12 @@ export function useUpdateEscrow() {
     try {
       setIsSubmitting(true);
 
+      /**
+       * Create the final payload for the update escrow mutation
+       *
+       * @param payload - The payload from the form
+       * @returns The final payload for the update escrow mutation
+       */
       const finalPayload: UpdateSingleReleaseEscrowPayload = {
         contractId: selectedEscrow?.contractId || "",
         signer: walletAddress || "",
@@ -167,6 +173,13 @@ export function useUpdateEscrow() {
         },
       };
 
+      /**
+       * Call the update escrow mutation
+       *
+       * @param payload - The final payload for the update escrow mutation
+       * @param type - The type of the escrow
+       * @param address - The address of the escrow
+       */
       (await updateEscrow.mutateAsync({
         payload: finalPayload,
         type: "single-release",

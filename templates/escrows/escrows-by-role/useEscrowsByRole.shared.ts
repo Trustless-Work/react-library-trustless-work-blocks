@@ -234,6 +234,12 @@ export function useEscrowsByRole() {
     dateRange,
   ]);
 
+  /**
+   * Call the query to get the escrows from the Trustless Work Indexer
+   *
+   * @param params - The parameters for the query
+   * @returns The query result
+   */
   const query = useEscrowsByRoleQuery(params);
   const nextPageQuery = useEscrowsByRoleQuery({ ...params, page: page + 1 });
 

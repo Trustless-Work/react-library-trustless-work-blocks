@@ -35,6 +35,9 @@ export const EscrowProvider = ({ children }: { children: ReactNode }) => {
   );
   const [userRolesInEscrow, setUserRolesInEscrowState] = useState<string[]>([]);
 
+  /**
+   * Get the selected escrow from the local storage
+   */
   useEffect(() => {
     try {
       const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -47,6 +50,11 @@ export const EscrowProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
+  /**
+   * Persist the selected escrow to the local storage
+   *
+   * @param value - The escrow to persist
+   */
   const persist = (value: Escrow | null) => {
     if (value) {
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(value));
@@ -55,6 +63,11 @@ export const EscrowProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  /**
+   * Update the selected escrow
+   *
+   * @param updater - The updater function
+   */
   const updateEscrow: EscrowContextType["updateEscrow"] = (updater) => {
     setSelectedEscrowState((current) => {
       if (!current) return current;
@@ -67,6 +80,12 @@ export const EscrowProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
+  /**
+   * Set a field of the selected escrow
+   *
+   * @param key - The key of the field to set
+   * @param value - The value to set
+   */
   const setEscrowField: EscrowContextType["setEscrowField"] = (key, value) => {
     setSelectedEscrowState((current) => {
       if (!current) return current;
@@ -76,11 +95,19 @@ export const EscrowProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
+  /**
+   * Clear the selected escrow
+   */
   const clearEscrow = () => {
     setSelectedEscrowState(null);
     persist(null);
   };
 
+  /**
+   * Set the user roles in the escrow
+   *
+   * @param roles - The roles to set
+   */
   const setUserRolesInEscrow = useCallback((roles: string[]) => {
     setUserRolesInEscrowState((prev) => {
       // Avoid unnecessary updates to prevent re-renders
@@ -94,6 +121,9 @@ export const EscrowProvider = ({ children }: { children: ReactNode }) => {
     });
   }, []);
 
+  /**
+   * Check if the user has an escrow
+   */
   const hasEscrow = useMemo(() => Boolean(selectedEscrow), [selectedEscrow]);
 
   return (

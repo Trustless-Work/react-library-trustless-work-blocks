@@ -26,6 +26,18 @@ import {
 } from "@trustless-work/escrow";
 import { signTransaction } from "../wallet-kit/wallet-kit";
 
+/**
+ * Use the mutations to interact with the escrows
+ *
+ * - Deploy Escrow
+ * - Update Escrow
+ * - Fund Escrow
+ * - Change Milestone Status
+ * - Approve Milestone
+ * - Start Dispute
+ * - Release Funds
+ * - Resolve Dispute
+ */
 export const useEscrowsMutations = () => {
   const queryClient = useQueryClient();
   const { deployEscrow } = useInitializeEscrow();
@@ -38,6 +50,9 @@ export const useEscrowsMutations = () => {
   const { releaseFunds } = useReleaseFunds();
   const { resolveDispute } = useResolveDispute();
 
+  /**
+   * Deploy Escrow
+   */
   const deployEscrowMutation = useMutation({
     mutationFn: async ({
       payload,
@@ -83,6 +98,9 @@ export const useEscrowsMutations = () => {
     },
   });
 
+  /**
+   * Update Escrow
+   */
   const updateEscrowMutation = useMutation({
     mutationFn: async ({
       payload,
@@ -128,6 +146,9 @@ export const useEscrowsMutations = () => {
     },
   });
 
+  /**
+   * Fund Escrow
+   */
   const fundEscrowMutation = useMutation({
     mutationFn: async ({
       payload,
@@ -174,6 +195,9 @@ export const useEscrowsMutations = () => {
     },
   });
 
+  /**
+   * Approve Milestone
+   */
   const approveMilestoneMutation = useMutation({
     mutationFn: async ({
       payload,
@@ -217,6 +241,9 @@ export const useEscrowsMutations = () => {
     },
   });
 
+  /**
+   * Change Milestone Status
+   */
   const changeMilestoneStatusMutation = useMutation({
     mutationFn: async ({
       payload,
@@ -263,6 +290,9 @@ export const useEscrowsMutations = () => {
     },
   });
 
+  /**
+   * Start Dispute
+   */
   const startDisputeMutation = useMutation({
     mutationFn: async ({
       payload,
@@ -308,6 +338,9 @@ export const useEscrowsMutations = () => {
     },
   });
 
+  /**
+   * Release Funds
+   */
   const releaseFundsMutation = useMutation({
     mutationFn: async ({
       payload,
@@ -353,6 +386,9 @@ export const useEscrowsMutations = () => {
     },
   });
 
+  /**
+   * Resolve Dispute
+   */
   const resolveDisputeMutation = useMutation({
     mutationFn: async ({
       payload,

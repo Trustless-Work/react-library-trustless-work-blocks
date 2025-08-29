@@ -1,5 +1,10 @@
 import { useState } from "react";
 
+/**
+ * Use copy to clipboard
+ *
+ * @returns The copied key id and the function to copy to clipboard
+ */
 export const useCopy = () => {
   const [copiedKeyId, setCopiedKeyId] = useState(false);
 

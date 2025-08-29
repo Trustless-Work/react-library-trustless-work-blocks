@@ -21,11 +21,23 @@ export default function DisputeEscrowButton() {
     try {
       setIsSubmitting(true);
 
+      /**
+       * Create the payload for the dispute escrow mutation
+       *
+       * @returns The payload for the dispute escrow mutation
+       */
       const payload: SingleReleaseStartDisputePayload = {
         contractId: selectedEscrow?.contractId || "",
         signer: walletAddress || "",
       };
 
+      /**
+       * Call the dispute escrow mutation
+       *
+       * @param payload - The payload for the dispute escrow mutation
+       * @param type - The type of the escrow
+       * @param address - The address of the escrow
+       */
       await startDispute.mutateAsync({
         payload,
         type: "single-release",

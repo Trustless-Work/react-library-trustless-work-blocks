@@ -14,6 +14,12 @@ type UseEscrowsByRoleQueryParams = Omit<
   validateOnChain?: boolean;
 };
 
+/**
+ * Use the query to get the escrows by role
+ *
+ * @param params - The parameters for the query
+ * @returns The query result
+ */
 export const useEscrowsByRoleQuery = ({
   role,
   roleAddress,
@@ -32,6 +38,7 @@ export const useEscrowsByRoleQuery = ({
   enabled = true,
   validateOnChain = true,
 }: UseEscrowsByRoleQueryParams) => {
+  // Get the escrows by role
   const { getEscrowsByRole } = useGetEscrowsFromIndexerByRole();
 
   return useQuery({
@@ -57,6 +64,13 @@ export const useEscrowsByRoleQuery = ({
       if (!role) {
         throw new Error("Role is required to fetch escrows by role");
       }
+
+      /**
+       * Call the query to get the escrows from the Trustless Work Indexer
+       *
+       * @param params - The parameters for the query
+       * @returns The query result
+       */
       const escrows = await getEscrowsByRole({
         role,
         roleAddress,

@@ -37,7 +37,10 @@ export const EscrowAmountProvider = ({ children }: { children: ReactNode }) => {
 
   const setAmounts: AmountEscrowStore["setAmounts"] = useCallback(
     (totalAmount, platformFee) => {
+      // Trustless Work percentage
       const trustlessPercentage = 0.3;
+
+      // Receiver percentage
       const receiverPercentage = 100 - (trustlessPercentage + platformFee);
 
       setReceiverAmount((totalAmount * receiverPercentage) / 100);

@@ -25,11 +25,23 @@ export default function ReleaseEscrowButton() {
     try {
       setIsSubmitting(true);
 
+      /**
+       * Create the payload for the release escrow mutation
+       *
+       * @returns The payload for the release escrow mutation
+       */
       const payload: SingleReleaseReleaseFundsPayload = {
         contractId: selectedEscrow?.contractId || "",
         releaseSigner: walletAddress || "",
       };
 
+      /**
+       * Call the release escrow mutation
+       *
+       * @param payload - The payload for the release escrow mutation
+       * @param type - The type of the escrow
+       * @param address - The address of the escrow
+       */
       await releaseFunds.mutateAsync({
         payload,
         type: "single-release",

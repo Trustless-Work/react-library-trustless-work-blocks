@@ -31,7 +31,10 @@ export function EscrowDialogsProvider({
 
   const value = useMemo<EscrowDialogsContextType>(
     () => ({
-      second: { isOpen: secondOpen, setIsOpen: setSecondOpen }, //
+      // Detail Escrow Dialog
+      second: { isOpen: secondOpen, setIsOpen: setSecondOpen },
+
+      // Success Release Dialog
       successRelease: {
         isOpen: successReleaseOpen,
         setIsOpen: setSuccessReleaseOpen,

@@ -32,6 +32,12 @@ export function useResolveDispute() {
     try {
       setIsSubmitting(true);
 
+      /**
+       * Create the final payload for the resolve dispute mutation
+       *
+       * @param payload - The payload from the form
+       * @returns The final payload for the resolve dispute mutation
+       */
       const finalPayload: SingleReleaseResolveDisputePayload = {
         contractId: selectedEscrow?.contractId || "",
         disputeResolver: walletAddress || "",
@@ -39,6 +45,13 @@ export function useResolveDispute() {
         receiverFunds: Number(payload.receiverFunds),
       };
 
+      /**
+       * Call the resolve dispute mutation
+       *
+       * @param payload - The final payload for the resolve dispute mutation
+       * @param type - The type of the escrow
+       * @param address - The address of the escrow
+       */
       await resolveDispute.mutateAsync({
         payload: finalPayload,
         type: "single-release",

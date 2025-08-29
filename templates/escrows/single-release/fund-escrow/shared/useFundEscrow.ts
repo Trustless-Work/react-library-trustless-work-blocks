@@ -31,6 +31,12 @@ export function useFundEscrow() {
     try {
       setIsSubmitting(true);
 
+      /**
+       * Create the final payload for the fund escrow mutation
+       *
+       * @param payload - The payload from the form
+       * @returns The final payload for the fund escrow mutation
+       */
       const finalPayload: FundEscrowPayload = {
         amount:
           typeof payload.amount === "string"
@@ -40,6 +46,13 @@ export function useFundEscrow() {
         signer: walletAddress || "",
       };
 
+      /**
+       * Call the fund escrow mutation
+       *
+       * @param payload - The final payload for the fund escrow mutation
+       * @param type - The type of the escrow
+       * @param address - The address of the escrow
+       */
       await fundEscrow.mutateAsync({
         payload: finalPayload,
         type: "single-release",

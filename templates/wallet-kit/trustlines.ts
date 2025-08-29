@@ -1,3 +1,10 @@
+/**
+ * Trustlines | Non-Native Tokens from Stellar
+ *
+ * @description Trustlines are the tokens that are used to pay for the escrow
+ * @description The trustlines are filtered by the network
+ * @description The trustlines are filtered by the network in the trustlineOptions
+ */
 export const trustlines = [
   // TESTNET
   {

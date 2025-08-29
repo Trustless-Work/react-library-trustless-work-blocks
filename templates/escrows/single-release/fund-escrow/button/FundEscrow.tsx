@@ -35,12 +35,24 @@ export default function FundEscrowButton({ amount }: FundEscrowButtonProps) {
 
       setIsSubmitting(true);
 
+      /**
+       * Create the payload for the fund escrow mutation
+       *
+       * @returns The payload for the fund escrow mutation
+       */
       const payload: FundEscrowPayload = {
         amount: Number(amount),
         contractId: selectedEscrow?.contractId || "",
         signer: walletAddress || "",
       };
 
+      /**
+       * Call the fund escrow mutation
+       *
+       * @param payload - The payload for the fund escrow mutation
+       * @param type - The type of the escrow
+       * @param address - The address of the escrow
+       */
       await fundEscrow.mutateAsync({
         payload,
         type: "single-release",

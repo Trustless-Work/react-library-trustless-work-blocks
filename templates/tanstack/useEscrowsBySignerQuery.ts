@@ -11,6 +11,12 @@ interface UseEscrowsBySignerQueryParams
   validateOnChain?: boolean;
 }
 
+/**
+ * Use the query to get the escrows by signer
+ *
+ * @param params - The parameters for the query
+ * @returns The query result
+ */
 export const useEscrowsBySignerQuery = ({
   signer,
   isActive,
@@ -30,6 +36,7 @@ export const useEscrowsBySignerQuery = ({
 }: UseEscrowsBySignerQueryParams) => {
   const { getEscrowsBySigner } = useGetEscrowsFromIndexerBySigner();
 
+  // Get the escrows by signer
   return useQuery({
     queryKey: [
       "escrows",
@@ -49,6 +56,12 @@ export const useEscrowsBySignerQuery = ({
       validateOnChain,
     ],
     queryFn: async (): Promise<Escrow[]> => {
+      /**
+       * Call the query to get the escrows from the Trustless Work Indexer
+       *
+       * @param params - The parameters for the query
+       * @returns The query result
+       */
       const escrows = await getEscrowsBySigner({
         signer,
         isActive,
