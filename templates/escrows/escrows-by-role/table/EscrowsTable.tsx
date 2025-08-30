@@ -75,6 +75,17 @@ export function EscrowsByRoleTable() {
   const dialogStates = useEscrowDialogs();
   const { setSelectedEscrow } = useEscrowContext();
 
+  const handleRefresh = React.useCallback(() => {
+    void refetch();
+  }, [refetch]);
+
+  const setRoleStable = React.useCallback(
+    (v: Role | undefined) => {
+      if (v) setRole(v);
+    },
+    [setRole]
+  );
+
   const columns = React.useMemo<ColumnDef<Escrow>[]>(
     () => [
       {
@@ -187,7 +198,7 @@ export function EscrowsByRoleTable() {
         ),
       },
     ],
-    []
+    [dialogStates.second.setIsOpen, setSelectedEscrow]
   );
 
   const table = useReactTable({
@@ -212,7 +223,10 @@ export function EscrowsByRoleTable() {
    *
    * Depending of the role, you'll have different actions buttons
    */
-  const activeRole: Role[] = role.split(",") as Role[];
+  const activeRole: Role[] = React.useMemo(
+    () => role.split(",") as Role[],
+    [role]
+  );
 
   const escrows = data ?? [];
 
@@ -235,19 +249,19 @@ export function EscrowsByRoleTable() {
           setEngagementId={setEngagementId}
           setIsActive={setIsActive}
           setValidateOnChain={setValidateOnChain}
-          setType={(v) => setType(v as typeof type)}
-          setStatus={(v) => setStatus(v as typeof status)}
+          setType={setType}
+          setStatus={setStatus}
           setMinAmount={setMinAmount}
           setMaxAmount={setMaxAmount}
           setDateRange={setDateRange}
-          setRole={(v) => setRole(v as Role)}
+          setRole={setRoleStable}
           onClearFilters={onClearFilters}
-          onRefresh={() => refetch()}
+          onRefresh={handleRefresh}
           isRefreshing={isFetching}
           orderBy={orderBy}
           orderDirection={orderDirection}
-          setOrderBy={(v) => setOrderBy(v)}
-          setOrderDirection={(v) => setOrderDirection(v)}
+          setOrderBy={setOrderBy}
+          setOrderDirection={setOrderDirection}
         />
 
         <Card className="w-full py-2 sm:py-4">
@@ -346,7 +360,7 @@ export function EscrowsByRoleTable() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => refetch()}
+                          onClick={handleRefresh}
                         >
                           <RefreshCw className="h-4 w-4 mr-2" />
                           Retry
@@ -425,14 +439,16 @@ export function EscrowsByRoleTable() {
       </div>
 
       {/* Dialog */}
-      <EscrowDetailDialog
-        activeRole={activeRole}
-        isDialogOpen={dialogStates.second.isOpen}
-        setIsDialogOpen={dialogStates.second.setIsOpen}
-        setSelectedEscrow={setSelectedEscrow}
-      />
+      {dialogStates.second.isOpen ? (
+        <EscrowDetailDialog
+          activeRole={activeRole}
+          isDialogOpen={dialogStates.second.isOpen}
+          setIsDialogOpen={dialogStates.second.setIsOpen}
+          setSelectedEscrow={setSelectedEscrow}
+        />
+      ) : null}
     </>
   );
 }
 
-export default EscrowsByRoleTable;
+export default React.memo(EscrowsByRoleTable);

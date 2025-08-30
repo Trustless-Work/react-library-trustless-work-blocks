@@ -151,4 +151,4 @@ const EscrowDetailDialog = ({
   );
 };
 
-export default EscrowDetailDialog;
+export default React.memo(EscrowDetailDialog);

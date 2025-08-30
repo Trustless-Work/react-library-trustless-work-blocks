@@ -73,6 +73,10 @@ export function EscrowsBySignerTable() {
   const dialogStates = useEscrowDialogs();
   const { setSelectedEscrow } = useEscrowContext();
 
+  const handleRefresh = React.useCallback(() => {
+    void refetch();
+  }, [refetch]);
+
   const columns = React.useMemo<ColumnDef<Escrow>[]>(
     () => [
       {
@@ -184,7 +188,7 @@ export function EscrowsBySignerTable() {
         ),
       },
     ],
-    []
+    [dialogStates.second.setIsOpen, setSelectedEscrow]
   );
 
   const table = useReactTable({
@@ -209,7 +213,7 @@ export function EscrowsBySignerTable() {
    *
    * Depending of the role, you'll have different actions buttons
    */
-  const activeRole: Role[] = ["approver"];
+  const activeRole: Role[] = React.useMemo(() => ["approver"] as Role[], []);
 
   const escrows = data ?? [];
 
@@ -231,18 +235,18 @@ export function EscrowsBySignerTable() {
           setEngagementId={setEngagementId}
           setIsActive={setIsActive}
           setValidateOnChain={setValidateOnChain}
-          setType={(v) => setType(v as typeof type)}
-          setStatus={(v) => setStatus(v as typeof status)}
+          setType={setType}
+          setStatus={setStatus}
           setMinAmount={setMinAmount}
           setMaxAmount={setMaxAmount}
           setDateRange={setDateRange}
           onClearFilters={onClearFilters}
-          onRefresh={() => refetch()}
+          onRefresh={handleRefresh}
           isRefreshing={isFetching}
           orderBy={orderBy}
           orderDirection={orderDirection}
-          setOrderBy={(v) => setOrderBy(v)}
-          setOrderDirection={(v) => setOrderDirection(v)}
+          setOrderBy={setOrderBy}
+          setOrderDirection={setOrderDirection}
         />
 
         <Card className="w-full py-2 sm:py-4">
@@ -341,7 +345,7 @@ export function EscrowsBySignerTable() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => refetch()}
+                          onClick={handleRefresh}
                         >
                           <RefreshCw className="h-4 w-4 mr-2" />
                           Retry
@@ -420,14 +424,16 @@ export function EscrowsBySignerTable() {
       </div>
 
       {/* Dialog */}
-      <EscrowDetailDialog
-        activeRole={activeRole}
-        isDialogOpen={dialogStates.second.isOpen}
-        setIsDialogOpen={dialogStates.second.setIsOpen}
-        setSelectedEscrow={setSelectedEscrow}
-      />
+      {dialogStates.second.isOpen ? (
+        <EscrowDetailDialog
+          activeRole={activeRole}
+          isDialogOpen={dialogStates.second.isOpen}
+          setIsDialogOpen={dialogStates.second.setIsOpen}
+          setSelectedEscrow={setSelectedEscrow}
+        />
+      ) : null}
     </>
   );
 }
 
-export default EscrowsBySignerTable;
+export default React.memo(EscrowsBySignerTable);

@@ -70,6 +70,10 @@ export function EscrowsBySignerCards() {
 
   const dialogStates = useEscrowDialogs();
 
+  const handleRefresh = React.useCallback(() => {
+    void refetch();
+  }, [refetch]);
+
   const formatCurrency = (value: number, currency: string) => {
     return `${currency} ${value.toFixed(2)}`;
   };
@@ -126,7 +130,7 @@ export function EscrowsBySignerCards() {
    *
    * Depending of the role, you'll have different actions buttons
    */
-  const activeRole: Role[] = ["approver"];
+  const activeRole: Role[] = React.useMemo(() => ["approver"] as Role[], []);
 
   const escrows: Escrow[] = data ?? [];
 
@@ -148,18 +152,18 @@ export function EscrowsBySignerCards() {
           setEngagementId={setEngagementId}
           setIsActive={setIsActive}
           setValidateOnChain={setValidateOnChain}
-          setType={(v) => setType(v as typeof type)}
-          setStatus={(v) => setStatus(v as typeof status)}
+          setType={setType}
+          setStatus={setStatus}
           setMinAmount={setMinAmount}
           setMaxAmount={setMaxAmount}
           setDateRange={setDateRange}
           onClearFilters={onClearFilters}
-          onRefresh={() => refetch()}
+          onRefresh={handleRefresh}
           isRefreshing={isFetching}
           orderBy={orderBy}
           orderDirection={orderDirection}
-          setOrderBy={(v) => setOrderBy(v)}
-          setOrderDirection={(v) => setOrderDirection(v)}
+          setOrderBy={setOrderBy}
+          setOrderDirection={setOrderDirection}
         />
 
         <div className="w-full py-2 sm:py-4">
@@ -235,7 +239,7 @@ export function EscrowsBySignerCards() {
                     An error occurred while loading the information. Please try
                     again.
                   </p>
-                  <Button variant="outline" size="sm" onClick={() => refetch()}>
+                  <Button variant="outline" size="sm" onClick={handleRefresh}>
                     <RefreshCw className="h-4 w-4 mr-2" />
                     Retry
                   </Button>
@@ -502,14 +506,16 @@ export function EscrowsBySignerCards() {
       </div>
 
       {/* Dialog */}
-      <EscrowDetailDialog
-        activeRole={activeRole}
-        isDialogOpen={dialogStates.second.isOpen}
-        setIsDialogOpen={dialogStates.second.setIsOpen}
-        setSelectedEscrow={setSelectedEscrow}
-      />
+      {dialogStates.second.isOpen ? (
+        <EscrowDetailDialog
+          activeRole={activeRole}
+          isDialogOpen={dialogStates.second.isOpen}
+          setIsDialogOpen={dialogStates.second.setIsOpen}
+          setSelectedEscrow={setSelectedEscrow}
+        />
+      ) : null}
     </>
   );
 }
 
-export default EscrowsBySignerCards;
+export default React.memo(EscrowsBySignerCards);

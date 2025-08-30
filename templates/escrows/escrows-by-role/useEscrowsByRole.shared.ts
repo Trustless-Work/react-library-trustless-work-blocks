@@ -108,8 +108,8 @@ export function useEscrowsByRole() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const debouncedSearchParams = useDebouncedValue(
-    {
+  const stableSearchParams = React.useMemo(
+    () => ({
       page,
       orderBy,
       orderDirection,
@@ -126,9 +126,28 @@ export function useEscrowsByRole() {
         : undefined,
       endDate: dateRange.to ? endOfDay(dateRange.to).toISOString() : undefined,
       role,
-    },
-    200
+    }),
+    [
+      page,
+      orderBy,
+      orderDirection,
+      debouncedTitle,
+      debouncedEngagementId,
+      isActive,
+      validateOnChain,
+      type,
+      status,
+      debouncedMinAmount,
+      debouncedMaxAmount,
+      dateRange.from,
+      dateRange.to,
+      role,
+    ]
   );
+
+  const debouncedSearchParams = useDebouncedValue(stableSearchParams, 200);
+
+  const lastQueryStringRef = React.useRef("");
 
   React.useEffect(() => {
     if (!pathname) return;
@@ -145,8 +164,10 @@ export function useEscrowsByRole() {
       qp.set("engagementId", debouncedSearchParams.engagementId);
     qp.set("isActive", String(debouncedSearchParams.isActive));
     qp.set("validateOnChain", String(debouncedSearchParams.validateOnChain));
-    if (type && type !== "all") qp.set("type", type);
-    if (status && status !== "all") qp.set("status", status);
+    if (debouncedSearchParams.type && debouncedSearchParams.type !== "all")
+      qp.set("type", debouncedSearchParams.type);
+    if (debouncedSearchParams.status && debouncedSearchParams.status !== "all")
+      qp.set("status", debouncedSearchParams.status);
     if (debouncedSearchParams.minAmount)
       qp.set("minAmount", String(debouncedSearchParams.minAmount));
     if (debouncedSearchParams.maxAmount)
@@ -158,25 +179,12 @@ export function useEscrowsByRole() {
     if (debouncedSearchParams.role)
       qp.set("role", String(debouncedSearchParams.role));
 
-    router.replace(`${pathname}?${qp.toString()}`);
-  }, [
-    pathname,
-    router,
-    debouncedSearchParams.page,
-    debouncedSearchParams.orderBy,
-    debouncedSearchParams.orderDirection,
-    debouncedSearchParams.title,
-    debouncedSearchParams.engagementId,
-    debouncedSearchParams.isActive,
-    debouncedSearchParams.validateOnChain,
-    type,
-    status,
-    debouncedSearchParams.minAmount,
-    debouncedSearchParams.maxAmount,
-    debouncedSearchParams.startDate,
-    debouncedSearchParams.endDate,
-    debouncedSearchParams.role,
-  ]);
+    const newQs = qp.toString();
+    if (lastQueryStringRef.current !== newQs) {
+      lastQueryStringRef.current = newQs;
+      router.replace(`${pathname}?${newQs}`);
+    }
+  }, [pathname, router, debouncedSearchParams]);
 
   const formattedRangeLabel = React.useMemo(() => {
     if (!dateRange?.from && !dateRange?.to) return "Date range";

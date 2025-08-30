@@ -75,6 +75,17 @@ export function EscrowsByRoleCards() {
 
   const dialogStates = useEscrowDialogs();
 
+  const handleRefresh = React.useCallback(() => {
+    void refetch();
+  }, [refetch]);
+
+  const setRoleStable = React.useCallback(
+    (v: Role | undefined) => {
+      if (v) setRole(v);
+    },
+    [setRole]
+  );
+
   function allMilestonesReleasedOrResolved(
     milestones: MultiReleaseMilestone[]
   ) {
@@ -129,7 +140,10 @@ export function EscrowsByRoleCards() {
    *
    * Depending of the role, you'll have different actions buttons
    */
-  const activeRole: Role[] = role.split(",") as Role[];
+  const activeRole: Role[] = React.useMemo(
+    () => role.split(",") as Role[],
+    [role]
+  );
 
   return (
     <>
@@ -150,19 +164,19 @@ export function EscrowsByRoleCards() {
           setEngagementId={setEngagementId}
           setIsActive={setIsActive}
           setValidateOnChain={setValidateOnChain}
-          setType={(v) => setType(v as typeof type)}
-          setStatus={(v) => setStatus(v as typeof status)}
+          setType={setType}
+          setStatus={setStatus}
           setMinAmount={setMinAmount}
           setMaxAmount={setMaxAmount}
           setDateRange={setDateRange}
-          setRole={(v) => setRole(v as Role)}
+          setRole={setRoleStable}
           onClearFilters={onClearFilters}
-          onRefresh={() => refetch()}
+          onRefresh={handleRefresh}
           isRefreshing={isFetching}
           orderBy={orderBy}
           orderDirection={orderDirection}
-          setOrderBy={(v) => setOrderBy(v)}
-          setOrderDirection={(v) => setOrderDirection(v)}
+          setOrderBy={setOrderBy}
+          setOrderDirection={setOrderDirection}
         />
 
         <div className="w-full py-2 sm:py-4">
@@ -502,14 +516,16 @@ export function EscrowsByRoleCards() {
       </div>
 
       {/* Dialog */}
-      <EscrowDetailDialog
-        activeRole={activeRole}
-        isDialogOpen={dialogStates.second.isOpen}
-        setIsDialogOpen={dialogStates.second.setIsOpen}
-        setSelectedEscrow={setSelectedEscrow}
-      />
+      {dialogStates.second.isOpen ? (
+        <EscrowDetailDialog
+          activeRole={activeRole}
+          isDialogOpen={dialogStates.second.isOpen}
+          setIsDialogOpen={dialogStates.second.setIsOpen}
+          setSelectedEscrow={setSelectedEscrow}
+        />
+      ) : null}
     </>
   );
 }
 
-export default EscrowsByRoleCards;
+export default React.memo(EscrowsByRoleCards);
