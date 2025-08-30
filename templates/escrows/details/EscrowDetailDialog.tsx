@@ -12,7 +12,7 @@ import useEscrowDetailDialog from "./useDetailsEscrow";
 import Link from "next/link";
 import { Card } from "__UI_BASE__/card";
 import { Info, Users, ListChecks } from "lucide-react";
-import { useEscrowDialogs } from "../../escrow-context/EscrowDialogsProvider";
+import { useEscrowDialogs } from "@/components/tw-blocks/providers/EscrowDialogsProvider";
 import type {
   GetEscrowsFromIndexerResponse as Escrow,
   Role,
@@ -21,7 +21,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "__UI_BASE__/tabs";
 import { Milestones } from "./Milestones";
 import { Entities } from "./Entities";
 import { GeneralInformation } from "./GeneralInformation";
-import { useEscrowContext } from "../../escrow-context/EscrowProvider";
+import { useEscrowContext } from "@/components/tw-blocks/providers/EscrowProvider";
 import SuccessReleaseDialog from "./SuccessReleaseDialog";
 
 interface EscrowDetailDialogProps {

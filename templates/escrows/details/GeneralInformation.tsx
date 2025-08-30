@@ -19,12 +19,12 @@ import { Actions, roleActions } from "./Actions";
 import type {
   DialogStates,
   StatusStates,
-} from "../../escrow-context/EscrowDialogsProvider";
+} from "@/components/tw-blocks/providers/EscrowDialogsProvider";
 import {
   GetEscrowsFromIndexerResponse,
   Role,
 } from "@trustless-work/escrow/types";
-import { useEscrowAmountContext } from "../../escrow-context/EscrowAmountProvider";
+import { useEscrowAmountContext } from "@/components/tw-blocks/providers/EscrowAmountProvider";
 import { StatisticsCard } from "./StatisticsCard";
 import {
   formatAddress,

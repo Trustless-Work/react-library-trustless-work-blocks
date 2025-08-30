@@ -3,6 +3,7 @@
 # Trustless Work <a href="https://www.npmjs.com/package/@trustless-work/blocks" target="_blank">React Library</a>
 
 A production-ready set of React blocks for integrating Trustless Work's escrow and dispute resolution flows. It ships:
+
 - UI blocks (cards/tables/dialogs/forms) to list and manage escrows
 - Providers for API config, wallet context, dialogs and amounts
 - TanStack Query hooks for fetching and mutating escrows
@@ -20,12 +21,14 @@ npx trustless-work init
 ```
 
 What init does:
+
 - Installs shadcn/ui components (prompted)
 - Installs required deps: @tanstack/react-query, @trustless-work/escrow, axios, zod, react-hook-form, @creit.tech/stellar-wallets-kit, react-day-picker, etc.
 - Creates .twblocks.json with your UI base alias (default: "@/components/ui")
 - Optionally wires providers into Next.js `app/layout.tsx`
 
 Environment:
+
 - Create `NEXT_PUBLIC_API_KEY` in your env. The library uses `TrustlessWorkProvider` with `development` base URL by default.
 
 Tutorial at <a href="https://dapp.trustlesswork.com" target="_blank">backoffice's landing</a>
@@ -33,33 +36,41 @@ Tutorial at <a href="https://dapp.trustlesswork.com" target="_blank">backoffice'
 ## Quick Start
 
 1. Initialize
+
 ```bash
 npx trustless-work init
 ```
 
 2. Add providers (if you skipped wiring during init)
+
 ```bash
 npx trustless-work add providers
 ```
 
 3. Wrap your Next.js layout
+
 ```tsx
 // app/layout.tsx
 import { ReactQueryClientProvider } from "@/components/tw-blocks/providers/ReactQueryClientProvider";
-import { TrustlessWorkProvider } from "@/components/tw-blocks/providers/TrustlessWork";
+import {
+  TrustlessWorkProvider,
+  ReactQueryClientProvider,
+  EscrowProvider,
+} from "@/components/tw-blocks/providers/TrustlessWork";
 import { WalletProvider } from "@/components/tw-blocks/wallet-kit/WalletProvider";
-import { EscrowProvider } from "@/components/tw-blocks/escrows/escrow-context/EscrowProvider";
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en">
       <body>
         <ReactQueryClientProvider>
           <TrustlessWorkProvider>
             <WalletProvider>
-              <EscrowProvider>
-                {children}
-              </EscrowProvider>
+              <EscrowProvider>{children}</EscrowProvider>
             </WalletProvider>
           </TrustlessWorkProvider>
         </ReactQueryClientProvider>
@@ -70,9 +81,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 ```
 
 4. Add a wallet button to your header
+
 ```bash
 npx trustless-work add wallet-kit
 ```
+
 ```tsx
 // Example usage
 import { WalletButton } from "@/components/tw-blocks/wallet-kit/WalletButtons";
@@ -87,16 +100,18 @@ export function Header() {
 ```
 
 5. List escrows quickly
+
 ```bash
 # By role
 npx trustless-work add escrows/escrows-by-role/cards
 # Or table view
 npx trustless-work add escrows/escrows-by-role/table
 ```
+
 ```tsx
 // app/escrows/page.tsx
 import { EscrowsByRoleCards } from "@/components/tw-blocks/escrows/escrows-by-role/cards/EscrowsCards";
-import { EscrowDialogsProvider } from "@/components/tw-blocks/escrows/escrow-context/EscrowDialogsProvider";
+import { EscrowDialogsProvider } from "@/components/tw-blocks/providers/EscrowDialogsProvider";
 
 export default function Page() {
   return (
@@ -142,7 +157,9 @@ export function DeployButton({ address }: { address: string }) {
     <button
       onClick={() =>
         deployEscrow.mutate({
-          payload: { /* InitializeSingleReleaseEscrowPayload */ },
+          payload: {
+            /* InitializeSingleReleaseEscrowPayload */
+          },
           type: "single-release",
           address,
         })
@@ -170,9 +187,6 @@ npx trustless-work add helpers
 npx trustless-work add tanstack
 npx trustless-work add escrows
 
-# Escrow context providers
-npx trustless-work add escrows/escrow-context
-
 # Escrows by role
 npx trustless-work add escrows/escrows-by-role
 npx trustless-work add escrows/escrows-by-role/table
@@ -199,13 +213,15 @@ npx trustless-work add escrows/single-release/update-escrow
 ```
 
 ### Escrows
+
 - Cards and tables to browse escrows (by role or by signer) with filters, pagination, and sort
 - Detail dialog with actions gated by roles and escrow flags
 - Dialogs/forms for single-release lifecycle (initialize, fund, approve, change status, release, dispute, resolve, update)
 
 Using cards (by role):
+
 ```tsx
-import { EscrowDialogsProvider } from "@/components/tw-blocks/escrows/escrow-context/EscrowDialogsProvider";
+import { EscrowDialogsProvider } from "@/components/tw-blocks/providers/EscrowDialogsProvider";
 import { EscrowsByRoleCards } from "@/components/tw-blocks/escrows/escrows-by-role/cards/EscrowsCards";
 
 export default function Screen() {
@@ -218,6 +234,7 @@ export default function Screen() {
 ```
 
 Make sure to:
+
 1. Set `NEXT_PUBLIC_API_KEY` and run the app against the correct environment (the provider defaults to `development`).
 2. Configure your UI base imports. CLI uses `.twblocks.json` `uiBase` to replace `__UI_BASE__`. If your UI alias differs, pass `--ui-base`:
    ```bash
@@ -228,6 +245,7 @@ Make sure to:
 ## Best Practices
 
 1. Providers
+
    - `ReactQueryClientProvider`: global query cache and devtools.
    - `TrustlessWorkProvider`: sets API `baseURL` and `apiKey` via `TrustlessWorkConfig` from `@trustless-work/escrow`.
    - `WalletProvider`: minimal wallet state (address/name) persisted in localStorage; used by wallet button and mutations.
@@ -236,17 +254,25 @@ Make sure to:
    - `EscrowAmountProvider`: computes receiver/platform/fee splits for releases.
 
 2. Queries and caching
+
    - Use provided queries: `useEscrowsByRoleQuery`, `useEscrowsBySignerQuery`.
    - All mutations invalidate `['escrows']` automatically.
 
 3. Error handling
+
    - Use `handleError(error)` from `handle-errors/handle.ts` to map Axios and wallet errors to normalized types (`ApiErrorTypes`).
+
    ```ts
    import { handleError } from "@/components/tw-blocks/handle-errors/handle";
-   try { /* ... */ } catch (e) { const err = handleError(e as any); /* show toast */ }
+   try {
+     /* ... */
+   } catch (e) {
+     const err = handleError(e as any); /* show toast */
+   }
    ```
 
 4. Wallet-kit
+
    - `WalletButton` opens a modal using `@creit.tech/stellar-wallets-kit` and stores address/name in `WalletProvider`.
    - `signTransaction({ unsignedTransaction, address })` signs and returns XDR used by mutations.
    - `trustlines` and `trustlineOptions` include common assets for testnet/mainnet.

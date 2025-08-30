@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { fundEscrowSchema, type FundEscrowValues } from "./schema";
 import { toast } from "sonner";
 import { FundEscrowPayload } from "@trustless-work/escrow";
-import { useEscrowContext } from "../../../escrow-context/EscrowProvider";
+import { useEscrowContext } from "@/components/tw-blocks/providers/EscrowProvider";
 import { useEscrowsMutations } from "@/components/tw-blocks/tanstack/useEscrowsMutations";
 import {
   ErrorResponse,

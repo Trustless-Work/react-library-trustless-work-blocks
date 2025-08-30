@@ -8,9 +8,9 @@ import {
   ErrorResponse,
   handleError,
 } from "@/components/tw-blocks/handle-errors/handle";
-import { useEscrowContext } from "../../../escrow-context/EscrowProvider";
-import { useEscrowDialogs } from "../../../escrow-context/EscrowDialogsProvider";
-import { useEscrowAmountContext } from "../../../escrow-context/EscrowAmountProvider";
+import { useEscrowContext } from "@/components/tw-blocks/providers/EscrowProvider";
+import { useEscrowDialogs } from "@/components/tw-blocks/providers/EscrowDialogsProvider";
+import { useEscrowAmountContext } from "@/components/tw-blocks/providers/EscrowAmountProvider";
 import { Loader2 } from "lucide-react";
 
 export default function ReleaseEscrowButton() {

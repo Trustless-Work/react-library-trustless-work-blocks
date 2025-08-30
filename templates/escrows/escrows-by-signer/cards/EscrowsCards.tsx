@@ -21,8 +21,8 @@ import {
   RefreshCw,
   FileX,
 } from "lucide-react";
-import { useEscrowContext } from "../../escrow-context/EscrowProvider";
-import { useEscrowDialogs } from "../../escrow-context/EscrowDialogsProvider";
+import { useEscrowContext } from "@/components/tw-blocks/providers/EscrowProvider";
+import { useEscrowDialogs } from "@/components/tw-blocks/providers/EscrowDialogsProvider";
 import EscrowDetailDialog from "../../escrows-by-role/details/EscrowDetailDialog";
 import { formatTimestamp } from "../../../helpers/format.helper";
 

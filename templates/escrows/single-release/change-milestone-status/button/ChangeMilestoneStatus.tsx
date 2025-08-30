@@ -8,7 +8,7 @@ import {
   ErrorResponse,
   handleError,
 } from "@/components/tw-blocks/handle-errors/handle";
-import { useEscrowContext } from "../../../escrow-context/EscrowProvider";
+import { useEscrowContext } from "@/components/tw-blocks/providers/EscrowProvider";
 import { Loader2 } from "lucide-react";
 
 type ChangeMilestoneStatusButtonProps = {

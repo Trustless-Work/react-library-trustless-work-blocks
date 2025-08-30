@@ -22,8 +22,8 @@ import {
 import { useEscrowsByRole } from "../useEscrowsByRole.shared";
 import Filters from "./Filters";
 import EscrowDetailDialog from "../details/EscrowDetailDialog";
-import { useEscrowContext } from "../../escrow-context/EscrowProvider";
-import { useEscrowDialogs } from "../../escrow-context/EscrowDialogsProvider";
+import { useEscrowContext } from "@/components/tw-blocks/providers/EscrowProvider";
+import { useEscrowDialogs } from "@/components/tw-blocks/providers/EscrowDialogsProvider";
 import {
   formatCurrency,
   formatTimestamp,

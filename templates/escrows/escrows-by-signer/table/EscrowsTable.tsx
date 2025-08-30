@@ -25,8 +25,8 @@ import {
 import { FileX, Loader2, Wallet, RefreshCw, AlertTriangle } from "lucide-react";
 import Filters from "./Filters";
 import { useEscrowsBySigner } from "../useEscrowsBySigner.shared";
-import { useEscrowDialogs } from "../../escrow-context/EscrowDialogsProvider";
-import { useEscrowContext } from "../../escrow-context/EscrowProvider";
+import { useEscrowDialogs } from "@/components/tw-blocks/providers/EscrowDialogsProvider";
+import { useEscrowContext } from "@/components/tw-blocks/providers/EscrowProvider";
 import EscrowDetailDialog from "../../escrows-by-role/details/EscrowDetailDialog";
 import { formatTimestamp } from "../../../helpers/format.helper";
 

@@ -14,7 +14,7 @@ import {
   ErrorResponse,
   handleError,
 } from "@/components/tw-blocks/handle-errors/handle";
-import { useEscrowContext } from "../../../escrow-context/EscrowProvider";
+import { useEscrowContext } from "@/components/tw-blocks/providers/EscrowProvider";
 
 export function useInitializeEscrow() {
   const [isSubmitting, setIsSubmitting] = React.useState(false);

@@ -8,10 +8,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "__UI_BASE__/dialog";
-import { Card } from "__UI_BASE__/card";
 import EntityCard from "./EntityCard";
-import { useEscrowContext } from "../../escrow-context/EscrowProvider";
-import { useEscrowAmountContext } from "../../escrow-context/EscrowAmountProvider";
+import { useEscrowContext } from "@/components/tw-blocks/providers/EscrowProvider";
+import { useEscrowAmountContext } from "@/components/tw-blocks/providers/EscrowAmountProvider";
 import { CircleCheckBig } from "lucide-react";
 
 interface SuccessReleaseDialogProps {

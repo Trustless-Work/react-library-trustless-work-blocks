@@ -18,7 +18,7 @@ import {
 } from "__UI_BASE__/dialog";
 import { Loader2 } from "lucide-react";
 import { useResolveDispute } from "./useResolveDispute";
-import { useEscrowContext } from "../../../escrow-context/EscrowProvider";
+import { useEscrowContext } from "@/components/tw-blocks/providers/EscrowProvider";
 
 export default function ResolveDisputeDialog() {
   const { form, handleSubmit, isSubmitting } = useResolveDispute();

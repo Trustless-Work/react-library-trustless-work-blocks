@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { GetEscrowsFromIndexerResponse as Escrow } from "@trustless-work/escrow/types";
 import { useWalletContext } from "@/components/tw-blocks/wallet-kit/WalletProvider";
-import { useEscrowContext } from "../../escrow-context/EscrowProvider";
-import { useEscrowAmountContext } from "../../escrow-context/EscrowAmountProvider";
+import { useEscrowContext } from "@/components/tw-blocks/providers/EscrowProvider";
+import { useEscrowAmountContext } from "@/components/tw-blocks/providers/EscrowAmountProvider";
 
 interface EscrowDetailDialogProps {
   setIsDialogOpen: (value: boolean) => void;
