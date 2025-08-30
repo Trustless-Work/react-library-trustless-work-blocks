@@ -754,7 +754,7 @@ function injectProvidersIntoLayout(
     const importTW =
       'import { TrustlessWorkProvider } from "@/components/tw-blocks/providers/TrustlessWork";\n';
     const importEscrow =
-      'import { EscrowProvider } from "@/components/tw-blocks/escrows/escrow-context/EscrowProvider";\n';
+      'import { EscrowProvider } from "@/components/tw-blocks/providers/EscrowProvider";\n';
     const importWallet =
       'import { WalletProvider } from "@/components/tw-blocks/wallet-kit/WalletProvider";\n';
     const commentText =
@@ -997,12 +997,6 @@ if (args[0] === "init") {
     if (args[1] === "wallet-kit" || args[1].startsWith("wallet-kit/")) {
       injectProvidersIntoLayout(layoutPath, { wallet: true });
     }
-    if (
-      args[1] === "escrows/escrow-context" ||
-      args[1].startsWith("escrows/escrow-context/")
-    ) {
-      injectProvidersIntoLayout(layoutPath, { escrow: true });
-    }
   }
 
   // Copy shared details into role/signer targets when applicable
@@ -1072,9 +1066,6 @@ if (args[0] === "init") {
   
   --- Escrows ---
   trustless-work add escrows
-  
-  --- Escrow context ---
-  trustless-work add escrows/escrow-context
   
   --- Escrows by role ---
   trustless-work add escrows/escrows-by-role
