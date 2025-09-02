@@ -220,18 +220,144 @@ function parseFlags(argv) {
 
 function copyTemplate(name, { uiBase, shouldInstall = false } = {}) {
   const srcFile = path.join(TEMPLATES_DIR, `${name}.tsx`);
-  const srcDir = path.join(TEMPLATES_DIR, name);
+  const requestedDir = path.join(TEMPLATES_DIR, name);
+  let srcDir = null;
+  if (fs.existsSync(requestedDir) && fs.lstatSync(requestedDir).isDirectory()) {
+    srcDir = requestedDir;
+  } else {
+    // Alias: allow multi-release/approve-milestone to fallback to existing source
+    if (name.startsWith("escrows/multi-release/approve-milestone")) {
+      const altMulti = path.join(
+        TEMPLATES_DIR,
+        "escrows",
+        "multi-release",
+        "approve-milestone"
+      );
+      const altSingle = path.join(
+        TEMPLATES_DIR,
+        "escrows",
+        "single-release",
+        "approve-milestone"
+      );
+      if (fs.existsSync(altMulti) && fs.lstatSync(altMulti).isDirectory()) {
+        srcDir = altMulti;
+      } else if (
+        fs.existsSync(altSingle) &&
+        fs.lstatSync(altSingle).isDirectory()
+      ) {
+        srcDir = altSingle;
+      }
+    }
+  }
   const outRoot = path.join(PROJECT_ROOT, "src", "components", "tw-blocks");
 
   const config = loadConfig();
   const effectiveUiBase = uiBase || config.uiBase || "@/components/ui";
+  let currentEscrowType = null;
 
   function writeTransformed(srcPath, destPath) {
     const raw = fs.readFileSync(srcPath, "utf8");
-    const transformed = raw.replaceAll("__UI_BASE__", effectiveUiBase);
+    let transformed = raw.replaceAll("__UI_BASE__", effectiveUiBase);
+    if (currentEscrowType) {
+      transformed = transformed.replaceAll(
+        "__ESCROW_TYPE__",
+        currentEscrowType
+      );
+    }
     fs.mkdirSync(path.dirname(destPath), { recursive: true });
     fs.writeFileSync(destPath, transformed, "utf8");
     console.log(`✅ ${path.relative(PROJECT_ROOT, destPath)} created`);
+  }
+
+  // Generic: materialize any module from templates/escrows/shared/<module>
+  if (!srcDir) {
+    const m = name.match(
+      /^escrows\/(single-release|multi-release)\/([^\/]+)(?:\/(button|dialog|form))?$/
+    );
+    if (m) {
+      const releaseType = m[1];
+      const moduleName = m[2];
+      const variant = m[3] || null;
+
+      const sharedModuleDir = path.join(
+        TEMPLATES_DIR,
+        "escrows",
+        "shared",
+        moduleName
+      );
+
+      if (
+        fs.existsSync(sharedModuleDir) &&
+        fs.lstatSync(sharedModuleDir).isDirectory()
+      ) {
+        currentEscrowType = releaseType;
+        const destBase = path.join(outRoot, "escrows", releaseType, moduleName);
+
+        function copyModuleRootFilesInto(targetDir) {
+          const entries = fs.readdirSync(sharedModuleDir, {
+            withFileTypes: true,
+          });
+          for (const entry of entries) {
+            if (entry.isDirectory()) continue;
+            if (!/\.(tsx?|jsx?)$/i.test(entry.name)) continue;
+            const entrySrc = path.join(sharedModuleDir, entry.name);
+            const entryDest = path.join(targetDir, entry.name);
+            writeTransformed(entrySrc, entryDest);
+          }
+        }
+
+        function copyVariant(variantName) {
+          const variantSrc = path.join(sharedModuleDir, variantName);
+          const variantDest = path.join(destBase, variantName);
+          fs.mkdirSync(variantDest, { recursive: true });
+          if (
+            fs.existsSync(variantSrc) &&
+            fs.lstatSync(variantSrc).isDirectory()
+          ) {
+            const stack = [""];
+            while (stack.length) {
+              const rel = stack.pop();
+              const current = path.join(variantSrc, rel);
+              const entries = fs.readdirSync(current, { withFileTypes: true });
+              for (const entry of entries) {
+                const entryRel = path.join(rel, entry.name);
+                const entrySrc = path.join(variantSrc, entryRel);
+                const entryDest = path.join(variantDest, entryRel);
+                if (entry.isDirectory()) {
+                  stack.push(entryRel);
+                  continue;
+                }
+                if (/\.(tsx?|jsx?)$/i.test(entry.name)) {
+                  writeTransformed(entrySrc, entryDest);
+                } else {
+                  fs.mkdirSync(path.dirname(entryDest), { recursive: true });
+                  fs.copyFileSync(entrySrc, entryDest);
+                  console.log(
+                    `✅ ${path.relative(PROJECT_ROOT, entryDest)} created`
+                  );
+                }
+              }
+            }
+          }
+          // Always place module-level shared files into the variant directory
+          copyModuleRootFilesInto(variantDest);
+        }
+
+        if (variant) {
+          copyVariant(variant);
+        } else {
+          const variants = ["button", "dialog", "form"];
+          for (const v of variants) copyVariant(v);
+        }
+
+        if (shouldInstall && fs.existsSync(GLOBAL_DEPS_FILE)) {
+          const meta = JSON.parse(fs.readFileSync(GLOBAL_DEPS_FILE, "utf8"));
+          installDeps(meta);
+        }
+        currentEscrowType = null;
+        return;
+      }
+    }
   }
 
   if (fs.existsSync(srcDir) && fs.lstatSync(srcDir).isDirectory()) {
@@ -326,17 +452,20 @@ function copyTemplate(name, { uiBase, shouldInstall = false } = {}) {
     }
 
     try {
-      const isSingleReleaseInitRoot =
-        name === "escrows/single-release/approve-milestone";
-      const isSingleReleaseInitDialog =
+      const isSRRoot = name === "escrows/single-release/approve-milestone";
+      const isSRDialog =
         name === "escrows/single-release/approve-milestone/dialog";
-      const isSingleReleaseInitForm =
-        name === "escrows/single-release/approve-milestone/form";
+      const isSRForm = name === "escrows/single-release/approve-milestone/form";
+
+      const isMRRoot = name === "escrows/multi-release/approve-milestone";
+      const isMRDialog =
+        name === "escrows/multi-release/approve-milestone/dialog";
+      const isMRForm = name === "escrows/multi-release/approve-milestone/form";
 
       const srcSharedDir = path.join(
         TEMPLATES_DIR,
         "escrows",
-        "single-release",
+        "shared",
         "approve-milestone",
         "shared"
       );
@@ -352,12 +481,12 @@ function copyTemplate(name, { uiBase, shouldInstall = false } = {}) {
         }
       }
 
-      if (isSingleReleaseInitRoot) {
+      if (isSRRoot || isMRRoot) {
         copySharedInto(path.join(destDir, "dialog"));
         copySharedInto(path.join(destDir, "form"));
-      } else if (isSingleReleaseInitDialog) {
+      } else if (isSRDialog || isMRDialog) {
         copySharedInto(destDir);
-      } else if (isSingleReleaseInitForm) {
+      } else if (isSRForm || isMRForm) {
         copySharedInto(destDir);
       }
     } catch (e) {
@@ -551,8 +680,8 @@ function copyTemplate(name, { uiBase, shouldInstall = false } = {}) {
           const srcSharedDir = path.join(
             TEMPLATES_DIR,
             "escrows",
-            "single-release",
-            mod,
+            mod === "approve-milestone" ? "shared" : "single-release",
+            mod === "approve-milestone" ? "approve-milestone" : mod,
             "shared"
           );
           if (!fs.existsSync(srcSharedDir)) continue;
@@ -597,8 +726,8 @@ function copyTemplate(name, { uiBase, shouldInstall = false } = {}) {
           const srcSharedDir = path.join(
             TEMPLATES_DIR,
             "escrows",
-            "single-release",
-            mod,
+            mod === "approve-milestone" ? "shared" : "single-release",
+            mod === "approve-milestone" ? "approve-milestone" : mod,
             "shared"
           );
           if (!fs.existsSync(srcSharedDir)) continue;
