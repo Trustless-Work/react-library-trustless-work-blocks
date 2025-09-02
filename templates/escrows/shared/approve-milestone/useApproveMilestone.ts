@@ -31,12 +31,6 @@ export function useApproveMilestone() {
     try {
       setIsSubmitting(true);
 
-      /**
-       * Create the final payload for the approve milestone mutation
-       *
-       * @param payload - The payload from the form
-       * @returns The final payload for the approve milestone mutation
-       */
       const finalPayload: ApproveMilestonePayload = {
         contractId: selectedEscrow?.contractId || "",
         milestoneIndex: payload.milestoneIndex,
@@ -44,16 +38,9 @@ export function useApproveMilestone() {
         newFlag: true,
       };
 
-      /**
-       * Call the approve milestone mutation
-       *
-       * @param payload - The final payload for the approve milestone mutation
-       * @param type - The type of the escrow
-       * @param address - The address of the escrow
-       */
       await approveMilestone.mutateAsync({
         payload: finalPayload,
-        type: "single-release",
+        type: "__ESCROW_TYPE__",
         address: walletAddress || "",
       });
 

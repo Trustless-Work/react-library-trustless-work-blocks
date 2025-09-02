@@ -49,7 +49,7 @@ export default function ApproveMilestoneButton({
        */
       await approveMilestone.mutateAsync({
         payload,
-        type: "single-release",
+        type: "__ESCROW_TYPE__",
         address: walletAddress || "",
       });
 
