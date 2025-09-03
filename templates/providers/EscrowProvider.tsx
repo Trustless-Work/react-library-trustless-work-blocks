@@ -10,18 +10,36 @@ import {
   ReactNode,
   useCallback,
 } from "react";
-import { GetEscrowsFromIndexerResponse as Escrow } from "@trustless-work/escrow/types";
+import {
+  GetEscrowsFromIndexerResponse as Escrow,
+  Trustline,
+} from "@trustless-work/escrow/types";
+
+type RelaxedEscrow = Omit<
+  Escrow,
+  "type" | "updatedAt" | "createdAt" | "user" | "trustline" | "amount"
+> &
+  Partial<
+    Pick<Escrow, "type" | "updatedAt" | "createdAt" | "user" | "amount">
+  > & {
+    trustline: Trustline & { name?: string };
+  };
 
 type EscrowContextType = {
-  selectedEscrow: Escrow | null;
+  selectedEscrow: RelaxedEscrow | null;
   hasEscrow: boolean;
   userRolesInEscrow: string[];
   updateEscrow: (
-    updater: Partial<Escrow> | ((previous: Escrow) => Escrow)
+    updater:
+      | Partial<RelaxedEscrow>
+      | ((previous: RelaxedEscrow) => RelaxedEscrow)
   ) => void;
-  setEscrowField: <K extends keyof Escrow>(key: K, value: Escrow[K]) => void;
+  setEscrowField: <K extends keyof RelaxedEscrow>(
+    key: K,
+    value: RelaxedEscrow[K]
+  ) => void;
   clearEscrow: () => void;
-  setSelectedEscrow: (escrow?: Escrow) => void;
+  setSelectedEscrow: (escrow?: RelaxedEscrow) => void;
   setUserRolesInEscrow: (roles: string[]) => void;
 };
 
@@ -30,9 +48,8 @@ const EscrowContext = createContext<EscrowContextType | undefined>(undefined);
 const LOCAL_STORAGE_KEY = "selectedEscrow";
 
 export const EscrowProvider = ({ children }: { children: ReactNode }) => {
-  const [selectedEscrow, setSelectedEscrowState] = useState<Escrow | null>(
-    null
-  );
+  const [selectedEscrow, setSelectedEscrowState] =
+    useState<RelaxedEscrow | null>(null);
   const [userRolesInEscrow, setUserRolesInEscrowState] = useState<string[]>([]);
 
   /**
@@ -42,7 +59,7 @@ export const EscrowProvider = ({ children }: { children: ReactNode }) => {
     try {
       const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (stored) {
-        const parsed: Escrow = JSON.parse(stored);
+        const parsed: RelaxedEscrow = JSON.parse(stored);
         setSelectedEscrowState(parsed);
       }
     } catch (_err) {
@@ -55,7 +72,7 @@ export const EscrowProvider = ({ children }: { children: ReactNode }) => {
    *
    * @param value - The escrow to persist
    */
-  const persist = (value: Escrow | null) => {
+  const persist = (value: RelaxedEscrow | null) => {
     if (value) {
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(value));
     } else {
@@ -89,7 +106,7 @@ export const EscrowProvider = ({ children }: { children: ReactNode }) => {
   const setEscrowField: EscrowContextType["setEscrowField"] = (key, value) => {
     setSelectedEscrowState((current) => {
       if (!current) return current;
-      const next = { ...current, [key]: value } as Escrow;
+      const next = { ...current, [key]: value } as RelaxedEscrow;
       persist(next);
       return next;
     });
@@ -134,7 +151,7 @@ export const EscrowProvider = ({ children }: { children: ReactNode }) => {
         updateEscrow,
         setEscrowField,
         clearEscrow,
-        setSelectedEscrow: (value?: Escrow) =>
+        setSelectedEscrow: (value?: RelaxedEscrow) =>
           setSelectedEscrowState(value ?? null),
         setUserRolesInEscrow,
         userRolesInEscrow,
