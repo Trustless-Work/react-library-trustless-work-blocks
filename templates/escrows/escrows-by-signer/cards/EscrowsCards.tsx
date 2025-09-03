@@ -23,7 +23,7 @@ import {
 } from "lucide-react";
 import { useEscrowContext } from "@/components/tw-blocks/providers/EscrowProvider";
 import { useEscrowDialogs } from "@/components/tw-blocks/providers/EscrowDialogsProvider";
-import EscrowDetailDialog from "../../escrows-by-role/details/EscrowDetailDialog";
+import EscrowDetailDialog from "../details/EscrowDetailDialog";
 import { formatTimestamp } from "../../../helpers/format.helper";
 
 export function EscrowsBySignerCards() {
@@ -262,7 +262,7 @@ export function EscrowsBySignerCards() {
                 {escrows.map((escrow) => (
                   <React.Fragment key={escrow.contractId}>
                     <Card
-                      className="w-full max-w-md mx-auto hover:shadow-lg transition-shadow duration-200"
+                      className="w-full max-w-md mx-auto hover:shadow-lg transition-shadow duration-200 cursor-pointer"
                       onClick={(e) => {
                         e.stopPropagation();
                         onCardClick(escrow);

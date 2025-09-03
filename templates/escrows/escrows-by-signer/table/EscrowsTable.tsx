@@ -27,7 +27,7 @@ import Filters from "./Filters";
 import { useEscrowsBySigner } from "../useEscrowsBySigner.shared";
 import { useEscrowDialogs } from "@/components/tw-blocks/providers/EscrowDialogsProvider";
 import { useEscrowContext } from "@/components/tw-blocks/providers/EscrowProvider";
-import EscrowDetailDialog from "../../escrows-by-role/details/EscrowDetailDialog";
+import EscrowDetailDialog from "../details/EscrowDetailDialog";
 import { formatTimestamp } from "../../../helpers/format.helper";
 
 export function EscrowsBySignerTable() {
