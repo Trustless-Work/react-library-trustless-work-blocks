@@ -17,11 +17,11 @@ type ChangeMilestoneStatusButtonProps = {
   milestoneIndex: number | string;
 };
 
-export default function ChangeMilestoneStatusButton({
+export const ChangeMilestoneStatusButton = ({
   status,
   evidence,
   milestoneIndex,
-}: ChangeMilestoneStatusButtonProps) {
+}: ChangeMilestoneStatusButtonProps) => {
   const { changeMilestoneStatus } = useEscrowsMutations();
   const { selectedEscrow } = useEscrowContext();
   const { walletAddress } = useWalletContext();
@@ -90,4 +90,4 @@ export default function ChangeMilestoneStatusButton({
       )}
     </Button>
   );
-}
+};

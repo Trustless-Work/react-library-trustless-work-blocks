@@ -18,9 +18,9 @@ type ApproveMilestoneButtonProps = {
   milestoneIndex: number | string;
 };
 
-export default function ApproveMilestoneButton({
+export const ApproveMilestoneButton = ({
   milestoneIndex,
-}: ApproveMilestoneButtonProps) {
+}: ApproveMilestoneButtonProps) => {
   const { approveMilestone } = useEscrowsMutations();
   const { selectedEscrow, updateEscrow } = useEscrowContext();
   const { walletAddress } = useWalletContext();
@@ -101,4 +101,4 @@ export default function ApproveMilestoneButton({
       )}
     </Button>
   );
-}
+};

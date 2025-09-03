@@ -28,13 +28,13 @@ import {
   SelectValue,
 } from "__UI_BASE__/select";
 
-export default function ChangeMilestoneStatusDialog({
+export const ChangeMilestoneStatusDialog = ({
   showSelectMilestone = false,
   milestoneIndex,
 }: {
   showSelectMilestone?: boolean;
   milestoneIndex?: number | string;
-}) {
+}) => {
   const { form, handleSubmit, isSubmitting } = useChangeMilestoneStatus();
   const { selectedEscrow } = useEscrowContext();
 
@@ -164,4 +164,4 @@ export default function ChangeMilestoneStatusDialog({
       </DialogContent>
     </Dialog>
   );
-}
+};

@@ -15,7 +15,7 @@ type FundEscrowButtonProps = {
   amount: number;
 };
 
-export default function FundEscrowButton({ amount }: FundEscrowButtonProps) {
+export const FundEscrowButton = ({ amount }: FundEscrowButtonProps) => {
   const { fundEscrow } = useEscrowsMutations();
   const { selectedEscrow, updateEscrow } = useEscrowContext();
   const { walletAddress } = useWalletContext();
@@ -88,4 +88,4 @@ export default function FundEscrowButton({ amount }: FundEscrowButtonProps) {
       )}
     </Button>
   );
-}
+};

@@ -19,7 +19,7 @@ import {
 import { Loader2 } from "lucide-react";
 import { useFundEscrow } from "../useFundEscrow";
 
-export default function FundEscrowDialog() {
+export const FundEscrowDialog = () => {
   const { form, handleSubmit, isSubmitting } = useFundEscrow();
 
   return (
@@ -74,4 +74,4 @@ export default function FundEscrowDialog() {
       </DialogContent>
     </Dialog>
   );
-}
+};

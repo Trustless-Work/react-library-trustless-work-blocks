@@ -21,7 +21,7 @@ import {
   SelectValue,
 } from "__UI_BASE__/select";
 
-export default function ChangeMilestoneStatusForm() {
+export const ChangeMilestoneStatusForm = () => {
   const { form, handleSubmit, isSubmitting } = useChangeMilestoneStatus();
   const { selectedEscrow } = useEscrowContext();
 
@@ -111,4 +111,4 @@ export default function ChangeMilestoneStatusForm() {
       </form>
     </Form>
   );
-}
+};

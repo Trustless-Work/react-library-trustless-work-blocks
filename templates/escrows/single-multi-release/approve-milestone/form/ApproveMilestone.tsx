@@ -19,7 +19,7 @@ import {
   SelectValue,
 } from "__UI_BASE__/select";
 
-export default function ApproveMilestoneForm() {
+export const ApproveMilestoneForm = () => {
   const { form, handleSubmit, isSubmitting } = useApproveMilestone();
   const { selectedEscrow } = useEscrowContext();
 
@@ -77,4 +77,4 @@ export default function ApproveMilestoneForm() {
       </form>
     </Form>
   );
-}
+};
