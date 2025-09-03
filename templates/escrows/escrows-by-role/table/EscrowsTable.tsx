@@ -23,14 +23,14 @@ import {
   TableRow,
 } from "__UI_BASE__/table";
 import { FileX, Loader2, Wallet, RefreshCw, AlertTriangle } from "lucide-react";
-import Filters from "./Filters";
-import EscrowDetailDialog from "../details/EscrowDetailDialog";
+import { Filters } from "./Filters";
+import { EscrowDetailDialog } from "../details/EscrowDetailDialog";
 import { useEscrowDialogs } from "@/components/tw-blocks/providers/EscrowDialogsProvider";
 import { useEscrowContext } from "@/components/tw-blocks/providers/EscrowProvider";
 import { useEscrowsByRole } from "../useEscrowsByRole.shared";
 import { formatTimestamp } from "../../../helpers/format.helper";
 
-export function EscrowsByRoleTable() {
+export const EscrowsByRoleTable = () => {
   const {
     walletAddress,
     data,
@@ -212,21 +212,6 @@ export function EscrowsByRoleTable() {
     manualSorting: true,
     enableSortingRemoval: true,
   });
-
-  /**
-   * Based on the provided roles -> https://docs.trustlesswork.com/trustless-work/technology-overview/roles-in-trustless-work
-   *
-   * You must pass one or more roles according to requirements. Acctually it's coming from the select filter.
-   *
-   * For example:
-   * - If the user is a freelancer, you must pass the "serviceProvider" and "receiver" role
-   *
-   * Depending of the role, you'll have different actions buttons
-   */
-  const activeRole: Role[] = React.useMemo(
-    () => role.split(",") as Role[],
-    [role]
-  );
 
   const escrows = data ?? [];
 
@@ -441,7 +426,6 @@ export function EscrowsByRoleTable() {
       {/* Dialog */}
       {dialogStates.second.isOpen ? (
         <EscrowDetailDialog
-          activeRole={activeRole}
           isDialogOpen={dialogStates.second.isOpen}
           setIsDialogOpen={dialogStates.second.setIsOpen}
           setSelectedEscrow={setSelectedEscrow}
@@ -449,6 +433,4 @@ export function EscrowsByRoleTable() {
       ) : null}
     </>
   );
-}
-
-export default React.memo(EscrowsByRoleTable);
+};

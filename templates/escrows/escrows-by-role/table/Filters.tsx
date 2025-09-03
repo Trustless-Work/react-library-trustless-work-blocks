@@ -84,7 +84,7 @@ type FiltersProps = {
   setOrderDirection: (v: "asc" | "desc") => void;
 };
 
-function Filters({
+export const Filters = ({
   title,
   engagementId,
   isActive,
@@ -113,7 +113,7 @@ function Filters({
   onRefresh,
   setOrderBy,
   setOrderDirection,
-}: FiltersProps) {
+}: FiltersProps) => {
   return (
     <div className="w-full bg-card/50 backdrop-blur-sm border border-border/50 rounded-lg p-4 shadow-sm">
       {/* Header Section */}
@@ -416,6 +416,4 @@ function Filters({
       </div>
     </div>
   );
-}
-
-export default React.memo(Filters);
+};
