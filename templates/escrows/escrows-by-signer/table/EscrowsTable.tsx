@@ -248,8 +248,8 @@ export const EscrowsBySignerTable = () => {
                       const className =
                         typeof header.column.columnDef.meta === "object" &&
                         header.column.columnDef.meta &&
-                        "className" in (header.column.columnDef.meta as any)
-                          ? (header.column.columnDef.meta as any).className
+                        "className" in header.column.columnDef.meta
+                          ? header.column.columnDef.meta.className
                           : "";
                       return (
                         <TableHead
@@ -362,8 +362,8 @@ export const EscrowsBySignerTable = () => {
                           const className =
                             typeof cell.column.columnDef.meta === "object" &&
                             cell.column.columnDef.meta &&
-                            "className" in (cell.column.columnDef.meta as any)
-                              ? (cell.column.columnDef.meta as any).className
+                            "className" in cell.column.columnDef.meta
+                              ? (cell.column.columnDef.meta.className as string)
                               : "";
                           return (
                             <TableCell key={cell.id} className={className}>

@@ -11,10 +11,7 @@ import {
   CheckCheck,
   Layers,
 } from "lucide-react";
-import {
-  GetEscrowsFromIndexerResponse as Escrow,
-  Role,
-} from "@trustless-work/escrow/types";
+import { GetEscrowsFromIndexerResponse as Escrow } from "@trustless-work/escrow/types";
 import {
   MultiReleaseMilestone,
   SingleReleaseMilestone,

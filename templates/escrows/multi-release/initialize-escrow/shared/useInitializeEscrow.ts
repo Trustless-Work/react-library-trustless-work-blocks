@@ -83,7 +83,7 @@ export function useInitializeEscrow() {
       receiverMemo: "123",
       trustline: {
         address: usdc?.value || "",
-        decimals: usdc?.decimals || 10000000,
+        decimals: 10000000,
       },
       roles: {
         approver: walletAddress || "",
@@ -102,12 +102,12 @@ export function useInitializeEscrow() {
 
     // Set form values
     Object.entries(templateData).forEach(([key, value]) => {
-      form.setValue(key as any, value);
+      form.setValue(key as keyof z.infer<typeof formSchema>, value);
     });
 
     // Explicitly set the trustline field
     form.setValue("trustline.address", usdc?.value || "");
-    form.setValue("trustline.decimals", usdc?.decimals || 10000000);
+    form.setValue("trustline.decimals", 10000000);
   };
 
   const handleSubmit = form.handleSubmit(async (payload) => {

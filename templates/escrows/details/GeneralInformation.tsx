@@ -19,10 +19,7 @@ import {
   BookOpen,
 } from "lucide-react";
 import { Actions, roleActions } from "./Actions";
-import type {
-  DialogStates,
-  StatusStates,
-} from "@/components/tw-blocks/providers/EscrowDialogsProvider";
+import type { DialogStates } from "@/components/tw-blocks/providers/EscrowDialogsProvider";
 import { GetEscrowsFromIndexerResponse } from "@trustless-work/escrow/types";
 import { useEscrowAmountContext } from "@/components/tw-blocks/providers/EscrowAmountProvider";
 import { StatisticsCard } from "./StatisticsCard";
@@ -36,7 +33,7 @@ import { useCopy } from "@/components/tw-blocks/helpers/useCopy";
 interface GeneralInformationProps {
   selectedEscrow: GetEscrowsFromIndexerResponse;
   userRolesInEscrow: string[];
-  dialogStates: DialogStates & StatusStates;
+  dialogStates: DialogStates;
   areAllMilestonesApproved: boolean;
 }
 
