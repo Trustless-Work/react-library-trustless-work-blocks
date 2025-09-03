@@ -13,9 +13,7 @@ export type DialogStates = {
   successRelease: DialogState;
 };
 
-export type StatusStates = {};
-
-type EscrowDialogsContextType = DialogStates & StatusStates;
+type EscrowDialogsContextType = DialogStates;
 
 const EscrowDialogsContext = createContext<
   EscrowDialogsContextType | undefined
