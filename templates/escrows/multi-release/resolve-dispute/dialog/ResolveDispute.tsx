@@ -28,14 +28,14 @@ import {
   SelectValue,
 } from "__UI_BASE__/select";
 
-export default function ResolveDisputeDialog({
+export const ResolveDisputeDialog = ({
   showSelectMilestone = false,
   milestoneIndex,
 }: {
   showSelectMilestone?: boolean;
   milestoneIndex?: number | string;
-}) {
-  const { form, handleSubmit, isSubmitting } = useResolveDispute();
+}) => {
+  const { form, handleSubmit, isSubmitting, totalAmount } = useResolveDispute();
   const { selectedEscrow } = useEscrowContext();
 
   React.useEffect(() => {
@@ -157,7 +157,7 @@ export default function ResolveDisputeDialog({
               <p className="text-xs text-muted-foreground">
                 <span className="font-bold">Total Amount: </span>
                 {formatCurrency(
-                  selectedEscrow?.amount || 0,
+                  totalAmount,
                   selectedEscrow?.trustline.name || ""
                 )}
               </p>
@@ -175,4 +175,4 @@ export default function ResolveDisputeDialog({
       </DialogContent>
     </Dialog>
   );
-}
+};

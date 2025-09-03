@@ -23,7 +23,7 @@ import { Trash2, DollarSign, Percent, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { trustlineOptions } from "@/components/tw-blocks/wallet-kit/trustlines";
 
-export function InitializeEscrowForm() {
+export const InitializeEscrowForm = () => {
   const {
     form,
     isSubmitting,
@@ -32,6 +32,7 @@ export function InitializeEscrowForm() {
     handleSubmit,
     handleAddMilestone,
     handleRemoveMilestone,
+    fillTemplateForm,
   } = useInitializeEscrow();
 
   const handleMilestoneAmountChange = (
@@ -99,6 +100,16 @@ export function InitializeEscrowForm() {
               Fill out the form to initialize a multi release escrow
             </p>
           </Link>
+          {process.env.NODE_ENV !== "production" && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={fillTemplateForm}
+              className="cursor-pointer"
+            >
+              Autofill
+            </Button>
+          )}
         </Card>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           <FormField
@@ -492,6 +503,4 @@ export function InitializeEscrowForm() {
       </form>
     </Form>
   );
-}
-
-export default InitializeEscrowForm;
+};

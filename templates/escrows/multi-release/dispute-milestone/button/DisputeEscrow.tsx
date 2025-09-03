@@ -18,9 +18,9 @@ type DisputeEscrowButtonProps = {
   milestoneIndex: number | string;
 };
 
-export default function DisputeEscrowButton({
+export const DisputeEscrowButton = ({
   milestoneIndex,
-}: DisputeEscrowButtonProps) {
+}: DisputeEscrowButtonProps) => {
   const { startDispute } = useEscrowsMutations();
   const { selectedEscrow, updateEscrow } = useEscrowContext();
   const { walletAddress } = useWalletContext();
@@ -95,4 +95,4 @@ export default function DisputeEscrowButton({
       )}
     </Button>
   );
-}
+};

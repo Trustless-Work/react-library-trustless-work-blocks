@@ -15,6 +15,7 @@ import {
   handleError,
 } from "@/components/tw-blocks/handle-errors/handle";
 import { useEscrowContext } from "@/components/tw-blocks/providers/EscrowProvider";
+import { trustlineOptions } from "@/components/tw-blocks/wallet-kit/trustlines";
 
 export function useInitializeEscrow() {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
@@ -71,6 +72,44 @@ export function useInitializeEscrow() {
     form.setValue("milestones", updatedMilestones);
   };
 
+  const fillTemplateForm = () => {
+    const usdc = trustlineOptions.find((t) => t.label === "USDC");
+
+    const templateData: z.infer<typeof formSchema> = {
+      engagementId: "ENG-001",
+      title: "Design Landing Page",
+      description: "Landing for the new product of the company.",
+      platformFee: 5,
+      receiverMemo: "123",
+      trustline: {
+        address: usdc?.value || "",
+        decimals: usdc?.decimals || 10000000,
+      },
+      roles: {
+        approver: walletAddress || "",
+        serviceProvider: walletAddress || "",
+        platformAddress: walletAddress || "",
+        receiver: walletAddress || "",
+        releaseSigner: walletAddress || "",
+        disputeResolver: walletAddress || "",
+      },
+      milestones: [
+        { description: "Design the wireframe", amount: 2 },
+        { description: "Develop the wireframe", amount: 2 },
+        { description: "Deploy the wireframe", amount: 2 },
+      ],
+    };
+
+    // Set form values
+    Object.entries(templateData).forEach(([key, value]) => {
+      form.setValue(key as any, value);
+    });
+
+    // Explicitly set the trustline field
+    form.setValue("trustline.address", usdc?.value || "");
+    form.setValue("trustline.decimals", usdc?.decimals || 10000000);
+  };
+
   const handleSubmit = form.handleSubmit(async (payload) => {
     try {
       setIsSubmitting(true);
@@ -114,7 +153,7 @@ export function useInitializeEscrow() {
 
       toast.success("Escrow initialized successfully");
 
-      setSelectedEscrow(response);
+      setSelectedEscrow({ ...finalPayload, contractId: response.contractId });
     } catch (error) {
       toast.error(handleError(error as ErrorResponse).message);
     } finally {
@@ -128,6 +167,7 @@ export function useInitializeEscrow() {
     isSubmitting,
     milestones,
     isAnyMilestoneEmpty,
+    fillTemplateForm,
     handleSubmit,
     handleAddMilestone,
     handleRemoveMilestone,

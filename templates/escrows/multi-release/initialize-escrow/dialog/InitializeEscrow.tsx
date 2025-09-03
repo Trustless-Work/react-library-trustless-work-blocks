@@ -30,7 +30,7 @@ import {
   DialogTrigger,
 } from "__UI_BASE__/dialog";
 
-export function InitializeEscrowDialog() {
+export const InitializeEscrowDialog = () => {
   const {
     form,
     isSubmitting,
@@ -39,6 +39,7 @@ export function InitializeEscrowDialog() {
     handleSubmit,
     handleAddMilestone,
     handleRemoveMilestone,
+    fillTemplateForm,
   } = useInitializeEscrow();
 
   const handleMilestoneAmountChange = (
@@ -118,6 +119,16 @@ export function InitializeEscrowDialog() {
                   Fill out the form to initialize a multi release escrow
                 </p>
               </Link>
+              {process.env.NODE_ENV !== "production" && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={fillTemplateForm}
+                  className="cursor-pointer"
+                >
+                  Autofill
+                </Button>
+              )}
             </Card>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
               <FormField
@@ -514,6 +525,4 @@ export function InitializeEscrowDialog() {
       </DialogContent>
     </Dialog>
   );
-}
-
-export default InitializeEscrowDialog;
+};

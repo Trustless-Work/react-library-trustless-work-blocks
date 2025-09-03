@@ -3,7 +3,10 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { resolveDisputeSchema, type ResolveDisputeValues } from "./schema";
 import { toast } from "sonner";
-import { MultiReleaseResolveDisputePayload } from "@trustless-work/escrow";
+import {
+  MultiReleaseResolveDisputePayload,
+  MultiReleaseMilestone,
+} from "@trustless-work/escrow";
 import { useEscrowContext } from "@/components/tw-blocks/providers/EscrowProvider";
 import { useEscrowsMutations } from "@/components/tw-blocks/tanstack/useEscrowsMutations";
 import {
@@ -26,6 +29,15 @@ export function useResolveDispute() {
     },
     mode: "onChange",
   });
+
+  const totalAmount = React.useMemo(() => {
+    if (selectedEscrow?.type !== "multi-release") return 0;
+    const milestones = selectedEscrow.milestones as MultiReleaseMilestone[];
+    return milestones.reduce(
+      (acc, milestone) => acc + Number(milestone.amount),
+      0
+    );
+  }, [selectedEscrow]);
 
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
@@ -68,15 +80,18 @@ export function useResolveDispute() {
           if (index === Number(payload.milestoneIndex)) {
             return {
               ...milestone,
-              flags: { ...milestone.flags, disputed: false, resolved: true },
+              flags: {
+                ...(milestone as MultiReleaseMilestone).flags,
+                disputed: false,
+                resolved: true,
+              },
             };
           }
           return milestone;
         }),
         balance:
-          (selectedEscrow?.balance || 0) -
-            (Number(payload.approverFunds) + Number(payload.receiverFunds)) ||
-          0,
+          selectedEscrow?.balance ||
+          Number(payload.approverFunds) + Number(payload.receiverFunds),
       });
     } catch (error) {
       toast.error(handleError(error as ErrorResponse).message);
@@ -86,5 +101,5 @@ export function useResolveDispute() {
     }
   });
 
-  return { form, handleSubmit, isSubmitting };
+  return { form, handleSubmit, isSubmitting, totalAmount };
 }

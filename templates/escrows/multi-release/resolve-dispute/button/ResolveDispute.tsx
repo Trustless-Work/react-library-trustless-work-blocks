@@ -2,7 +2,10 @@ import * as React from "react";
 import { Button } from "__UI_BASE__/button";
 import { useEscrowsMutations } from "@/components/tw-blocks/tanstack/useEscrowsMutations";
 import { useWalletContext } from "@/components/tw-blocks/wallet-kit/WalletProvider";
-import { SingleReleaseResolveDisputePayload } from "@trustless-work/escrow/types";
+import {
+  MultiReleaseResolveDisputePayload,
+  MultiReleaseMilestone,
+} from "@trustless-work/escrow/types";
 import { toast } from "sonner";
 import {
   ErrorResponse,
@@ -17,11 +20,11 @@ type ResolveDisputeButtonProps = {
   milestoneIndex: number | string;
 };
 
-export default function ResolveDisputeButton({
+export const ResolveDisputeButton = ({
   approverFunds,
   receiverFunds,
   milestoneIndex,
-}: ResolveDisputeButtonProps) {
+}: ResolveDisputeButtonProps) => {
   const { resolveDispute } = useEscrowsMutations();
   const { selectedEscrow, updateEscrow } = useEscrowContext();
   const { walletAddress } = useWalletContext();
@@ -51,7 +54,7 @@ export default function ResolveDisputeButton({
        *
        * @returns The payload for the resolve dispute mutation
        */
-      const payload: SingleReleaseResolveDisputePayload = {
+      const payload: MultiReleaseResolveDisputePayload = {
         contractId: selectedEscrow?.contractId || "",
         disputeResolver: walletAddress || "",
         approverFunds: Number(approverFunds),
@@ -79,12 +82,18 @@ export default function ResolveDisputeButton({
           if (index === Number(milestoneIndex)) {
             return {
               ...milestone,
-              flags: { ...milestone.flags, disputed: false, resolved: true },
+              flags: {
+                ...(milestone as MultiReleaseMilestone).flags,
+                disputed: false,
+                resolved: true,
+              },
             };
           }
           return milestone;
         }),
-        balance: selectedEscrow?.balance || 0,
+        balance:
+          selectedEscrow?.balance ||
+          Number(approverFunds) + Number(receiverFunds),
       });
     } catch (error) {
       toast.error(handleError(error as ErrorResponse).message);
@@ -110,4 +119,4 @@ export default function ResolveDisputeButton({
       )}
     </Button>
   );
-}
+};

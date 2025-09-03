@@ -21,14 +21,14 @@ import {
 } from "__UI_BASE__/select";
 import { formatCurrency } from "../../../../helpers/format.helper";
 
-export default function ResolveDisputeForm({
+export const ResolveDisputeForm = ({
   showSelectMilestone = false,
   milestoneIndex,
 }: {
   showSelectMilestone?: boolean;
   milestoneIndex?: number | string;
-}) {
-  const { form, handleSubmit, isSubmitting } = useResolveDispute();
+}) => {
+  const { form, handleSubmit, isSubmitting, totalAmount } = useResolveDispute();
   const { selectedEscrow } = useEscrowContext();
 
   React.useEffect(() => {
@@ -139,10 +139,7 @@ export default function ResolveDisputeForm({
 
           <p className="text-xs text-muted-foreground">
             <span className="font-bold">Total Amount: </span>
-            {formatCurrency(
-              selectedEscrow?.amount || 0,
-              selectedEscrow?.trustline.name || ""
-            )}
+            {formatCurrency(totalAmount, selectedEscrow?.trustline.name || "")}
           </p>
 
           <p className="text-xs text-muted-foreground">
@@ -156,4 +153,4 @@ export default function ResolveDisputeForm({
       </form>
     </Form>
   );
-}
+};

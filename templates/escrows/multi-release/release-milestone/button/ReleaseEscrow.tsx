@@ -20,9 +20,9 @@ type ReleaseEscrowButtonProps = {
   milestoneIndex: number | string;
 };
 
-export default function ReleaseEscrowButton({
+export const ReleaseEscrowButton = ({
   milestoneIndex,
-}: ReleaseEscrowButtonProps) {
+}: ReleaseEscrowButtonProps) => {
   const { releaseFunds } = useEscrowsMutations();
   const { selectedEscrow, updateEscrow } = useEscrowContext();
   const dialogStates = useEscrowDialogs();
@@ -62,9 +62,12 @@ export default function ReleaseEscrowButton({
 
       // Ensure amounts are up to date for the success dialog
       if (selectedEscrow) {
-        const totalAmount = Number(selectedEscrow.amount || 0);
+        const milestone = selectedEscrow.milestones?.[Number(milestoneIndex)];
+        const releasedAmount = Number(
+          (milestone as MultiReleaseMilestone | undefined)?.amount || 0
+        );
         const platformFee = Number(selectedEscrow.platformFee || 0);
-        setAmounts(totalAmount, platformFee);
+        setAmounts(releasedAmount, platformFee);
       }
 
       updateEscrow({
@@ -110,4 +113,4 @@ export default function ReleaseEscrowButton({
       )}
     </Button>
   );
-}
+};
