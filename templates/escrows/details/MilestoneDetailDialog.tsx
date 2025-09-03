@@ -25,7 +25,6 @@ import {
 import {
   GetEscrowsFromIndexerResponse,
   MultiReleaseMilestone,
-  Role,
   SingleReleaseMilestone,
 } from "@trustless-work/escrow";
 import Link from "next/link";
@@ -39,7 +38,6 @@ interface MilestoneDetailDialogProps {
   } | null;
   selectedEscrow: GetEscrowsFromIndexerResponse;
   userRolesInEscrow: string[];
-  activeRole: Role[];
   evidenceVisibleMap: Record<number, boolean>;
   setEvidenceVisibleMap: React.Dispatch<
     React.SetStateAction<Record<number, boolean>>

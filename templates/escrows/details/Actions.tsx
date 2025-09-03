@@ -14,17 +14,12 @@ import {
   GetEscrowsFromIndexerResponse as Escrow,
   Role,
 } from "@trustless-work/escrow/types";
-import DisputeEscrowButton from "../../single-release/dispute-escrow/button/DisputeEscrow";
-import ResolveDisputeDialog from "../../single-release/resolve-dispute/dialog/ResolveDispute";
-import ReleaseEscrowButton from "../../single-release/release-escrow/button/ReleaseEscrow";
-import FundEscrowDialog from "../../single-multi-release/fund-escrow/dialog/FundEscrow";
-import UpdateEscrowDialog from "../../single-release/update-escrow/dialog/UpdateEscrow";
+import { FundEscrowDialog } from "../../single-multi-release/fund-escrow/dialog/FundEscrow";
 
 interface ActionsProps {
   selectedEscrow: Escrow;
   userRolesInEscrow: string[];
   areAllMilestonesApproved: boolean;
-  activeRole: Role[];
 }
 
 export const roleActions: {
@@ -91,28 +86,24 @@ export const Actions = ({
   selectedEscrow,
   userRolesInEscrow,
   areAllMilestonesApproved,
-  activeRole,
 }: ActionsProps) => {
   const shouldShowEditButton =
     userRolesInEscrow.includes("platformAddress") &&
     !selectedEscrow?.flags?.disputed &&
     !selectedEscrow?.flags?.resolved &&
     !selectedEscrow?.flags?.released &&
-    activeRole.includes("platformAddress");
+    selectedEscrow?.balance === 0;
 
   const shouldShowDisputeButton =
     selectedEscrow.type === "single-release" &&
     (userRolesInEscrow.includes("approver") ||
       userRolesInEscrow.includes("serviceProvider")) &&
-    (activeRole.includes("approver") ||
-      activeRole.includes("serviceProvider")) &&
     !selectedEscrow?.flags?.disputed &&
     !selectedEscrow?.flags?.resolved;
 
   const shouldShowResolveButton =
     selectedEscrow.type === "single-release" &&
     userRolesInEscrow.includes("disputeResolver") &&
-    activeRole.includes("disputeResolver") &&
     !selectedEscrow?.flags?.resolved &&
     selectedEscrow?.flags?.disputed;
 
@@ -120,8 +111,7 @@ export const Actions = ({
     selectedEscrow.type === "single-release" &&
     areAllMilestonesApproved &&
     userRolesInEscrow.includes("releaseSigner") &&
-    !selectedEscrow.flags?.released &&
-    activeRole.includes("releaseSigner");
+    !selectedEscrow.flags?.released;
 
   const hasConditionalButtons =
     shouldShowEditButton ||
@@ -131,15 +121,20 @@ export const Actions = ({
 
   return (
     <div className="flex items-start justify-start flex-col gap-2 w-full">
+      {/* You can add the buttons here, using the buttons from the blocks. These actions are conditional based on the escrow flags and the user roles. */}
       {hasConditionalButtons && (
-        <div className="flex flex-col sm:flex-row gap-2 w-full">
-          {shouldShowEditButton && <UpdateEscrowDialog />}
+        <div className="flex flex-col gap-2 w-full">
+          {/* UpdateEscrowDialog component should be rendered based on the escrow type. It means that if the selectedEscrow.type is "single-release", then the UpdateEscrowDialog (from the single-release block) component should be rendered. If the selectedEscrow.type is "multi-release", then the UpdateEscrowDialog (from the multi-release block) component should be rendered. */}
+          {/* {shouldShowEditButton && <UpdateEscrowDialog />} */}
 
-          {shouldShowDisputeButton && <DisputeEscrowButton />}
+          {/* Works only with single-release escrows */}
+          {/* {shouldShowDisputeButton && <DisputeEscrowButton />} */}
 
-          {shouldShowResolveButton && <ResolveDisputeDialog />}
+          {/* Works only with single-release escrows */}
+          {/* {shouldShowResolveButton && <ResolveDisputeDialog />} */}
 
-          {shouldShowReleaseFundsButton && <ReleaseEscrowButton />}
+          {/* Works only with single-release escrows */}
+          {/* {shouldShowReleaseFundsButton && <ReleaseEscrowButton />} */}
         </div>
       )}
 

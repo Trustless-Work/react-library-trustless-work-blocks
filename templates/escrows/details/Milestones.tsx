@@ -4,7 +4,6 @@ import { useCallback, useState } from "react";
 import { GetEscrowsFromIndexerResponse as Escrow } from "@trustless-work/escrow/types";
 import {
   MultiReleaseMilestone,
-  Role,
   SingleReleaseMilestone,
 } from "@trustless-work/escrow";
 import { MilestoneCard } from "./MilestoneCard";
@@ -17,7 +16,6 @@ interface MilestonesProps {
     React.SetStateAction<Record<number, boolean>>
   >;
   evidenceVisibleMap: Record<number, boolean>;
-  activeRole: Role[];
 }
 
 export const Milestones = ({
@@ -25,7 +23,6 @@ export const Milestones = ({
   userRolesInEscrow,
   setEvidenceVisibleMap,
   evidenceVisibleMap,
-  activeRole,
 }: MilestonesProps) => {
   const [selectedMilestoneForDetail, setSelectedMilestoneForDetail] = useState<{
     milestone: SingleReleaseMilestone | MultiReleaseMilestone;
@@ -65,7 +62,6 @@ export const Milestones = ({
               milestoneIndex={milestoneIndex}
               selectedEscrow={selectedEscrow}
               userRolesInEscrow={userRolesInEscrow}
-              activeRole={activeRole}
               onViewDetails={handleViewDetails}
             />
           ))}
@@ -77,7 +73,6 @@ export const Milestones = ({
           selectedMilestone={selectedMilestoneForDetail}
           selectedEscrow={selectedEscrow}
           userRolesInEscrow={userRolesInEscrow}
-          activeRole={activeRole}
           evidenceVisibleMap={evidenceVisibleMap}
           setEvidenceVisibleMap={setEvidenceVisibleMap}
         />

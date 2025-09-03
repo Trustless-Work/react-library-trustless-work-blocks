@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "__UI_BASE__/dialog";
-import EntityCard from "./EntityCard";
+import { EntityCard } from "./EntityCard";
 import { useEscrowContext } from "@/components/tw-blocks/providers/EscrowProvider";
 import { useEscrowAmountContext } from "@/components/tw-blocks/providers/EscrowAmountProvider";
 import { CircleCheckBig } from "lucide-react";
@@ -18,10 +18,10 @@ interface SuccessReleaseDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export function SuccessReleaseDialog({
+export const SuccessReleaseDialog = ({
   isOpen,
   onOpenChange,
-}: SuccessReleaseDialogProps) {
+}: SuccessReleaseDialogProps) => {
   const { selectedEscrow } = useEscrowContext();
   const { receiverAmount, platformFeeAmount, trustlessWorkAmount } =
     useEscrowAmountContext();
@@ -95,6 +95,4 @@ export function SuccessReleaseDialog({
       </DialogContent>
     </Dialog>
   );
-}
-
-export default SuccessReleaseDialog;
+};

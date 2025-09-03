@@ -22,7 +22,7 @@ interface EntityCardProps {
   inDispute?: boolean;
 }
 
-const EntityCard = ({
+export const EntityCard = ({
   entity,
   type,
   hasPercentage,
@@ -94,5 +94,3 @@ const EntityCard = ({
     </Card>
   );
 };
-
-export default EntityCard;

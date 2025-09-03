@@ -2,6 +2,7 @@
 
 import React, { useMemo } from "react";
 import { Card } from "__UI_BASE__/card";
+import { Tooltip, TooltipTrigger, TooltipContent } from "__UI_BASE__/tooltip";
 import { cn } from "@/lib/utils";
 import { MultiReleaseMilestone } from "@trustless-work/escrow";
 import {
@@ -14,21 +15,21 @@ import {
   Users,
   Check,
   Copy,
+  BriefcaseBusiness,
+  BookOpen,
 } from "lucide-react";
 import { Actions, roleActions } from "./Actions";
 import type {
   DialogStates,
   StatusStates,
 } from "@/components/tw-blocks/providers/EscrowDialogsProvider";
-import {
-  GetEscrowsFromIndexerResponse,
-  Role,
-} from "@trustless-work/escrow/types";
+import { GetEscrowsFromIndexerResponse } from "@trustless-work/escrow/types";
 import { useEscrowAmountContext } from "@/components/tw-blocks/providers/EscrowAmountProvider";
 import { StatisticsCard } from "./StatisticsCard";
 import {
   formatAddress,
   formatCurrency,
+  formatRole,
 } from "@/components/tw-blocks/helpers/format.helper";
 import { useCopy } from "@/components/tw-blocks/helpers/useCopy";
 
@@ -37,7 +38,6 @@ interface GeneralInformationProps {
   userRolesInEscrow: string[];
   dialogStates: DialogStates & StatusStates;
   areAllMilestonesApproved: boolean;
-  activeRole: Role[];
 }
 
 export const GeneralInformation = ({
@@ -45,7 +45,6 @@ export const GeneralInformation = ({
   userRolesInEscrow,
   dialogStates,
   areAllMilestonesApproved,
-  activeRole,
 }: GeneralInformationProps) => {
   const { trustlessWorkAmount, receiverAmount, platformFeeAmount } =
     useEscrowAmountContext();
@@ -117,7 +116,6 @@ export const GeneralInformation = ({
             selectedEscrow={selectedEscrow}
             userRolesInEscrow={userRolesInEscrow}
             areAllMilestonesApproved={areAllMilestonesApproved}
-            activeRole={activeRole}
           />
         </div>
       </div>
@@ -176,14 +174,16 @@ export const GeneralInformation = ({
                     {userRolesInEscrow.map((role) => {
                       const roleData = roleActions.find((r) => r.role === role);
                       return (
-                        <div
-                          key={role}
-                          className="p-2 bg-primary/10 rounded-md hover:bg-primary/20 transition-colors"
-                        >
-                          {roleData?.icon || (
-                            <Users className="h-4 w-4 text-primary" />
-                          )}
-                        </div>
+                        <Tooltip key={role}>
+                          <TooltipTrigger>
+                            <div className="p-2 bg-primary/10 rounded-md hover:bg-primary/20 transition-colors cursor-pointer">
+                              {roleData?.icon || (
+                                <Users className="h-4 w-4 text-primary" />
+                              )}
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent>{formatRole(role)}</TooltipContent>
+                        </Tooltip>
                       );
                     })}
                   </div>
@@ -205,7 +205,7 @@ export const GeneralInformation = ({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="p-4 bg-muted/50 rounded-lg border">
                   <div className="flex items-center gap-3 mb-2">
-                    <CircleDollarSign className="h-5 w-5 text-primary flex-shrink-0" />
+                    <BriefcaseBusiness className="h-5 w-5 text-primary flex-shrink-0" />
                     <span className="text-sm font-medium text-muted-foreground">
                       Engagement ID
                     </span>
@@ -217,7 +217,7 @@ export const GeneralInformation = ({
 
                 <div className="p-4 bg-muted/50 rounded-lg border">
                   <div className="flex items-center gap-3 mb-2">
-                    <CircleDollarSign className="h-5 w-5 text-primary flex-shrink-0" />
+                    <BookOpen className="h-5 w-5 text-primary flex-shrink-0" />
                     <span className="text-sm font-medium text-muted-foreground">
                       Type
                     </span>

@@ -1,7 +1,7 @@
 "use client";
 
 import { GetEscrowsFromIndexerResponse as Escrow } from "@trustless-work/escrow/types";
-import EntityCard from "./EntityCard";
+import { EntityCard } from "./EntityCard";
 
 interface EntitiesProps {
   selectedEscrow: Escrow;
