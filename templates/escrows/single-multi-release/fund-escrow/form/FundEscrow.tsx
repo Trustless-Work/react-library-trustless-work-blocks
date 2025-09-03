@@ -9,7 +9,7 @@ import {
 } from "__UI_BASE__/form";
 import { Input } from "__UI_BASE__/input";
 import { Button } from "__UI_BASE__/button";
-import { useFundEscrow } from "./useFundEscrow";
+import { useFundEscrow } from "../useFundEscrow";
 import { Loader2 } from "lucide-react";
 
 export const FundEscrowForm = () => {
