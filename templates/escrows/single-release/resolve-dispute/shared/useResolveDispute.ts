@@ -14,7 +14,7 @@ import { useWalletContext } from "@/components/tw-blocks/wallet-kit/WalletProvid
 
 export function useResolveDispute() {
   const { resolveDispute } = useEscrowsMutations();
-  const { selectedEscrow } = useEscrowContext();
+  const { selectedEscrow, updateEscrow } = useEscrowContext();
   const { walletAddress } = useWalletContext();
 
   const form = useForm<ResolveDisputeValues>({
@@ -59,6 +59,19 @@ export function useResolveDispute() {
       });
 
       toast.success("Dispute resolved successfully");
+
+      updateEscrow({
+        ...selectedEscrow,
+        flags: {
+          ...selectedEscrow?.flags,
+          disputed: false,
+          resolved: true,
+        },
+        balance:
+          (selectedEscrow?.balance || 0) -
+            (Number(payload.approverFunds) + Number(payload.receiverFunds)) ||
+          0,
+      });
     } catch (error) {
       toast.error(handleError(error as ErrorResponse).message);
     } finally {

@@ -88,8 +88,7 @@ export function InitializeEscrowForm() {
               <h2 className="text-xl font-semibold">Single Release Escrow</h2>
             </div>
             <p className="text-muted-foreground mt-1">
-              A single payment will be released upon completion of all
-              milestones
+              Fill out the form to initialize a single release escrow milestones
             </p>
           </Link>
         </Card>

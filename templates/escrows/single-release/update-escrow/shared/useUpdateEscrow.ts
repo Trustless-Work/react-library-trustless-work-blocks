@@ -6,6 +6,7 @@ import { z } from "zod";
 import {
   UpdateSingleReleaseEscrowPayload,
   UpdateSingleReleaseEscrowResponse,
+  SingleReleaseMilestone,
 } from "@trustless-work/escrow/types";
 import { toast } from "sonner";
 import { useEscrowContext } from "@/components/tw-blocks/providers/EscrowProvider";
@@ -53,9 +54,11 @@ export function useUpdateEscrow() {
         releaseSigner: selectedEscrow?.roles?.releaseSigner || "",
         disputeResolver: selectedEscrow?.roles?.disputeResolver || "",
       },
-      milestones: (selectedEscrow?.milestones || []).map((m: any) => ({
-        description: m?.description || "",
-      })),
+      milestones: (selectedEscrow?.milestones || []).map(
+        (m: SingleReleaseMilestone) => ({
+          description: m?.description || "",
+        })
+      ),
     },
     mode: "onChange",
   });
@@ -89,9 +92,11 @@ export function useUpdateEscrow() {
         releaseSigner: selectedEscrow?.roles?.releaseSigner || "",
         disputeResolver: selectedEscrow?.roles?.disputeResolver || "",
       },
-      milestones: (selectedEscrow?.milestones || []).map((m: any) => ({
-        description: m?.description || "",
-      })),
+      milestones: (selectedEscrow?.milestones || []).map(
+        (m: SingleReleaseMilestone) => ({
+          description: m?.description || "",
+        })
+      ),
     });
   }, [selectedEscrow, form]);
 
@@ -168,7 +173,7 @@ export function useUpdateEscrow() {
             address: payload.trustline.address,
             decimals: 10000000,
           },
-          roles: payload.roles as any,
+          roles: payload.roles,
           milestones: payload.milestones,
         },
       };

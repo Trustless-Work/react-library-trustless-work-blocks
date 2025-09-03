@@ -107,8 +107,7 @@ export function InitializeEscrowDialog() {
                   </h2>
                 </div>
                 <p className="text-muted-foreground mt-1">
-                  A single payment will be released upon completion of all
-                  milestones
+                  Fill out the form to initialize a single release escrow
                 </p>
               </Link>
             </Card>

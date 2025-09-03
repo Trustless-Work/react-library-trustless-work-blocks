@@ -19,14 +19,11 @@ import {
 import { Loader2 } from "lucide-react";
 import { useResolveDispute } from "./useResolveDispute";
 import { useEscrowContext } from "@/components/tw-blocks/providers/EscrowProvider";
+import { formatCurrency } from "../../../../helpers/format.helper";
 
 export default function ResolveDisputeDialog() {
   const { form, handleSubmit, isSubmitting } = useResolveDispute();
   const { selectedEscrow } = useEscrowContext();
-
-  function formatCurrency(amount: number, currency: string) {
-    return `${currency} ${amount.toFixed(2)}`;
-  }
 
   return (
     <Dialog>
