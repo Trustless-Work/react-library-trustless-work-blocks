@@ -23,7 +23,7 @@ import { Trash2, DollarSign, Percent, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { trustlineOptions } from "@/components/tw-blocks/wallet-kit/trustlines";
 
-export default function UpdateEscrowForm() {
+export const UpdateEscrowForm = () => {
   const {
     form,
     isSubmitting,
@@ -460,4 +460,4 @@ export default function UpdateEscrowForm() {
       </form>
     </Form>
   );
-}
+};

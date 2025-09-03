@@ -21,7 +21,7 @@ import { useResolveDispute } from "./useResolveDispute";
 import { useEscrowContext } from "@/components/tw-blocks/providers/EscrowProvider";
 import { formatCurrency } from "../../../../helpers/format.helper";
 
-export default function ResolveDisputeDialog() {
+export const ResolveDisputeDialog = () => {
   const { form, handleSubmit, isSubmitting } = useResolveDispute();
   const { selectedEscrow } = useEscrowContext();
 
@@ -117,4 +117,4 @@ export default function ResolveDisputeDialog() {
       </DialogContent>
     </Dialog>
   );
-}
+};

@@ -11,7 +11,7 @@ import {
 import { useEscrowContext } from "@/components/tw-blocks/providers/EscrowProvider";
 import { Loader2 } from "lucide-react";
 
-export default function DisputeEscrowButton() {
+export const DisputeEscrowButton = () => {
   const { startDispute } = useEscrowsMutations();
   const { selectedEscrow, updateEscrow } = useEscrowContext();
   const { walletAddress } = useWalletContext();
@@ -77,4 +77,4 @@ export default function DisputeEscrowButton() {
       )}
     </Button>
   );
-}
+};

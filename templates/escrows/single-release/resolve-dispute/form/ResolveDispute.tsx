@@ -12,7 +12,7 @@ import { Button } from "__UI_BASE__/button";
 import { useResolveDispute } from "./useResolveDispute";
 import { Loader2 } from "lucide-react";
 
-export default function ResolveDisputeForm() {
+export const ResolveDisputeForm = () => {
   const { form, handleSubmit, isSubmitting } = useResolveDispute();
 
   return (
@@ -79,4 +79,4 @@ export default function ResolveDisputeForm() {
       </form>
     </Form>
   );
-}
+};

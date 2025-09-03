@@ -13,7 +13,7 @@ import { useEscrowDialogs } from "@/components/tw-blocks/providers/EscrowDialogs
 import { useEscrowAmountContext } from "@/components/tw-blocks/providers/EscrowAmountProvider";
 import { Loader2 } from "lucide-react";
 
-export default function ReleaseEscrowButton() {
+export const ReleaseEscrowButton = () => {
   const { releaseFunds } = useEscrowsMutations();
   const { selectedEscrow, updateEscrow } = useEscrowContext();
   const dialogStates = useEscrowDialogs();
@@ -89,4 +89,4 @@ export default function ReleaseEscrowButton() {
       )}
     </Button>
   );
-}
+};

@@ -16,10 +16,10 @@ type ResolveDisputeButtonProps = {
   receiverFunds: number;
 };
 
-export default function ResolveDisputeButton({
+export const ResolveDisputeButton = ({
   approverFunds,
   receiverFunds,
-}: ResolveDisputeButtonProps) {
+}: ResolveDisputeButtonProps) => {
   const { resolveDispute } = useEscrowsMutations();
   const { selectedEscrow, updateEscrow } = useEscrowContext();
   const { walletAddress } = useWalletContext();
@@ -103,4 +103,4 @@ export default function ResolveDisputeButton({
       )}
     </Button>
   );
-}
+};
