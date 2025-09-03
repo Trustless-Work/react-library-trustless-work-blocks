@@ -20,11 +20,11 @@ import {
   SingleReleaseMilestone,
 } from "@trustless-work/escrow";
 import { Badge } from "__UI_BASE__/badge";
-import ApproveMilestoneButton from "../../single-release/approve-milestone/button/ApproveMilestone";
-import ResolveDisputeDialog from "../../single-release/resolve-dispute/dialog/ResolveDispute";
-import DisputeEscrowButton from "../../single-release/dispute-escrow/button/DisputeEscrow";
-import ReleaseEscrowButton from "../../single-release/release-escrow/button/ReleaseEscrow";
-import ChangeMilestoneStatusDialog from "../../single-release/change-milestone-status/dialog/ChangeMilestoneStatus";
+import ChangeMilestoneStatusDialog from "../../single-multi-release/change-milestone-status/dialog/ChangeMilestoneStatus";
+import ApproveMilestoneButton from "../../single-multi-release/approve-milestone/button/ApproveMilestone";
+import ResolveDisputeDialog from "__MR_RESOLVE_MODULE__";
+import DisputeEscrowButton from "__MR_DISPUTE_MODULE__";
+import ReleaseEscrowButton from "__MR_RELEASE_MODULE__";
 import { formatCurrency } from "@/components/tw-blocks/helpers/format.helper";
 
 interface MilestoneCardProps {
@@ -132,7 +132,12 @@ const MilestoneCardComponent = ({
       milestone.flags?.approved &&
       !milestone.flags?.released
     ) {
-      buttons.push(<ReleaseEscrowButton key={`release-${milestoneIndex}`} />);
+      buttons.push(
+        <ReleaseEscrowButton
+          key={`release-${milestoneIndex}`}
+          milestoneIndex={milestoneIndex}
+        />
+      );
     }
 
     if (
@@ -145,7 +150,12 @@ const MilestoneCardComponent = ({
       !milestone.flags?.released &&
       !milestone.flags?.resolved
     ) {
-      buttons.push(<DisputeEscrowButton key={`dispute-${milestoneIndex}`} />);
+      buttons.push(
+        <DisputeEscrowButton
+          key={`dispute-${milestoneIndex}`}
+          milestoneIndex={milestoneIndex}
+        />
+      );
     }
 
     if (
@@ -154,7 +164,12 @@ const MilestoneCardComponent = ({
       "flags" in milestone &&
       milestone.flags?.disputed
     ) {
-      buttons.push(<ResolveDisputeDialog key={`resolve-${milestoneIndex}`} />);
+      buttons.push(
+        <ResolveDisputeDialog
+          key={`resolve-${milestoneIndex}`}
+          milestoneIndex={milestoneIndex}
+        />
+      );
     }
 
     if (

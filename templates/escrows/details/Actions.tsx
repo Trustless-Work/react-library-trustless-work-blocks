@@ -17,7 +17,7 @@ import {
 import DisputeEscrowButton from "../../single-release/dispute-escrow/button/DisputeEscrow";
 import ResolveDisputeDialog from "../../single-release/resolve-dispute/dialog/ResolveDispute";
 import ReleaseEscrowButton from "../../single-release/release-escrow/button/ReleaseEscrow";
-import FundEscrowDialog from "../../single-release/fund-escrow/dialog/FundEscrow";
+import FundEscrowDialog from "../../single-multi-release/fund-escrow/dialog/FundEscrow";
 import UpdateEscrowDialog from "../../single-release/update-escrow/dialog/UpdateEscrow";
 
 interface ActionsProps {
