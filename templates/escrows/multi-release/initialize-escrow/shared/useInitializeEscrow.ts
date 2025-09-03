@@ -1,0 +1,135 @@
+import * as React from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useInitializeEscrowSchema } from "./schema";
+import { z } from "zod";
+import {
+  InitializeMultiReleaseEscrowPayload,
+  InitializeMultiReleaseEscrowResponse,
+} from "@trustless-work/escrow/types";
+import { toast } from "sonner";
+import { useWalletContext } from "@/components/tw-blocks/wallet-kit/WalletProvider";
+import { useEscrowsMutations } from "@/components/tw-blocks/tanstack/useEscrowsMutations";
+import {
+  ErrorResponse,
+  handleError,
+} from "@/components/tw-blocks/handle-errors/handle";
+import { useEscrowContext } from "@/components/tw-blocks/providers/EscrowProvider";
+
+export function useInitializeEscrow() {
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+
+  const { getMultiReleaseFormSchema } = useInitializeEscrowSchema();
+  const formSchema = getMultiReleaseFormSchema();
+  const { setSelectedEscrow } = useEscrowContext();
+
+  const { walletAddress } = useWalletContext();
+  const { deployEscrow } = useEscrowsMutations();
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      engagementId: "",
+      title: "",
+      description: "",
+      platformFee: undefined,
+      receiverMemo: "",
+      trustline: {
+        address: "",
+        decimals: 10000000,
+      },
+      roles: {
+        approver: "",
+        serviceProvider: "",
+        platformAddress: "",
+        receiver: "",
+        releaseSigner: "",
+        disputeResolver: "",
+      },
+      milestones: [{ description: "", amount: "" }],
+    },
+    mode: "onChange",
+  });
+
+  const milestones = form.watch("milestones");
+  const isAnyMilestoneEmpty = milestones.some(
+    (milestone) => milestone.description === ""
+  );
+
+  const handleAddMilestone = () => {
+    const currentMilestones = form.getValues("milestones");
+    const updatedMilestones = [
+      ...currentMilestones,
+      { description: "", amount: "" },
+    ];
+    form.setValue("milestones", updatedMilestones);
+  };
+
+  const handleRemoveMilestone = (index: number) => {
+    const currentMilestones = form.getValues("milestones");
+    const updatedMilestones = currentMilestones.filter((_, i) => i !== index);
+    form.setValue("milestones", updatedMilestones);
+  };
+
+  const handleSubmit = form.handleSubmit(async (payload) => {
+    try {
+      setIsSubmitting(true);
+
+      /**
+       * Create the final payload for the initialize escrow mutation
+       *
+       * @param payload - The payload from the form
+       * @returns The final payload for the initialize escrow mutation
+       */
+      const finalPayload: InitializeMultiReleaseEscrowPayload = {
+        ...payload,
+        platformFee:
+          typeof payload.platformFee === "string"
+            ? Number(payload.platformFee)
+            : payload.platformFee,
+        receiverMemo: Number(payload.receiverMemo) ?? 0,
+        signer: walletAddress || "",
+        milestones: payload.milestones.map((milestone) => ({
+          ...milestone,
+          amount:
+            typeof milestone.amount === "string"
+              ? Number(milestone.amount)
+              : milestone.amount,
+        })),
+      };
+
+      /**
+       * Call the initialize escrow mutation
+       *
+       * @param payload - The final payload for the initialize escrow mutation
+       * @param type - The type of the escrow
+       * @param address - The address of the escrow
+       */
+      const response: InitializeMultiReleaseEscrowResponse =
+        (await deployEscrow.mutateAsync({
+          payload: finalPayload,
+          type: "multi-release",
+          address: walletAddress || "",
+        })) as InitializeMultiReleaseEscrowResponse;
+
+      toast.success("Escrow initialized successfully");
+
+      setSelectedEscrow(response);
+    } catch (error) {
+      toast.error(handleError(error as ErrorResponse).message);
+    } finally {
+      setIsSubmitting(false);
+      form.reset();
+    }
+  });
+
+  return {
+    form,
+    isSubmitting,
+    milestones,
+    isAnyMilestoneEmpty,
+    handleSubmit,
+    handleAddMilestone,
+    handleRemoveMilestone,
+  };
+}
