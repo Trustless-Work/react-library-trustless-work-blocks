@@ -258,6 +258,71 @@ function copyTemplate(name, { uiBase, shouldInstall = false } = {}) {
   function writeTransformed(srcPath, destPath) {
     const raw = fs.readFileSync(srcPath, "utf8");
     let transformed = raw.replaceAll("__UI_BASE__", effectiveUiBase);
+    // Resolve details placeholders to either multi-release modules (if present) or local compat
+    const applyDetailsPlaceholders = (content) => {
+      const resolveImport = (segments, compatFile) => {
+        const realWithExt = path.join(
+          outRoot,
+          "escrows",
+          "multi-release",
+          ...segments
+        );
+        const realCandidate = [
+          realWithExt,
+          realWithExt + ".tsx",
+          realWithExt + ".ts",
+          realWithExt + ".jsx",
+          realWithExt + ".js",
+        ].find((p) => fs.existsSync(p));
+        const realNoExt = realCandidate
+          ? realCandidate.replace(/\.(tsx|ts|jsx|js)$/i, "")
+          : null;
+        const compatWithExt = path.join(
+          path.dirname(destPath),
+          "compat",
+          compatFile
+        );
+        const compatCandidate = [
+          compatWithExt,
+          compatWithExt + ".tsx",
+          compatWithExt + ".ts",
+          compatWithExt + ".jsx",
+          compatWithExt + ".js",
+        ].find((p) => fs.existsSync(p));
+        const compatNoExt = (compatCandidate || compatWithExt).replace(
+          /\.(tsx|ts|jsx|js)$/i,
+          ""
+        );
+        const target = realNoExt || compatNoExt;
+        let rel = path.relative(path.dirname(destPath), target);
+        rel = rel.split(path.sep).join("/");
+        if (!rel.startsWith(".")) rel = "./" + rel;
+        return rel;
+      };
+      return content
+        .replaceAll(
+          "__MR_RELEASE_MODULE__",
+          resolveImport(
+            ["release-escrow", "button", "ReleaseEscrow"],
+            "ReleaseEscrow"
+          )
+        )
+        .replaceAll(
+          "__MR_DISPUTE_MODULE__",
+          resolveImport(
+            ["dispute-escrow", "button", "DisputeEscrow"],
+            "DisputeEscrow"
+          )
+        )
+        .replaceAll(
+          "__MR_RESOLVE_MODULE__",
+          resolveImport(
+            ["resolve-dispute", "dialog", "ResolveDispute"],
+            "ResolveDispute"
+          )
+        );
+    };
+    transformed = applyDetailsPlaceholders(transformed);
     if (currentEscrowType) {
       transformed = transformed.replaceAll(
         "__ESCROW_TYPE__",
@@ -664,6 +729,132 @@ function copyTemplate(name, { uiBase, shouldInstall = false } = {}) {
       );
     }
 
+    // Post-copy: materialize shared files for multi-release modules
+    try {
+      const isMultiInitRoot =
+        name === "escrows/multi-release/initialize-escrow";
+      const isMultiInitDialog =
+        name === "escrows/multi-release/initialize-escrow/dialog";
+      const isMultiInitForm =
+        name === "escrows/multi-release/initialize-escrow/form";
+
+      const srcSharedDir = path.join(
+        TEMPLATES_DIR,
+        "escrows",
+        "multi-release",
+        "initialize-escrow",
+        "shared"
+      );
+
+      function copyMultiInitSharedInto(targetDir) {
+        if (!fs.existsSync(srcSharedDir)) return;
+        const entries = fs.readdirSync(srcSharedDir, { withFileTypes: true });
+        for (const entry of entries) {
+          if (!/\.(tsx?|jsx?)$/i.test(entry.name)) continue;
+          const entrySrc = path.join(srcSharedDir, entry.name);
+          const entryDest = path.join(targetDir, entry.name);
+          writeTransformed(entrySrc, entryDest);
+        }
+      }
+
+      if (isMultiInitRoot) {
+        copyMultiInitSharedInto(path.join(destDir, "dialog"));
+        copyMultiInitSharedInto(path.join(destDir, "form"));
+      } else if (isMultiInitDialog) {
+        copyMultiInitSharedInto(destDir);
+      } else if (isMultiInitForm) {
+        copyMultiInitSharedInto(destDir);
+      }
+    } catch (e) {
+      console.warn(
+        "⚠️  Failed to materialize shared multi-release initialize-escrow files:",
+        e?.message || e
+      );
+    }
+
+    try {
+      const isMultiResolveRoot =
+        name === "escrows/multi-release/resolve-dispute";
+      const isMultiResolveDialog =
+        name === "escrows/multi-release/resolve-dispute/dialog";
+      const isMultiResolveForm =
+        name === "escrows/multi-release/resolve-dispute/form";
+
+      const srcSharedDir = path.join(
+        TEMPLATES_DIR,
+        "escrows",
+        "multi-release",
+        "resolve-dispute",
+        "shared"
+      );
+
+      function copyMultiResolveSharedInto(targetDir) {
+        if (!fs.existsSync(srcSharedDir)) return;
+        const entries = fs.readdirSync(srcSharedDir, { withFileTypes: true });
+        for (const entry of entries) {
+          if (!/\.(tsx?|jsx?)$/i.test(entry.name)) continue;
+          const entrySrc = path.join(srcSharedDir, entry.name);
+          const entryDest = path.join(targetDir, entry.name);
+          writeTransformed(entrySrc, entryDest);
+        }
+      }
+
+      if (isMultiResolveRoot) {
+        copyMultiResolveSharedInto(path.join(destDir, "dialog"));
+        copyMultiResolveSharedInto(path.join(destDir, "form"));
+      } else if (isMultiResolveDialog) {
+        copyMultiResolveSharedInto(destDir);
+      } else if (isMultiResolveForm) {
+        copyMultiResolveSharedInto(destDir);
+      }
+    } catch (e) {
+      console.warn(
+        "⚠️  Failed to materialize shared multi-release resolve-dispute files:",
+        e?.message || e
+      );
+    }
+
+    try {
+      const isMultiUpdateRoot = name === "escrows/multi-release/update-escrow";
+      const isMultiUpdateDialog =
+        name === "escrows/multi-release/update-escrow/dialog";
+      const isMultiUpdateForm =
+        name === "escrows/multi-release/update-escrow/form";
+
+      const srcSharedDir = path.join(
+        TEMPLATES_DIR,
+        "escrows",
+        "multi-release",
+        "update-escrow",
+        "shared"
+      );
+
+      function copyMultiUpdateSharedInto(targetDir) {
+        if (!fs.existsSync(srcSharedDir)) return;
+        const entries = fs.readdirSync(srcSharedDir, { withFileTypes: true });
+        for (const entry of entries) {
+          if (!/\.(tsx?|jsx?)$/i.test(entry.name)) continue;
+          const entrySrc = path.join(srcSharedDir, entry.name);
+          const entryDest = path.join(targetDir, entry.name);
+          writeTransformed(entrySrc, entryDest);
+        }
+      }
+
+      if (isMultiUpdateRoot) {
+        copyMultiUpdateSharedInto(path.join(destDir, "dialog"));
+        copyMultiUpdateSharedInto(path.join(destDir, "form"));
+      } else if (isMultiUpdateDialog) {
+        copyMultiUpdateSharedInto(destDir);
+      } else if (isMultiUpdateForm) {
+        copyMultiUpdateSharedInto(destDir);
+      }
+    } catch (e) {
+      console.warn(
+        "⚠️  Failed to materialize shared multi-release update-escrow files:",
+        e?.message || e
+      );
+    }
+
     // If adding the whole single-release bundle, materialize all shared files
     try {
       if (name === "escrows/single-release") {
@@ -705,6 +896,48 @@ function copyTemplate(name, { uiBase, shouldInstall = false } = {}) {
     } catch (e) {
       console.warn(
         "⚠️  Failed to materialize shared files for single-release bundle:",
+        e?.message || e
+      );
+    }
+
+    // If adding the whole multi-release bundle, materialize all shared files
+    try {
+      if (name === "escrows/multi-release") {
+        const modules = [
+          "initialize-escrow",
+          "resolve-dispute",
+          "update-escrow",
+        ];
+
+        for (const mod of modules) {
+          const srcSharedDir = path.join(
+            TEMPLATES_DIR,
+            "escrows",
+            "multi-release",
+            mod,
+            "shared"
+          );
+          if (!fs.existsSync(srcSharedDir)) continue;
+
+          const targets = [
+            path.join(destDir, mod, "dialog"),
+            path.join(destDir, mod, "form"),
+          ];
+
+          const entries = fs.readdirSync(srcSharedDir, { withFileTypes: true });
+          for (const entry of entries) {
+            if (!/\.(tsx?|jsx?)$/i.test(entry.name)) continue;
+            const entrySrc = path.join(srcSharedDir, entry.name);
+            for (const t of targets) {
+              const entryDest = path.join(t, entry.name);
+              writeTransformed(entrySrc, entryDest);
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.warn(
+        "⚠️  Failed to materialize shared files for multi-release bundle:",
         e?.message || e
       );
     }
@@ -754,6 +987,49 @@ function copyTemplate(name, { uiBase, shouldInstall = false } = {}) {
         e?.message || e
       );
     }
+
+    // If adding the root escrows bundle, also materialize multi-release shared files
+    try {
+      if (name === "escrows") {
+        const modules = [
+          "initialize-escrow",
+          "resolve-dispute",
+          "update-escrow",
+        ];
+
+        const baseTarget = path.join(destDir, "multi-release");
+        for (const mod of modules) {
+          const srcSharedDir = path.join(
+            TEMPLATES_DIR,
+            "escrows",
+            "multi-release",
+            mod,
+            "shared"
+          );
+          if (!fs.existsSync(srcSharedDir)) continue;
+
+          const targets = [
+            path.join(baseTarget, mod, "dialog"),
+            path.join(baseTarget, mod, "form"),
+          ];
+
+          const entries = fs.readdirSync(srcSharedDir, { withFileTypes: true });
+          for (const entry of entries) {
+            if (!/\.(tsx?|jsx?)$/i.test(entry.name)) continue;
+            const entrySrc = path.join(srcSharedDir, entry.name);
+            for (const t of targets) {
+              const entryDest = path.join(t, entry.name);
+              writeTransformed(entrySrc, entryDest);
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.warn(
+        "⚠️  Failed to materialize shared files for escrows root (multi-release):",
+        e?.message || e
+      );
+    }
   } else if (fs.existsSync(srcFile)) {
     fs.mkdirSync(outRoot, { recursive: true });
     const destFile = path.join(outRoot, name + ".tsx");
@@ -781,7 +1057,69 @@ function copySharedDetailsInto(targetRelativeDir, { uiBase } = {}) {
 
   function writeTransformed(srcPath, destPath) {
     const raw = fs.readFileSync(srcPath, "utf8");
-    const transformed = raw.replaceAll("__UI_BASE__", effectiveUiBase);
+    let transformed = raw.replaceAll("__UI_BASE__", effectiveUiBase);
+    // Resolve details placeholders to either multi-release modules (if present) or local compat
+    const resolveImport = (segments, compatFile) => {
+      const realWithExt = path.join(
+        outRoot,
+        "escrows",
+        "multi-release",
+        ...segments
+      );
+      const realCandidate = [
+        realWithExt,
+        realWithExt + ".tsx",
+        realWithExt + ".ts",
+        realWithExt + ".jsx",
+        realWithExt + ".js",
+      ].find((p) => fs.existsSync(p));
+      const realNoExt = realCandidate
+        ? realCandidate.replace(/\.(tsx|ts|jsx|js)$/i, "")
+        : null;
+      const compatWithExt = path.join(
+        path.dirname(destPath),
+        "compat",
+        compatFile
+      );
+      const compatCandidate = [
+        compatWithExt,
+        compatWithExt + ".tsx",
+        compatWithExt + ".ts",
+        compatWithExt + ".jsx",
+        compatWithExt + ".js",
+      ].find((p) => fs.existsSync(p));
+      const compatNoExt = (compatCandidate || compatWithExt).replace(
+        /\.(tsx|ts|jsx|js)$/i,
+        ""
+      );
+      const target = realNoExt || compatNoExt;
+      let rel = path.relative(path.dirname(destPath), target);
+      rel = rel.split(path.sep).join("/");
+      if (!rel.startsWith(".")) rel = "./" + rel;
+      return rel;
+    };
+    transformed = transformed
+      .replaceAll(
+        "__MR_RELEASE_MODULE__",
+        resolveImport(
+          ["release-escrow", "button", "ReleaseEscrow"],
+          "ReleaseEscrow"
+        )
+      )
+      .replaceAll(
+        "__MR_DISPUTE_MODULE__",
+        resolveImport(
+          ["dispute-escrow", "button", "DisputeEscrow"],
+          "DisputeEscrow"
+        )
+      )
+      .replaceAll(
+        "__MR_RESOLVE_MODULE__",
+        resolveImport(
+          ["resolve-dispute", "dialog", "ResolveDispute"],
+          "ResolveDispute"
+        )
+      );
     fs.mkdirSync(path.dirname(destPath), { recursive: true });
     fs.writeFileSync(destPath, transformed, "utf8");
     console.log(`✅ ${path.relative(PROJECT_ROOT, destPath)} created`);
