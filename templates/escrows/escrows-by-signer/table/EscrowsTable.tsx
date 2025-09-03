@@ -6,7 +6,6 @@ import { Button } from "__UI_BASE__/button";
 import type {
   GetEscrowsFromIndexerResponse as Escrow,
   MultiReleaseMilestone,
-  Role,
 } from "@trustless-work/escrow/types";
 import {
   ColumnDef,
@@ -23,14 +22,14 @@ import {
   TableRow,
 } from "__UI_BASE__/table";
 import { FileX, Loader2, Wallet, RefreshCw, AlertTriangle } from "lucide-react";
-import Filters from "./Filters";
+import { Filters } from "./Filters";
 import { useEscrowsBySigner } from "../useEscrowsBySigner.shared";
 import { useEscrowDialogs } from "@/components/tw-blocks/providers/EscrowDialogsProvider";
 import { useEscrowContext } from "@/components/tw-blocks/providers/EscrowProvider";
-import EscrowDetailDialog from "../details/EscrowDetailDialog";
+import { EscrowDetailDialog } from "../details/EscrowDetailDialog";
 import { formatTimestamp } from "../../../helpers/format.helper";
 
-export function EscrowsBySignerTable() {
+export const EscrowsBySignerTable = () => {
   const {
     walletAddress,
     data,
@@ -202,18 +201,6 @@ export function EscrowsBySignerTable() {
     manualSorting: true,
     enableSortingRemoval: true,
   });
-
-  /**
-   * Based on the provided roles -> https://docs.trustlesswork.com/trustless-work/technology-overview/roles-in-trustless-work
-   *
-   * You must pass one or more roles according to requirements
-   *
-   * For example:
-   * - If the user is a freelancer, you must pass the "serviceProvider" and "receiver" role
-   *
-   * Depending of the role, you'll have different actions buttons
-   */
-  const activeRole: Role[] = React.useMemo(() => ["approver"] as Role[], []);
 
   const escrows = data ?? [];
 
@@ -426,7 +413,6 @@ export function EscrowsBySignerTable() {
       {/* Dialog */}
       {dialogStates.second.isOpen ? (
         <EscrowDetailDialog
-          activeRole={activeRole}
           isDialogOpen={dialogStates.second.isOpen}
           setIsDialogOpen={dialogStates.second.setIsOpen}
           setSelectedEscrow={setSelectedEscrow}
@@ -434,6 +420,4 @@ export function EscrowsBySignerTable() {
       ) : null}
     </>
   );
-}
-
-export default React.memo(EscrowsBySignerTable);
+};

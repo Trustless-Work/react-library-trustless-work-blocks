@@ -5,14 +5,14 @@ import { Button } from "__UI_BASE__/button";
 import type {
   GetEscrowsFromIndexerResponse as Escrow,
   MultiReleaseMilestone,
-  Role,
   SingleReleaseMilestone,
 } from "@trustless-work/escrow/types";
-import Filters from "./Filters";
+import { Filters } from "./Filters";
 import { useEscrowsBySigner } from "../useEscrowsBySigner.shared";
 import { Card, CardContent, CardHeader, CardTitle } from "__UI_BASE__/card";
 import { Badge } from "__UI_BASE__/badge";
 import { Separator } from "__UI_BASE__/separator";
+import { Tooltip, TooltipContent, TooltipTrigger } from "__UI_BASE__/tooltip";
 import {
   Goal,
   Wallet,
@@ -23,10 +23,13 @@ import {
 } from "lucide-react";
 import { useEscrowContext } from "@/components/tw-blocks/providers/EscrowProvider";
 import { useEscrowDialogs } from "@/components/tw-blocks/providers/EscrowDialogsProvider";
-import EscrowDetailDialog from "../details/EscrowDetailDialog";
-import { formatTimestamp } from "../../../helpers/format.helper";
+import { EscrowDetailDialog } from "../details/EscrowDetailDialog";
+import {
+  formatCurrency,
+  formatTimestamp,
+} from "../../../helpers/format.helper";
 
-export function EscrowsBySignerCards() {
+export const EscrowsBySignerCards = () => {
   const {
     walletAddress,
     data,
@@ -74,10 +77,6 @@ export function EscrowsBySignerCards() {
     void refetch();
   }, [refetch]);
 
-  const formatCurrency = (value: number, currency: string) => {
-    return `${currency} ${value.toFixed(2)}`;
-  };
-
   function allMilestonesReleasedOrResolved(
     milestones: MultiReleaseMilestone[]
   ) {
@@ -119,18 +118,6 @@ export function EscrowsBySignerCards() {
     setSelectedEscrow(escrow);
     dialogStates.second.setIsOpen(true);
   };
-
-  /**
-   * Based on the provided roles -> https://docs.trustlesswork.com/trustless-work/technology-overview/roles-in-trustless-work
-   *
-   * You must pass one or more roles according to requirements
-   *
-   * For example:
-   * - If the user is a freelancer, you must pass the "serviceProvider" and "receiver" role
-   *
-   * Depending of the role, you'll have different actions buttons
-   */
-  const activeRole: Role[] = React.useMemo(() => ["approver"] as Role[], []);
 
   const escrows: Escrow[] = data ?? [];
 
@@ -347,9 +334,9 @@ export function EscrowsBySignerCards() {
                             <ul className="list-disc list-inside flex flex-col gap-1">
                               {escrow.milestones
                                 .slice(0, 3)
-                                .map((milestone) => (
+                                .map((milestone, index) => (
                                   <li
-                                    key={milestone.description.slice(0, 5)}
+                                    key={`milestone-${milestone.description}-${milestone.status}-${index}`}
                                     className="text-xs flex justify-between"
                                   >
                                     {milestone.description}
@@ -365,33 +352,83 @@ export function EscrowsBySignerCards() {
                                               )}
                                             </span>
 
-                                            <span
-                                              className={`bg-red-800 rounded-full h-2 w-2 ml-1 ${
-                                                milestone.flags?.disputed
-                                                  ? "block"
-                                                  : "hidden"
-                                              }`}
-                                            />
+                                            {milestone.flags?.disputed && (
+                                              <Tooltip>
+                                                <TooltipTrigger>
+                                                  <span
+                                                    className={`bg-red-800 rounded-full h-2 w-2 ml-1 ${
+                                                      milestone.flags?.disputed
+                                                        ? "block"
+                                                        : "hidden"
+                                                    }`}
+                                                  />
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                  Disputed
+                                                </TooltipContent>
+                                              </Tooltip>
+                                            )}
 
-                                            <span
-                                              className={`bg-green-800 rounded-full h-2 w-2 ml-1 ${
-                                                milestone.flags?.resolved ||
-                                                milestone.flags?.released
-                                                  ? "block"
-                                                  : "hidden"
-                                              }`}
-                                            />
+                                            {milestone.flags?.resolved && (
+                                              <Tooltip>
+                                                <TooltipTrigger>
+                                                  <span
+                                                    className={`bg-green-800 rounded-full h-2 w-2 ml-1 ${
+                                                      milestone.flags?.resolved
+                                                        ? "block"
+                                                        : "hidden"
+                                                    }`}
+                                                  />
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                  Resolved
+                                                </TooltipContent>
+                                              </Tooltip>
+                                            )}
 
-                                            <span
-                                              className={`bg-yellow-800 rounded-full h-2 w-2 ml-1 ${
-                                                milestone.flags?.approved &&
-                                                !milestone.flags?.disputed &&
-                                                !milestone.flags?.resolved &&
-                                                !milestone.flags?.released
-                                                  ? "block"
-                                                  : "hidden"
-                                              }`}
-                                            />
+                                            {milestone.flags?.released && (
+                                              <Tooltip>
+                                                <TooltipTrigger>
+                                                  <span
+                                                    className={`bg-green-800 rounded-full h-2 w-2 ml-1 ${
+                                                      milestone.flags?.released
+                                                        ? "block"
+                                                        : "hidden"
+                                                    }`}
+                                                  />
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                  Released
+                                                </TooltipContent>
+                                              </Tooltip>
+                                            )}
+
+                                            {milestone.flags?.approved &&
+                                              !milestone.flags?.disputed &&
+                                              !milestone.flags?.resolved &&
+                                              !milestone.flags?.released && (
+                                                <Tooltip>
+                                                  <TooltipTrigger>
+                                                    <span
+                                                      className={`bg-yellow-600 rounded-full h-2 w-2 ml-1 ${
+                                                        milestone.flags
+                                                          ?.approved &&
+                                                        !milestone.flags
+                                                          ?.disputed &&
+                                                        !milestone.flags
+                                                          ?.resolved &&
+                                                        !milestone.flags
+                                                          ?.released
+                                                          ? "block"
+                                                          : "hidden"
+                                                      }`}
+                                                    />
+                                                  </TooltipTrigger>
+                                                  <TooltipContent>
+                                                    Pending Release
+                                                  </TooltipContent>
+                                                </Tooltip>
+                                              )}
                                           </div>
                                         </>
                                       )}
@@ -508,7 +545,6 @@ export function EscrowsBySignerCards() {
       {/* Dialog */}
       {dialogStates.second.isOpen ? (
         <EscrowDetailDialog
-          activeRole={activeRole}
           isDialogOpen={dialogStates.second.isOpen}
           setIsDialogOpen={dialogStates.second.setIsOpen}
           setSelectedEscrow={setSelectedEscrow}
@@ -516,6 +552,4 @@ export function EscrowsBySignerCards() {
       ) : null}
     </>
   );
-}
-
-export default React.memo(EscrowsBySignerCards);
+};
