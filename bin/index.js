@@ -1323,7 +1323,7 @@ if (args[0] === "init") {
   }
 
   const addShadcn = await promptYesNo(
-    "Add shadcn components (button, input, form, card, sonner, checkbox, dialog, textarea, sonner, select, table, calendar, popover, separator, calendar-05, badge, sheet, tabs, avatar)?",
+    "Add shadcn components (button, input, form, card, sonner, checkbox, dialog, textarea, sonner, select, table, calendar, popover, separator, calendar-05, badge, sheet, tabs, avatar, tooltip)?",
     true
   );
   if (addShadcn) {
@@ -1350,6 +1350,7 @@ if (args[0] === "init") {
         "sheet",
         "tabs",
         "avatar",
+        "tooltip",
       ]);
     });
   } else {
