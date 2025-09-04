@@ -1757,9 +1757,6 @@ if (args[0] === "init") {
   trustless-work add escrows/escrows-by-signer/table
   trustless-work add escrows/escrows-by-signer/cards
   
-  --- Escrow details (optional standalone) ---
-  trustless-work add escrows/details
-  
   ----------------------
   --- SINGLE-RELEASE ---
   trustless-work add escrows/single-release
@@ -1768,24 +1765,6 @@ if (args[0] === "init") {
   - trustless-work add escrows/single-release/initialize-escrow
   - trustless-work add escrows/single-release/initialize-escrow/form
   - trustless-work add escrows/single-release/initialize-escrow/dialog
-  
-  --- Approve milestone ---
-  - trustless-work add escrows/single-release/approve-milestone
-  - trustless-work add escrows/single-release/approve-milestone/form
-  - trustless-work add escrows/single-release/approve-milestone/button
-  - trustless-work add escrows/single-release/approve-milestone/dialog
-  
-  --- Change milestone status ---
-  - trustless-work add escrows/single-release/change-milestone-status
-  - trustless-work add escrows/single-release/change-milestone-status/form
-  - trustless-work add escrows/single-release/change-milestone-status/button
-  - trustless-work add escrows/single-release/change-milestone-status/dialog
-  
-  --- Fund escrow ---
-  - trustless-work add escrows/single-release/fund-escrow
-  - trustless-work add escrows/single-release/fund-escrow/form
-  - trustless-work add escrows/single-release/fund-escrow/button
-  - trustless-work add escrows/single-release/fund-escrow/dialog
   
   --- Resolve dispute ---
   - trustless-work add escrows/single-release/resolve-dispute
@@ -1805,9 +1784,37 @@ if (args[0] === "init") {
   --- Dispute escrow ---
   - trustless-work add escrows/single-release/dispute-escrow
   - trustless-work add escrows/single-release/dispute-escrow/button
+
+  ----------------------
+  --- MULTI-RELEASE ---
+  trustless-work add escrows/multi-release
+  
+  --- Initialize escrow ---
+  - trustless-work add escrows/multi-release/initialize-escrow
+  - trustless-work add escrows/multi-release/initialize-escrow/form
+  - trustless-work add escrows/multi-release/initialize-escrow/dialog
+  
+  --- Resolve dispute ---
+  - trustless-work add escrows/multi-release/resolve-dispute
+  - trustless-work add escrows/multi-release/resolve-dispute/form
+  - trustless-work add escrows/multi-release/resolve-dispute/button
+  - trustless-work add escrows/multi-release/resolve-dispute/dialog
+  
+  --- Update escrow ---
+  - trustless-work add escrows/multi-release/update-escrow
+  - trustless-work add escrows/multi-release/update-escrow/form
+  - trustless-work add escrows/multi-release/update-escrow/dialog
+  
+  --- Release escrow ---
+  - trustless-work add escrows/multi-release/release-milestone
+  - trustless-work add escrows/multi-release/release-milestone/button
+  
+  --- Dispute escrow ---
+  - trustless-work add escrows/multi-release/dispute-milestone
+  - trustless-work add escrows/multi-release/dispute-milestone/button
   
   ----------------------
-  --- SINGLE-MULTI-RELEASE ---
+  --- SINGLE-MULTI-RELEASE -> Works with both types of escrows ---
   trustless-work add escrows/single-multi-release
   
   --- Approve milestone ---
