@@ -855,6 +855,133 @@ function copyTemplate(name, { uiBase, shouldInstall = false } = {}) {
       );
     }
 
+    // Post-copy: materialize shared files for single-multi-release modules
+    try {
+      const isSingleMultiApproveRoot =
+        name === "escrows/single-multi-release/approve-milestone";
+      const isSingleMultiApproveDialog =
+        name === "escrows/single-multi-release/approve-milestone/dialog";
+      const isSingleMultiApproveForm =
+        name === "escrows/single-multi-release/approve-milestone/form";
+
+      const srcSharedDir = path.join(
+        TEMPLATES_DIR,
+        "escrows",
+        "single-multi-release",
+        "approve-milestone",
+        "shared"
+      );
+
+      function copySingleMultiApproveSharedInto(targetDir) {
+        if (!fs.existsSync(srcSharedDir)) return;
+        const entries = fs.readdirSync(srcSharedDir, { withFileTypes: true });
+        for (const entry of entries) {
+          if (!/\.(tsx?|jsx?)$/i.test(entry.name)) continue;
+          const entrySrc = path.join(srcSharedDir, entry.name);
+          const entryDest = path.join(targetDir, entry.name);
+          writeTransformed(entrySrc, entryDest);
+        }
+      }
+
+      if (isSingleMultiApproveRoot) {
+        copySingleMultiApproveSharedInto(path.join(destDir, "dialog"));
+        copySingleMultiApproveSharedInto(path.join(destDir, "form"));
+      } else if (isSingleMultiApproveDialog) {
+        copySingleMultiApproveSharedInto(destDir);
+      } else if (isSingleMultiApproveForm) {
+        copySingleMultiApproveSharedInto(destDir);
+      }
+    } catch (e) {
+      console.warn(
+        "⚠️  Failed to materialize shared single-multi-release approve-milestone files:",
+        e?.message || e
+      );
+    }
+
+    try {
+      const isSingleMultiChangeRoot =
+        name === "escrows/single-multi-release/change-milestone-status";
+      const isSingleMultiChangeDialog =
+        name === "escrows/single-multi-release/change-milestone-status/dialog";
+      const isSingleMultiChangeForm =
+        name === "escrows/single-multi-release/change-milestone-status/form";
+
+      const srcSharedDir = path.join(
+        TEMPLATES_DIR,
+        "escrows",
+        "single-multi-release",
+        "change-milestone-status",
+        "shared"
+      );
+
+      function copySingleMultiChangeSharedInto(targetDir) {
+        if (!fs.existsSync(srcSharedDir)) return;
+        const entries = fs.readdirSync(srcSharedDir, { withFileTypes: true });
+        for (const entry of entries) {
+          if (!/\.(tsx?|jsx?)$/i.test(entry.name)) continue;
+          const entrySrc = path.join(srcSharedDir, entry.name);
+          const entryDest = path.join(targetDir, entry.name);
+          writeTransformed(entrySrc, entryDest);
+        }
+      }
+
+      if (isSingleMultiChangeRoot) {
+        copySingleMultiChangeSharedInto(path.join(destDir, "dialog"));
+        copySingleMultiChangeSharedInto(path.join(destDir, "form"));
+      } else if (isSingleMultiChangeDialog) {
+        copySingleMultiChangeSharedInto(destDir);
+      } else if (isSingleMultiChangeForm) {
+        copySingleMultiChangeSharedInto(destDir);
+      }
+    } catch (e) {
+      console.warn(
+        "⚠️  Failed to materialize shared single-multi-release change-milestone-status files:",
+        e?.message || e
+      );
+    }
+
+    try {
+      const isSingleMultiFundRoot =
+        name === "escrows/single-multi-release/fund-escrow";
+      const isSingleMultiFundDialog =
+        name === "escrows/single-multi-release/fund-escrow/dialog";
+      const isSingleMultiFundForm =
+        name === "escrows/single-multi-release/fund-escrow/form";
+
+      const srcSharedDir = path.join(
+        TEMPLATES_DIR,
+        "escrows",
+        "single-multi-release",
+        "fund-escrow",
+        "shared"
+      );
+
+      function copySingleMultiFundSharedInto(targetDir) {
+        if (!fs.existsSync(srcSharedDir)) return;
+        const entries = fs.readdirSync(srcSharedDir, { withFileTypes: true });
+        for (const entry of entries) {
+          if (!/\.(tsx?|jsx?)$/i.test(entry.name)) continue;
+          const entrySrc = path.join(srcSharedDir, entry.name);
+          const entryDest = path.join(targetDir, entry.name);
+          writeTransformed(entrySrc, entryDest);
+        }
+      }
+
+      if (isSingleMultiFundRoot) {
+        copySingleMultiFundSharedInto(path.join(destDir, "dialog"));
+        copySingleMultiFundSharedInto(path.join(destDir, "form"));
+      } else if (isSingleMultiFundDialog) {
+        copySingleMultiFundSharedInto(destDir);
+      } else if (isSingleMultiFundForm) {
+        copySingleMultiFundSharedInto(destDir);
+      }
+    } catch (e) {
+      console.warn(
+        "⚠️  Failed to materialize shared single-multi-release fund-escrow files:",
+        e?.message || e
+      );
+    }
+
     // If adding the whole single-release bundle, materialize all shared files
     try {
       if (name === "escrows/single-release") {
@@ -938,6 +1065,48 @@ function copyTemplate(name, { uiBase, shouldInstall = false } = {}) {
     } catch (e) {
       console.warn(
         "⚠️  Failed to materialize shared files for multi-release bundle:",
+        e?.message || e
+      );
+    }
+
+    // If adding the whole single-multi-release bundle, materialize all shared files
+    try {
+      if (name === "escrows/single-multi-release") {
+        const modules = [
+          "approve-milestone",
+          "change-milestone-status",
+          "fund-escrow",
+        ];
+
+        for (const mod of modules) {
+          const srcSharedDir = path.join(
+            TEMPLATES_DIR,
+            "escrows",
+            "single-multi-release",
+            mod,
+            "shared"
+          );
+          if (!fs.existsSync(srcSharedDir)) continue;
+
+          const targets = [
+            path.join(destDir, mod, "dialog"),
+            path.join(destDir, mod, "form"),
+          ];
+
+          const entries = fs.readdirSync(srcSharedDir, { withFileTypes: true });
+          for (const entry of entries) {
+            if (!/\.(tsx?|jsx?)$/i.test(entry.name)) continue;
+            const entrySrc = path.join(srcSharedDir, entry.name);
+            for (const t of targets) {
+              const entryDest = path.join(t, entry.name);
+              writeTransformed(entrySrc, entryDest);
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.warn(
+        "⚠️  Failed to materialize shared files for single-multi-release bundle:",
         e?.message || e
       );
     }
@@ -1027,6 +1196,49 @@ function copyTemplate(name, { uiBase, shouldInstall = false } = {}) {
     } catch (e) {
       console.warn(
         "⚠️  Failed to materialize shared files for escrows root (multi-release):",
+        e?.message || e
+      );
+    }
+
+    // If adding the root escrows bundle, also materialize single-multi-release shared files
+    try {
+      if (name === "escrows") {
+        const modules = [
+          "approve-milestone",
+          "change-milestone-status",
+          "fund-escrow",
+        ];
+
+        const baseTarget = path.join(destDir, "single-multi-release");
+        for (const mod of modules) {
+          const srcSharedDir = path.join(
+            TEMPLATES_DIR,
+            "escrows",
+            "single-multi-release",
+            mod,
+            "shared"
+          );
+          if (!fs.existsSync(srcSharedDir)) continue;
+
+          const targets = [
+            path.join(baseTarget, mod, "dialog"),
+            path.join(baseTarget, mod, "form"),
+          ];
+
+          const entries = fs.readdirSync(srcSharedDir, { withFileTypes: true });
+          for (const entry of entries) {
+            if (!/\.(tsx?|jsx?)$/i.test(entry.name)) continue;
+            const entrySrc = path.join(srcSharedDir, entry.name);
+            for (const t of targets) {
+              const entryDest = path.join(t, entry.name);
+              writeTransformed(entrySrc, entryDest);
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.warn(
+        "⚠️  Failed to materialize shared files for escrows root (single-multi-release):",
         e?.message || e
       );
     }
@@ -1593,5 +1805,27 @@ if (args[0] === "init") {
   --- Dispute escrow ---
   - trustless-work add escrows/single-release/dispute-escrow
   - trustless-work add escrows/single-release/dispute-escrow/button
+  
+  ----------------------
+  --- SINGLE-MULTI-RELEASE ---
+  trustless-work add escrows/single-multi-release
+  
+  --- Approve milestone ---
+  - trustless-work add escrows/single-multi-release/approve-milestone
+  - trustless-work add escrows/single-multi-release/approve-milestone/form
+  - trustless-work add escrows/single-multi-release/approve-milestone/button
+  - trustless-work add escrows/single-multi-release/approve-milestone/dialog
+  
+  --- Change milestone status ---
+  - trustless-work add escrows/single-multi-release/change-milestone-status
+  - trustless-work add escrows/single-multi-release/change-milestone-status/form
+  - trustless-work add escrows/single-multi-release/change-milestone-status/button
+  - trustless-work add escrows/single-multi-release/change-milestone-status/dialog
+  
+  --- Fund escrow ---
+  - trustless-work add escrows/single-multi-release/fund-escrow
+  - trustless-work add escrows/single-multi-release/fund-escrow/form
+  - trustless-work add escrows/single-multi-release/fund-escrow/button
+  - trustless-work add escrows/single-multi-release/fund-escrow/dialog
   `);
 }
