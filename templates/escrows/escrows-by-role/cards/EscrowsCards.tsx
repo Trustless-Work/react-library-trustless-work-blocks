@@ -562,5 +562,3 @@ export const EscrowsByRoleCards = () => {
     </>
   );
 };
-
-export default React.memo(EscrowsByRoleCards);
