@@ -128,12 +128,15 @@ export const Actions = ({
           {/* {shouldShowEditButton && <UpdateEscrowDialog />} */}
 
           {/* Works only with single-release escrows */}
+          {/* Only appears if the escrow has balance */}
           {/* {shouldShowDisputeButton && <DisputeEscrowButton />} */}
 
           {/* Works only with single-release escrows */}
+          {/* Only appears if the escrow is disputed */}
           {/* {shouldShowResolveButton && <ResolveDisputeDialog />} */}
 
           {/* Works only with single-release escrows */}
+          {/* Only appears if all the milestones are approved */}
           {/* {shouldShowReleaseFundsButton && <ReleaseEscrowButton />} */}
         </div>
       )}
