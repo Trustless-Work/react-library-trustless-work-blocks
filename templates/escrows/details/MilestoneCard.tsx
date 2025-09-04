@@ -141,7 +141,7 @@ const MilestoneCardComponent = ({
       buttons
         .push
         // You can add the button here, using the button from the blocks. This button is conditional based on the milestone status and the user roles. Works only with multi-release escrows.
-        // <ReleaseEscrowButton
+        // <ReleaseMilestoneButton
         //   key={`release-${milestoneIndex}`}
         //   milestoneIndex={milestoneIndex}
         // />
@@ -159,7 +159,7 @@ const MilestoneCardComponent = ({
       buttons
         .push
         // You can add the button here, using the button from the blocks. This button is conditional based on the milestone status and the user roles. Works only with multi-release escrows.
-        // <DisputeEscrowButton
+        // <DisputeMilestoneButton
         //   key={`dispute-${milestoneIndex}`}
         //   milestoneIndex={milestoneIndex}
         // />

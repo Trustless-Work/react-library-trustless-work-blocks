@@ -3,7 +3,7 @@ import { Button } from "__UI_BASE__/button";
 import { useEscrowsMutations } from "@/components/tw-blocks/tanstack/useEscrowsMutations";
 import { useWalletContext } from "@/components/tw-blocks/wallet-kit/WalletProvider";
 import {
-  MultiReleaseReleaseFundsPayload,
+  MultiReleaseStartDisputePayload,
   MultiReleaseMilestone,
 } from "@trustless-work/escrow/types";
 import { toast } from "sonner";
@@ -12,21 +12,17 @@ import {
   handleError,
 } from "@/components/tw-blocks/handle-errors/handle";
 import { useEscrowContext } from "@/components/tw-blocks/providers/EscrowProvider";
-import { useEscrowDialogs } from "@/components/tw-blocks/providers/EscrowDialogsProvider";
-import { useEscrowAmountContext } from "@/components/tw-blocks/providers/EscrowAmountProvider";
 import { Loader2 } from "lucide-react";
 
-type ReleaseEscrowButtonProps = {
+type DisputeMilestoneButtonProps = {
   milestoneIndex: number | string;
 };
 
-export const ReleaseEscrowButton = ({
+export const DisputeMilestoneButton = ({
   milestoneIndex,
-}: ReleaseEscrowButtonProps) => {
-  const { releaseFunds } = useEscrowsMutations();
+}: DisputeMilestoneButtonProps) => {
+  const { startDispute } = useEscrowsMutations();
   const { selectedEscrow, updateEscrow } = useEscrowContext();
-  const dialogStates = useEscrowDialogs();
-  const { setAmounts } = useEscrowAmountContext();
   const { walletAddress } = useWalletContext();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
@@ -35,40 +31,30 @@ export const ReleaseEscrowButton = ({
       setIsSubmitting(true);
 
       /**
-       * Create the payload for the release escrow mutation
+       * Create the payload for the dispute escrow mutation
        *
-       * @returns The payload for the release escrow mutation
+       * @returns The payload for the dispute escrow mutation
        */
-      const payload: MultiReleaseReleaseFundsPayload = {
+      const payload: MultiReleaseStartDisputePayload = {
         contractId: selectedEscrow?.contractId || "",
-        releaseSigner: walletAddress || "",
+        signer: walletAddress || "",
         milestoneIndex: String(milestoneIndex),
       };
 
       /**
-       * Call the release escrow mutation
+       * Call the dispute escrow mutation
        *
-       * @param payload - The payload for the release escrow mutation
+       * @param payload - The payload for the dispute escrow mutation
        * @param type - The type of the escrow
        * @param address - The address of the escrow
        */
-      await releaseFunds.mutateAsync({
+      await startDispute.mutateAsync({
         payload,
         type: "multi-release",
         address: walletAddress || "",
       });
 
-      toast.success("Escrow released successfully");
-
-      // Ensure amounts are up to date for the success dialog
-      if (selectedEscrow) {
-        const milestone = selectedEscrow.milestones?.[Number(milestoneIndex)];
-        const releasedAmount = Number(
-          (milestone as MultiReleaseMilestone | undefined)?.amount || 0
-        );
-        const platformFee = Number(selectedEscrow.platformFee || 0);
-        setAmounts(releasedAmount, platformFee);
-      }
+      toast.success("Milestone disputed successfully");
 
       updateEscrow({
         ...selectedEscrow,
@@ -78,17 +64,13 @@ export const ReleaseEscrowButton = ({
               ...milestone,
               flags: {
                 ...(milestone as MultiReleaseMilestone).flags,
-                released: true,
+                disputed: true,
               },
             };
           }
           return milestone;
         }),
-        balance: (selectedEscrow?.balance || 0) - (selectedEscrow?.amount || 0),
       });
-
-      // Open success dialog
-      dialogStates.successRelease.setIsOpen(true);
     } catch (error) {
       toast.error(handleError(error as ErrorResponse).message);
     } finally {
@@ -99,17 +81,17 @@ export const ReleaseEscrowButton = ({
   return (
     <Button
       type="button"
-      disabled={isSubmitting}
+      disabled={isSubmitting || !selectedEscrow?.balance}
       onClick={handleClick}
       className="cursor-pointer w-full"
     >
       {isSubmitting ? (
         <div className="flex items-center">
           <Loader2 className="h-5 w-5 animate-spin" />
-          <span className="ml-2">Releasing...</span>
+          <span className="ml-2">Disputing...</span>
         </div>
       ) : (
-        "Release Milestone"
+        "Dispute Milestone"
       )}
     </Button>
   );
