@@ -10,7 +10,7 @@ import {
 import { Input } from "__UI_BASE__/input";
 import { Textarea } from "__UI_BASE__/textarea";
 import { Button } from "__UI_BASE__/button";
-import { useChangeMilestoneStatus } from "../useChangeMilestoneStatus";
+import { useChangeMilestoneStatus } from "./useChangeMilestoneStatus";
 import { Loader2 } from "lucide-react";
 import { useEscrowContext } from "@/components/tw-blocks/providers/EscrowProvider";
 import {

@@ -17,7 +17,7 @@ import {
   DialogTrigger,
 } from "__UI_BASE__/dialog";
 import { Loader2 } from "lucide-react";
-import { useFundEscrow } from "../useFundEscrow";
+import { useFundEscrow } from "./useFundEscrow";
 
 export const FundEscrowDialog = () => {
   const { form, handleSubmit, isSubmitting } = useFundEscrow();

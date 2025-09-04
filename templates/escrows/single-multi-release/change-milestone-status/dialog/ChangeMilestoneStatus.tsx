@@ -18,7 +18,7 @@ import {
   DialogTrigger,
 } from "__UI_BASE__/dialog";
 import { Loader2 } from "lucide-react";
-import { useChangeMilestoneStatus } from "../useChangeMilestoneStatus";
+import { useChangeMilestoneStatus } from "./useChangeMilestoneStatus";
 import { useEscrowContext } from "@/components/tw-blocks/providers/EscrowProvider";
 import {
   Select,
