@@ -814,6 +814,49 @@ function copyTemplate(name, { uiBase, shouldInstall = false } = {}) {
       );
     }
 
+    // Post-copy: materialize shared files for multi-release withdraw-remaining-funds
+    try {
+      const isMultiWithdrawRoot =
+        name === "escrows/multi-release/withdraw-remaining-funds";
+      const isMultiWithdrawDialog =
+        name === "escrows/multi-release/withdraw-remaining-funds/dialog";
+      const isMultiWithdrawForm =
+        name === "escrows/multi-release/withdraw-remaining-funds/form";
+
+      const srcSharedDir = path.join(
+        TEMPLATES_DIR,
+        "escrows",
+        "multi-release",
+        "withdraw-remaining-funds",
+        "shared"
+      );
+
+      function copyMultiWithdrawSharedInto(targetDir) {
+        if (!fs.existsSync(srcSharedDir)) return;
+        const entries = fs.readdirSync(srcSharedDir, { withFileTypes: true });
+        for (const entry of entries) {
+          if (!/\.(tsx?|jsx?)$/i.test(entry.name)) continue;
+          const entrySrc = path.join(srcSharedDir, entry.name);
+          const entryDest = path.join(targetDir, entry.name);
+          writeTransformed(entrySrc, entryDest);
+        }
+      }
+
+      if (isMultiWithdrawRoot) {
+        copyMultiWithdrawSharedInto(path.join(destDir, "dialog"));
+        copyMultiWithdrawSharedInto(path.join(destDir, "form"));
+      } else if (isMultiWithdrawDialog) {
+        copyMultiWithdrawSharedInto(destDir);
+      } else if (isMultiWithdrawForm) {
+        copyMultiWithdrawSharedInto(destDir);
+      }
+    } catch (e) {
+      console.warn(
+        "⚠️  Failed to materialize shared multi-release withdraw-remaining-funds files:",
+        e?.message || e
+      );
+    }
+
     try {
       const isMultiUpdateRoot = name === "escrows/multi-release/update-escrow";
       const isMultiUpdateDialog =
@@ -1034,6 +1077,7 @@ function copyTemplate(name, { uiBase, shouldInstall = false } = {}) {
           "initialize-escrow",
           "resolve-dispute",
           "update-escrow",
+          "withdraw-remaining-funds",
         ];
 
         for (const mod of modules) {
@@ -1164,6 +1208,7 @@ function copyTemplate(name, { uiBase, shouldInstall = false } = {}) {
           "initialize-escrow",
           "resolve-dispute",
           "update-escrow",
+          "withdraw-remaining-funds",
         ];
 
         const baseTarget = path.join(destDir, "multi-release");
@@ -1804,6 +1849,12 @@ if (args[0] === "init") {
   - trustless-work add escrows/multi-release/update-escrow
   - trustless-work add escrows/multi-release/update-escrow/form
   - trustless-work add escrows/multi-release/update-escrow/dialog
+
+  --- Withdraw remaining funds ---
+  - trustless-work add escrows/multi-release/withdraw-remaining-funds
+  - trustless-work add escrows/multi-release/withdraw-remaining-funds/form
+  - trustless-work add escrows/multi-release/withdraw-remaining-funds/button
+  - trustless-work add escrows/multi-release/withdraw-remaining-funds/dialog
   
   --- Release escrow ---
   - trustless-work add escrows/multi-release/release-milestone

@@ -23,6 +23,8 @@ import {
   SingleReleaseReleaseFundsPayload,
   MultiReleaseResolveDisputePayload,
   SingleReleaseResolveDisputePayload,
+  WithdrawRemainingFundsPayload,
+  useWithdrawRemainingFunds,
 } from "@trustless-work/escrow";
 import { signTransaction } from "../wallet-kit/wallet-kit";
 
@@ -49,6 +51,7 @@ export const useEscrowsMutations = () => {
   const { startDispute } = useStartDispute();
   const { releaseFunds } = useReleaseFunds();
   const { resolveDispute } = useResolveDispute();
+  const { withdrawRemainingFunds } = useWithdrawRemainingFunds();
 
   /**
    * Deploy Escrow
@@ -434,6 +437,55 @@ export const useEscrowsMutations = () => {
     },
   });
 
+  /**
+   * Withdraw Remaining Funds
+   */
+  const withdrawRemainingFundsMutation = useMutation({
+    mutationFn: async ({
+      payload,
+      type,
+      address,
+    }: {
+      payload: WithdrawRemainingFundsPayload;
+      type: EscrowType;
+      address: string;
+    }) => {
+      const { unsignedTransaction } = await withdrawRemainingFunds(
+        payload,
+        type
+      );
+
+      if (!unsignedTransaction) {
+        throw new Error(
+          "Unsigned transaction is missing from withdrawRemainingFunds response."
+        );
+      }
+
+      const signedTxXdr = await signTransaction({
+        unsignedTransaction,
+        address,
+      });
+
+      if (!signedTxXdr) {
+        throw new Error("Signed transaction is missing.");
+      }
+
+      const response = await sendTransaction(signedTxXdr);
+
+      if (response.status !== "SUCCESS") {
+        throw new Error("Transaction failed to send");
+      }
+
+      return response;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["escrows"] });
+    },
+    onError: (error) => {
+      console.error(error);
+    },
+  });
+
   return {
     deployEscrow: deployEscrowMutation,
     updateEscrow: updateEscrowMutation,
@@ -443,5 +495,6 @@ export const useEscrowsMutations = () => {
     startDispute: startDisputeMutation,
     releaseFunds: releaseFundsMutation,
     resolveDispute: resolveDisputeMutation,
+    withdrawRemainingFunds: withdrawRemainingFundsMutation,
   };
 };
