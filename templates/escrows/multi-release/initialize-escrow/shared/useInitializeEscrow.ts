@@ -37,7 +37,6 @@ export function useInitializeEscrow() {
       receiverMemo: "",
       trustline: {
         address: "",
-        decimals: 10000000,
       },
       roles: {
         approver: "",
