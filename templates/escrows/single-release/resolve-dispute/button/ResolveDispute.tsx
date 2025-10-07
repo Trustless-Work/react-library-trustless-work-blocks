@@ -11,14 +11,14 @@ import {
 import { useEscrowContext } from "@/components/tw-blocks/providers/EscrowProvider";
 import { Loader2 } from "lucide-react";
 
+type Distribution = { address: string; amount: number };
+
 type ResolveDisputeButtonProps = {
-  approverFunds: number;
-  receiverFunds: number;
+  distributions: Distribution[];
 };
 
 export const ResolveDisputeButton = ({
-  approverFunds,
-  receiverFunds,
+  distributions,
 }: ResolveDisputeButtonProps) => {
   const { resolveDispute } = useEscrowsMutations();
   const { selectedEscrow, updateEscrow } = useEscrowContext();
@@ -27,42 +27,27 @@ export const ResolveDisputeButton = ({
 
   async function handleClick() {
     try {
-      if (
-        approverFunds == null ||
-        Number.isNaN(approverFunds) ||
-        receiverFunds == null ||
-        Number.isNaN(receiverFunds)
-      ) {
-        toast.error("Both amounts are required");
+      if (!distributions || distributions.length < 2) {
+        toast.error("Provide at least two distributions");
         return;
       }
 
-      if (approverFunds < 0 || receiverFunds < 0) {
-        toast.error("Amounts must be >= 0");
+      const hasInvalid = distributions.some(
+        (d) => !d.address || Number.isNaN(d.amount) || d.amount < 0
+      );
+      if (hasInvalid) {
+        toast.error("Invalid distributions");
         return;
       }
 
       setIsSubmitting(true);
 
-      /**
-       * Create the payload for the resolve dispute mutation
-       *
-       * @returns The payload for the resolve dispute mutation
-       */
       const payload: SingleReleaseResolveDisputePayload = {
         contractId: selectedEscrow?.contractId || "",
         disputeResolver: walletAddress || "",
-        approverFunds: Number(approverFunds),
-        receiverFunds: Number(receiverFunds),
+        distributions: distributions as [Distribution],
       };
 
-      /**
-       * Call the resolve dispute mutation
-       *
-       * @param payload - The payload for the resolve dispute mutation
-       * @param type - The type of the escrow
-       * @param address - The address of the escrow
-       */
       await resolveDispute.mutateAsync({
         payload,
         type: "single-release",
@@ -70,6 +55,10 @@ export const ResolveDisputeButton = ({
       });
 
       toast.success("Dispute resolved successfully");
+      const sumDistributed = distributions.reduce(
+        (acc, d) => acc + Number(d.amount || 0),
+        0
+      );
       updateEscrow({
         ...selectedEscrow,
         flags: {
@@ -77,7 +66,7 @@ export const ResolveDisputeButton = ({
           disputed: false,
           resolved: true,
         },
-        balance: selectedEscrow?.balance || 0,
+        balance: (selectedEscrow?.balance || 0) - sumDistributed || 0,
       });
     } catch (error) {
       toast.error(handleError(error as ErrorResponse).message);

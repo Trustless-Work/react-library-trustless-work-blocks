@@ -16,13 +16,27 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "__UI_BASE__/dialog";
-import { Loader2 } from "lucide-react";
+import { Loader2, Trash2 } from "lucide-react";
 import { useResolveDispute } from "./useResolveDispute";
 import { useEscrowContext } from "@/components/tw-blocks/providers/EscrowProvider";
 import { formatCurrency } from "../../../../helpers/format.helper";
 
 export const ResolveDisputeDialog = () => {
-  const { form, handleSubmit, isSubmitting } = useResolveDispute();
+  const {
+    form,
+    handleSubmit,
+    isSubmitting,
+    distributions,
+    handleAddDistribution,
+    handleRemoveDistribution,
+    handleDistributionAddressChange,
+    handleDistributionAmountChange,
+    isAnyDistributionEmpty,
+    allowedAmount,
+    distributedSum,
+    isExactMatch,
+    difference,
+  } = useResolveDispute();
   const { selectedEscrow } = useEscrowContext();
 
   return (
@@ -32,58 +46,116 @@ export const ResolveDisputeDialog = () => {
           Resolve Dispute
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="!w-full sm:!max-w-3xl max-h-[95vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Resolve Dispute</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={handleSubmit}>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="approverFunds"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Approver Funds</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="text"
-                        inputMode="decimal"
-                        placeholder="Enter approver funds"
-                        value={field.value as unknown as string}
-                        onChange={(e) => field.onChange(e.target.value)}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <FormLabel className="flex items-center my-4">
+              Distributions<span className="text-destructive ml-1">*</span>
+            </FormLabel>
 
-              <FormField
-                control={form.control}
-                name="receiverFunds"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Receiver Funds</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="text"
-                        inputMode="decimal"
-                        placeholder="Enter receiver funds"
-                        value={field.value as unknown as string}
-                        onChange={(e) => field.onChange(e.target.value)}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            {distributions.map((d, idx) => (
+              <div
+                key={`dist-${idx}`}
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1fr_minmax(140px,220px)_auto] gap-3 sm:gap-4 items-end mb-2"
+              >
+                <FormField
+                  control={form.control}
+                  name={`distributions.${idx}.address` as const}
+                  render={() => (
+                    <FormItem className="sm:col-span-2 lg:col-span-1">
+                      <FormLabel>Address</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="text"
+                          placeholder="Receiver address"
+                          value={d.address}
+                          onChange={(e) =>
+                            handleDistributionAddressChange(idx, e.target.value)
+                          }
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name={`distributions.${idx}.amount` as const}
+                  render={() => (
+                    <FormItem>
+                      <FormLabel>Amount</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="text"
+                          inputMode="decimal"
+                          placeholder="0.00"
+                          value={(d.amount as string) ?? ""}
+                          onChange={(e) =>
+                            handleDistributionAmountChange(idx, e)
+                          }
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <Button
+                  type="button"
+                  onClick={() => handleRemoveDistribution(idx)}
+                  className="justify-self-end self-end p-2 bg-transparent text-destructive rounded-md border-none shadow-none hover:bg-transparent hover:shadow-none hover:text-destructive focus:ring-0 active:ring-0"
+                  disabled={distributions.length <= 2}
+                >
+                  <Trash2 className="h-5 w-5" />
+                </Button>
+              </div>
+            ))}
+
+            <div className="flex justify-between items-center mt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleAddDistribution}
+                disabled={isAnyDistributionEmpty}
+                className="cursor-pointer"
+              >
+                Add Item
+              </Button>
+
+              <div className="flex items-center gap-4">
+                <div className="text-xs text-muted-foreground">
+                  <p>
+                    <span className="font-bold">Total Amount: </span>
+                    {distributedSum.toFixed(2)} / {allowedAmount.toFixed(2)}
+                  </p>
+                  {!isExactMatch && (
+                    <p className="text-destructive">
+                      <span className="font-bold">Difference: </span>
+                      {difference.toFixed(2)}
+                    </p>
+                  )}
+                </div>
+
+                <p className="text-xs text-muted-foreground">
+                  <span className="font-bold">Total Balance: </span>
+                  {formatCurrency(
+                    selectedEscrow?.balance || 0,
+                    selectedEscrow?.trustline.name || ""
+                  )}
+                </p>
+              </div>
             </div>
 
-            <div className="mt-4 flex justify-between items-center">
+            <div className="mt-4 flex justify-start items-center">
               <Button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={
+                  isSubmitting || isAnyDistributionEmpty || !isExactMatch
+                }
                 className="cursor-pointer"
               >
                 {isSubmitting ? (
@@ -95,22 +167,6 @@ export const ResolveDisputeDialog = () => {
                   "Resolve"
                 )}
               </Button>
-
-              <p className="text-xs text-muted-foreground">
-                <span className="font-bold">Total Amount: </span>
-                {formatCurrency(
-                  selectedEscrow?.amount || 0,
-                  selectedEscrow?.trustline.name || ""
-                )}
-              </p>
-
-              <p className="text-xs text-muted-foreground">
-                <span className="font-bold">Total Balance: </span>
-                {formatCurrency(
-                  selectedEscrow?.balance || 0,
-                  selectedEscrow?.trustline.name || ""
-                )}
-              </p>
             </div>
           </form>
         </Form>

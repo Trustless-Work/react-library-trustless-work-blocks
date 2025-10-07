@@ -15,14 +15,12 @@ import { useEscrowContext } from "@/components/tw-blocks/providers/EscrowProvide
 import { Loader2 } from "lucide-react";
 
 type ResolveDisputeButtonProps = {
-  approverFunds: number;
-  receiverFunds: number;
+  distributions: { address: string; amount: number }[];
   milestoneIndex: number | string;
 };
 
 export const ResolveDisputeButton = ({
-  approverFunds,
-  receiverFunds,
+  distributions,
   milestoneIndex,
 }: ResolveDisputeButtonProps) => {
   const { resolveDispute } = useEscrowsMutations();
@@ -32,18 +30,16 @@ export const ResolveDisputeButton = ({
 
   async function handleClick() {
     try {
-      if (
-        approverFunds == null ||
-        Number.isNaN(approverFunds) ||
-        receiverFunds == null ||
-        Number.isNaN(receiverFunds)
-      ) {
-        toast.error("Both amounts are required");
+      if (!distributions || distributions.length < 2) {
+        toast.error("Provide at least two distributions");
         return;
       }
 
-      if (approverFunds < 0 || receiverFunds < 0) {
-        toast.error("Amounts must be >= 0");
+      const hasInvalid = distributions.some(
+        (d) => !d.address || Number.isNaN(d.amount) || d.amount < 0
+      );
+      if (hasInvalid) {
+        toast.error("Invalid distributions");
         return;
       }
 
@@ -57,8 +53,7 @@ export const ResolveDisputeButton = ({
       const payload: MultiReleaseResolveDisputePayload = {
         contractId: selectedEscrow?.contractId || "",
         disputeResolver: walletAddress || "",
-        approverFunds: Number(approverFunds),
-        receiverFunds: Number(receiverFunds),
+        distributions: distributions as [{ address: string; amount: number }],
         milestoneIndex: String(milestoneIndex),
       };
 
@@ -92,8 +87,8 @@ export const ResolveDisputeButton = ({
           return milestone;
         }),
         balance:
-          selectedEscrow?.balance ||
-          Number(approverFunds) + Number(receiverFunds),
+          (selectedEscrow?.balance || 0) -
+          distributions.reduce((acc, d) => acc + Number(d.amount || 0), 0),
       });
     } catch (error) {
       toast.error(handleError(error as ErrorResponse).message);
