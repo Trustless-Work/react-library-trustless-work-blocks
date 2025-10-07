@@ -1863,6 +1863,12 @@ if (args[0] === "init") {
   --- Dispute escrow ---
   - trustless-work add escrows/multi-release/dispute-milestone
   - trustless-work add escrows/multi-release/dispute-milestone/button
+
+  --- Withdraw remaining funds ---
+  - trustless-work add escrows/multi-release/withdraw-remaining-funds
+  - trustless-work add escrows/multi-release/withdraw-remaining-funds/form
+  - trustless-work add escrows/multi-release/withdraw-remaining-funds/button
+  - trustless-work add escrows/multi-release/withdraw-remaining-funds/dialog
   
   ----------------------
   --- SINGLE-MULTI-RELEASE -> Works with both types of escrows ---
