@@ -44,7 +44,6 @@ export function useUpdateEscrow() {
         : "",
       trustline: {
         address: selectedEscrow?.trustline?.address || "",
-        decimals: 10000000,
       },
       roles: {
         approver: selectedEscrow?.roles?.approver || "",
@@ -82,7 +81,6 @@ export function useUpdateEscrow() {
         : "",
       trustline: {
         address: selectedEscrow?.trustline?.address || "",
-        decimals: 10000000,
       },
       roles: {
         approver: selectedEscrow?.roles?.approver || "",
@@ -171,7 +169,6 @@ export function useUpdateEscrow() {
             : undefined,
           trustline: {
             address: payload.trustline.address,
-            decimals: 10000000,
           },
           roles: payload.roles,
           milestones: payload.milestones,
@@ -202,7 +199,6 @@ export function useUpdateEscrow() {
             (selectedEscrow.trustline?.address as string) ||
             "",
           address: finalPayload.escrow.trustline.address,
-          decimals: finalPayload.escrow.trustline.decimals,
         },
       };
 

@@ -82,7 +82,6 @@ export function useInitializeEscrow() {
       receiverMemo: "123",
       trustline: {
         address: usdc?.value || "",
-        decimals: 10000000,
       },
       roles: {
         approver: walletAddress || "",
