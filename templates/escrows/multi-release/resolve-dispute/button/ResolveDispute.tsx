@@ -30,11 +30,6 @@ export const ResolveDisputeButton = ({
 
   async function handleClick() {
     try {
-      if (!distributions || distributions.length < 2) {
-        toast.error("Provide at least two distributions");
-        return;
-      }
-
       const hasInvalid = distributions.some(
         (d) => !d.address || Number.isNaN(d.amount) || d.amount < 0
       );

@@ -113,11 +113,28 @@ export const Actions = ({
     userRolesInEscrow.includes("releaseSigner") &&
     !selectedEscrow.flags?.released;
 
+  const shouldShowWithdrawRemaining = (() => {
+    if (selectedEscrow.type !== "multi-release") return false;
+    if (!userRolesInEscrow.includes("disputeResolver")) return false;
+    if ((selectedEscrow.balance ?? 0) === 0) return false;
+    const milestones = (selectedEscrow.milestones || []) as Array<{
+      flags?: { resolved?: boolean; released?: boolean; disputed?: boolean };
+    }>;
+    return (
+      milestones.length > 0 &&
+      milestones.every((m) => {
+        const f = m.flags || {};
+        return !!(f.resolved || f.released || f.disputed);
+      })
+    );
+  })();
+
   const hasConditionalButtons =
     shouldShowEditButton ||
     shouldShowDisputeButton ||
     shouldShowResolveButton ||
-    shouldShowReleaseFundsButton;
+    shouldShowReleaseFundsButton ||
+    shouldShowWithdrawRemaining;
 
   return (
     <div className="flex items-start justify-start flex-col gap-2 w-full">
@@ -138,6 +155,9 @@ export const Actions = ({
           {/* Works only with single-release escrows */}
           {/* Only appears if all the milestones are approved */}
           {/* {shouldShowReleaseFundsButton && <ReleaseEscrowButton />} */}
+
+          {/* Multi-release: Withdraw Remaining Funds */}
+          {/* {shouldShowWithdrawRemaining && <WithdrawRemainingFundsDialog />} */}
         </div>
       )}
 
