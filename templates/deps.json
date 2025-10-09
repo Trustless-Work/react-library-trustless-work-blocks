@@ -14,7 +14,8 @@
     "@creit.tech/stellar-wallets-kit": "^1.8.0",
     "axios": "^1.7.9",
     "@tanstack/react-table": "^8.21.3",
-    "react-day-picker": "^9.5.0"
+    "react-day-picker": "^9.5.0",
+    "recharts": "^2.13.3"
   },
   "devDependencies": {
     "postcss": "^8",

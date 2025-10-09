@@ -1580,7 +1580,7 @@ if (args[0] === "init") {
   }
 
   const addShadcn = await promptYesNo(
-    "Add shadcn components (button, input, form, card, sonner, checkbox, dialog, textarea, sonner, select, table, calendar, popover, separator, calendar-05, badge, sheet, tabs, avatar, tooltip, progress)?",
+    "Add shadcn components (button, input, form, card, sonner, checkbox, dialog, textarea, sonner, select, table, calendar, popover, separator, calendar-05, badge, sheet, tabs, avatar, tooltip, progress, chart)?",
     true
   );
   if (addShadcn) {
@@ -1609,6 +1609,7 @@ if (args[0] === "init") {
         "avatar",
         "tooltip",
         "progress",
+        "chart",
       ]);
     });
   } else {
@@ -1621,7 +1622,7 @@ if (args[0] === "init") {
   }
   const meta = JSON.parse(fs.readFileSync(GLOBAL_DEPS_FILE, "utf8"));
   const installLibs = await promptYesNo(
-    "Install (react-hook-form, @tanstack/react-query, @tanstack/react-query-devtools, @trustless-work/escrow, @hookform/resolvers, axios, @creit.tech/stellar-wallets-kit, react-day-picker & zod) dependencies now?",
+    "Install (react-hook-form, @tanstack/react-query, @tanstack/react-query-devtools, @trustless-work/escrow, @hookform/resolvers, axios, @creit.tech/stellar-wallets-kit, react-day-picker, recharts & zod) dependencies now?",
     true
   );
   if (installLibs) {
@@ -1806,6 +1807,9 @@ if (args[0] === "init") {
   
   --- Escrows ---
   trustless-work add escrows
+
+  --- Dashboard ---
+  trustless-work add dashboard
 
   --- Indicators ---
   trustless-work add escrows/indicators/balance-progress
