@@ -1810,6 +1810,7 @@ if (args[0] === "init") {
 
   --- Dashboard ---
   trustless-work add dashboard
+  trustless-work add dashboard/dashboard-01
 
   --- Indicators ---
   trustless-work add escrows/indicators/balance-progress
