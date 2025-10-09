@@ -1580,7 +1580,7 @@ if (args[0] === "init") {
   }
 
   const addShadcn = await promptYesNo(
-    "Add shadcn components (button, input, form, card, sonner, checkbox, dialog, textarea, sonner, select, table, calendar, popover, separator, calendar-05, badge, sheet, tabs, avatar, tooltip)?",
+    "Add shadcn components (button, input, form, card, sonner, checkbox, dialog, textarea, sonner, select, table, calendar, popover, separator, calendar-05, badge, sheet, tabs, avatar, tooltip, progress)?",
     true
   );
   if (addShadcn) {
@@ -1608,6 +1608,7 @@ if (args[0] === "init") {
         "tabs",
         "avatar",
         "tooltip",
+        "progress",
       ]);
     });
   } else {
@@ -1699,6 +1700,20 @@ if (args[0] === "init") {
   console.log("- " + oscHyperlink("X", "https://x.com/TrustlessWork"));
 } else if (args[0] === "add" && args[1]) {
   const flags = parseFlags(args.slice(2));
+  // Normalize common aliases (singular/plural, shorthand)
+  const normalizeTemplateName = (name) => {
+    let n = String(name).trim();
+    // singular to plural base
+    n = n.replace(/^escrow\b/, "escrows");
+    n = n.replace(/^indicator\b/, "indicators");
+    // allow nested segments singulars
+    n = n.replace(/(^|\/)escrow(\/|$)/g, "$1escrows$2");
+    n = n.replace(/(^|\/)indicator(\/|$)/g, "$1indicators$2");
+    // friendly shape variants
+    n = n.replace(/(^|\/)circle(\/|$)/g, "$1circular$2");
+    return n;
+  };
+  args[1] = normalizeTemplateName(args[1]);
   const cfgPath = path.join(PROJECT_ROOT, ".twblocks.json");
   if (!fs.existsSync(cfgPath)) {
     console.error(
@@ -1791,6 +1806,11 @@ if (args[0] === "init") {
   
   --- Escrows ---
   trustless-work add escrows
+
+  --- Indicators ---
+  trustless-work add escrows/indicators/balance-progress
+  trustless-work add escrows/indicators/balance-progress/bar
+  trustless-work add escrows/indicators/balance-progress/donut
   
   --- Escrows by role ---
   trustless-work add escrows/escrows-by-role
