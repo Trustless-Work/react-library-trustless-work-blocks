@@ -50,7 +50,7 @@ const chartConfigArea: ChartConfig = {
   },
 };
 
-export function Dashboard() {
+export const Dashboard01 = () => {
   const {
     isLoading,
     totalEscrows,
@@ -265,4 +265,4 @@ export function Dashboard() {
       </div>
     </div>
   );
-}
+};
