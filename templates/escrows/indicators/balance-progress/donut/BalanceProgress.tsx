@@ -88,7 +88,7 @@ export const BalanceProgress = ({
 
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <span className="text-2xl font-bold">{Math.round(pct)}%</span>
-                <span className="text-muted-foreground text-sm">Balance</span>
+                <span className="text-muted-foreground text-sm">Progress</span>
               </div>
             </div>
           </div>
