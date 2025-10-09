@@ -11,7 +11,7 @@ import {
 import { Separator } from "__UI_BASE__/separator";
 import { useDashboard } from "./useDashboard";
 import { formatCurrency } from "../../helpers/format.helper";
-import { Activity, Layers3, PiggyBank } from "lucide-react";
+import { Activity, Layers3, PiggyBank, CloudOff } from "lucide-react";
 import {
   AreaChart,
   Area,
@@ -29,6 +29,13 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "__UI_BASE__/chart";
+import {
+  Empty,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+  EmptyDescription,
+} from "__UI_BASE__/empty";
 
 const chartConfigBar: ChartConfig = {
   desktop: {
@@ -86,7 +93,7 @@ export const Dashboard01 = () => {
     <div className="grid gap-6">
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <Card>
+        <Card className="gap-3">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Escrows</CardTitle>
             <Layers3 className="h-4 w-4 text-muted-foreground" />
@@ -101,7 +108,7 @@ export const Dashboard01 = () => {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="gap-3">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Amount</CardTitle>
             <Activity className="h-4 w-4 text-muted-foreground" />
@@ -116,7 +123,7 @@ export const Dashboard01 = () => {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="gap-3">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Balance</CardTitle>
             <PiggyBank className="h-4 w-4 text-muted-foreground" />
@@ -137,7 +144,7 @@ export const Dashboard01 = () => {
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Bar chart: Amounts by date (shadcn pattern) */}
-        <Card>
+        <Card className="gap-3">
           <CardHeader>
             <CardTitle>Escrow Amounts</CardTitle>
             <CardDescription>Amounts by date</CardDescription>
@@ -147,26 +154,42 @@ export const Dashboard01 = () => {
               className="w-full h-56 sm:h-64 lg:h-72"
               config={chartConfigBar}
             >
-              <BarChart accessibilityLayer data={barData}>
-                <CartesianGrid vertical={false} />
-                <XAxis
-                  dataKey="month"
-                  tickLine={false}
-                  tickMargin={10}
-                  axisLine={false}
-                  tickFormatter={(value) =>
-                    new Date(String(value)).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                    })
-                  }
-                />
-                <ChartTooltip
-                  cursor={false}
-                  content={<ChartTooltipContent hideLabel />}
-                />
-                <Bar dataKey="desktop" fill="var(--color-desktop)" radius={8} />
-              </BarChart>
+              {barData.length > 0 ? (
+                <BarChart accessibilityLayer data={barData}>
+                  <CartesianGrid vertical={false} />
+                  <XAxis
+                    dataKey="month"
+                    tickLine={false}
+                    tickMargin={10}
+                    axisLine={false}
+                    tickFormatter={(value) =>
+                      new Date(String(value)).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                      })
+                    }
+                  />
+                  <ChartTooltip
+                    cursor={false}
+                    content={<ChartTooltipContent hideLabel />}
+                  />
+                  <Bar
+                    dataKey="desktop"
+                    fill="var(--color-desktop)"
+                    radius={8}
+                  />
+                </BarChart>
+              ) : (
+                <Empty className="border border-dashed">
+                  <EmptyHeader>
+                    <EmptyMedia variant="icon">
+                      <CloudOff />
+                    </EmptyMedia>
+                    <EmptyTitle>No data</EmptyTitle>
+                    <EmptyDescription>No Data Available</EmptyDescription>
+                  </EmptyHeader>
+                </Empty>
+              )}
             </ChartContainer>
           </CardContent>
         </Card>
@@ -182,22 +205,34 @@ export const Dashboard01 = () => {
               config={chartConfigDonut}
               className="w-full h-56 sm:h-64 lg:h-72"
             >
-              <PieChart>
-                <ChartTooltip
-                  cursor={false}
-                  content={<ChartTooltipContent hideLabel />}
-                />
-                <Pie
-                  data={donutData}
-                  dataKey="visitors"
-                  nameKey="browser"
-                  innerRadius={60}
-                >
-                  {donutData.map((slice, idx) => (
-                    <Cell key={`cell-${idx}`} fill={slice.fill} />
-                  ))}
-                </Pie>
-              </PieChart>
+              {donutData.some((d) => Number(d.visitors) > 0) ? (
+                <PieChart>
+                  <ChartTooltip
+                    cursor={false}
+                    content={<ChartTooltipContent hideLabel />}
+                  />
+                  <Pie
+                    data={donutData}
+                    dataKey="visitors"
+                    nameKey="browser"
+                    innerRadius={60}
+                  >
+                    {donutData.map((slice, idx) => (
+                      <Cell key={`cell-${idx}`} fill={slice.fill} />
+                    ))}
+                  </Pie>
+                </PieChart>
+              ) : (
+                <Empty className="border border-dashed">
+                  <EmptyHeader>
+                    <EmptyMedia variant="icon">
+                      <CloudOff />
+                    </EmptyMedia>
+                    <EmptyTitle>No data</EmptyTitle>
+                    <EmptyDescription>No Data Available</EmptyDescription>
+                  </EmptyHeader>
+                </Empty>
+              )}
             </ChartContainer>
             <div className="mt-4 flex items-center justify-center gap-6">
               <div className="flex items-center gap-2">
@@ -229,36 +264,48 @@ export const Dashboard01 = () => {
               className="w-full h-56 sm:h-64 lg:h-72"
               config={chartConfigArea}
             >
-              <AreaChart
-                accessibilityLayer
-                data={areaData}
-                margin={{ left: 12, right: 12 }}
-              >
-                <CartesianGrid vertical={false} />
-                <XAxis
-                  dataKey="month"
-                  tickLine={false}
-                  axisLine={false}
-                  tickMargin={8}
-                  tickFormatter={(value) =>
-                    new Date(String(value)).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                    })
-                  }
-                />
-                <ChartTooltip
-                  cursor={false}
-                  content={<ChartTooltipContent indicator="line" />}
-                />
-                <Area
-                  dataKey="desktop"
-                  type="natural"
-                  fill="var(--color-desktop)"
-                  fillOpacity={0.4}
-                  stroke="var(--color-desktop)"
-                />
-              </AreaChart>
+              {areaData.length > 0 ? (
+                <AreaChart
+                  accessibilityLayer
+                  data={areaData}
+                  margin={{ left: 12, right: 12 }}
+                >
+                  <CartesianGrid vertical={false} />
+                  <XAxis
+                    dataKey="month"
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={8}
+                    tickFormatter={(value) =>
+                      new Date(String(value)).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                      })
+                    }
+                  />
+                  <ChartTooltip
+                    cursor={false}
+                    content={<ChartTooltipContent indicator="line" />}
+                  />
+                  <Area
+                    dataKey="desktop"
+                    type="natural"
+                    fill="var(--color-desktop)"
+                    fillOpacity={0.4}
+                    stroke="var(--color-desktop)"
+                  />
+                </AreaChart>
+              ) : (
+                <Empty className="border border-dashed">
+                  <EmptyHeader>
+                    <EmptyMedia variant="icon">
+                      <CloudOff />
+                    </EmptyMedia>
+                    <EmptyTitle>No data</EmptyTitle>
+                    <EmptyDescription>No Data Available</EmptyDescription>
+                  </EmptyHeader>
+                </Empty>
+              )}
             </ChartContainer>
           </CardContent>
         </Card>
