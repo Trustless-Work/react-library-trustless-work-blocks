@@ -27,10 +27,7 @@ export const useGetMultipleEscrowBalancesQuery = ({
        * @param params - The parameters for the query
        * @returns The query result
        */
-      const balances = await getMultipleBalances(
-        { addresses },
-        "multi-release"
-      );
+      const balances = await getMultipleBalances({ addresses });
 
       if (!balances) {
         throw new Error("Escrows not found");
