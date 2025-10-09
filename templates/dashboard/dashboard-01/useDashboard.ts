@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import { useWalletContext } from "../wallet-kit/WalletProvider";
-import { useEscrowsBySignerQuery } from "../tanstack/useEscrowsBySignerQuery";
+import { useWalletContext } from "../../wallet-kit/WalletProvider";
+import { useEscrowsBySignerQuery } from "../../tanstack/useEscrowsBySignerQuery";
 import type { GetEscrowsFromIndexerResponse as Escrow } from "@trustless-work/escrow/types";
 
 type AmountsByDatePoint = { date: string; amount: number };

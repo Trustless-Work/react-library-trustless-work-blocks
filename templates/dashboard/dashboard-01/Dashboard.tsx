@@ -10,7 +10,7 @@ import {
 } from "__UI_BASE__/card";
 import { Separator } from "__UI_BASE__/separator";
 import { useDashboard } from "./useDashboard";
-import { formatCurrency } from "../helpers/format.helper";
+import { formatCurrency } from "../../helpers/format.helper";
 import { Activity, Layers3, PiggyBank } from "lucide-react";
 import {
   AreaChart,
