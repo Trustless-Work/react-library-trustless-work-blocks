@@ -3,17 +3,17 @@ import * as React from "react";
 import { useGetMultipleEscrowBalancesQuery } from "@/components/tw-blocks/tanstack/useGetMultipleEscrowBalances";
 import { formatCurrency } from "@/components/tw-blocks/helpers/format.helper";
 
-type BalanceProgressProps = {
+type BalanceProgressDonutProps = {
   contractId: string;
   target: number;
   currency: string;
 };
 
-export const BalanceProgress = ({
+export const BalanceProgressDonut = ({
   contractId,
   target,
   currency,
-}: BalanceProgressProps) => {
+}: BalanceProgressDonutProps) => {
   const isContractProvided = Boolean(
     contractId && contractId.trim().length > 0
   );

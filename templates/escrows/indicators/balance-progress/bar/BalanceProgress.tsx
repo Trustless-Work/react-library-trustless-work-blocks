@@ -3,17 +3,17 @@ import { Progress } from "__UI_BASE__/progress";
 import { useGetMultipleEscrowBalancesQuery } from "@/components/tw-blocks/tanstack/useGetMultipleEscrowBalances";
 import { formatCurrency } from "@/components/tw-blocks/helpers/format.helper";
 
-type BalanceProgressProps = {
+type BalanceProgressBarProps = {
   contractId: string;
   target: number;
   currency: string;
 };
 
-export const BalanceProgress = ({
+export const BalanceProgressBar = ({
   contractId,
   target,
   currency,
-}: BalanceProgressProps) => {
+}: BalanceProgressBarProps) => {
   const isContractProvided = Boolean(
     contractId && contractId.trim().length > 0
   );
